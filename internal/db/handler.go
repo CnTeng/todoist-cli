@@ -14,7 +14,7 @@ func (db *DB) HandleResponse(resp any) error {
 	switch r := resp.(type) {
 	case *sync.SyncResponse:
 		for _, item := range r.Items {
-			if err := db.StoreItem(item); err != nil {
+			if err := db.StoreTask(item); err != nil {
 				return err
 			}
 		}

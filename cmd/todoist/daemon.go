@@ -3,10 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"net/http"
 
-	"github.com/CnTeng/todoist-api-go/sync/v9"
-	"github.com/CnTeng/todoist-cli/internal/client"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/db"
 	"github.com/urfave/cli/v3"
@@ -24,9 +21,7 @@ var daemonCmd = &cli.Command{
 			fmt.Printf("Error migrating database: %v\n", err)
 		}
 
-		sc := sync.NewClientWithHandler(http.DefaultClient, cfg.Token, db)
-		c := client.NewClient(db, sc)
-		daemon := daemon.NewDaemon("@todo.sock", c)
+		daemon := daemon.NewDaemon("@todo.sock", cfg.Token, db)
 
 		if err := daemon.Serve(context.Background()); err != nil {
 			fmt.Printf("Error starting daemon: %v\n", err)
