@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"net/http"
 
 	"github.com/CnTeng/todoist-api-go/sync/v9"
 	tcli "github.com/CnTeng/todoist-cli/internal/cli"
-	"github.com/CnTeng/todoist-cli/internal/db"
+	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
@@ -57,16 +56,12 @@ var taskAddCmd = &cli.Command{
 		},
 	},
 	Action: func(ctx context.Context, cmd *cli.Command) error {
-		db, err := db.NewDB("test/todoist.db")
+		conn, err := net.Dial("unix", "@todo.sock")
 		if err != nil {
-			fmt.Printf("Error opening database: %v\n", err)
+			fmt.Printf("Error dialing daemon: %v\n", err)
 		}
-
-		if err := db.Migrate(); err != nil {
-			fmt.Printf("Error migrating database: %v\n", err)
-		}
-
-		c := sync.NewClientWithHandler(http.DefaultClient, cfg.Token, db)
+		defer conn.Close()
+		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
 		args := &sync.ItemAddArgs{}
 		args.Content = cmd.String("content")
@@ -75,9 +70,17 @@ var taskAddCmd = &cli.Command{
 			args.Description = &description
 		}
 
-		if _, err := c.AddItem(context.Background(), args); err != nil {
-			fmt.Printf("Error adding item: %v\n", err)
+		if _, err := cli.Call(ctx, daemon.AddTask, args); err != nil {
+			fmt.Printf("Error calling add task: %v\n", err)
 		}
+
+		resp := []*model.Task{}
+		if err := cli.CallResult(ctx, daemon.GetTask, nil, &resp); err != nil {
+			fmt.Printf("Error calling taskLists: %v\n", err)
+		}
+
+		c := tcli.NewCLI(tcli.Nerd)
+		c.PrintTasks(resp)
 
 		return nil
 	},
