@@ -2,6 +2,7 @@ package daemon
 
 import (
 	"context"
+	"log"
 	"net"
 
 	"github.com/CnTeng/todoist-cli/internal/client"
@@ -32,7 +33,12 @@ func (d *Daemon) Serve(ctx context.Context) error {
 
 	svc := server.Static(handler.Map{
 		"listTasks": handler.New(d.ListTasks),
+		"sync":      handler.New(d.Sync),
 	})
 
-	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, nil)
+	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{
+		ServerOptions: &jrpc2.ServerOptions{
+			Logger: jrpc2.StdLogger(log.New(log.Writer(), "daemon: ", log.Flags())),
+		},
+	})
 }

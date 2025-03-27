@@ -12,7 +12,6 @@ import (
 	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
-	"github.com/spf13/cobra"
 	"github.com/urfave/cli/v3"
 )
 
@@ -77,7 +76,7 @@ var taskAddCmd = &cli.Command{
 		}
 
 		if _, err := c.AddItem(context.Background(), args); err != nil {
-			cobra.CheckErr(err)
+			fmt.Printf("Error adding item: %v\n", err)
 		}
 
 		return nil

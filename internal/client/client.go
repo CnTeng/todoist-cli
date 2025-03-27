@@ -10,13 +10,13 @@ import (
 
 type Client struct {
 	db *db.DB
-	sc *sync.Client
+	*sync.Client
 }
 
 func NewClient(db *db.DB, sc *sync.Client) *Client {
 	return &Client{
-		db: db,
-		sc: sc,
+		db:     db,
+		Client: sc,
 	}
 }
 
