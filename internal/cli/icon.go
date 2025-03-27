@@ -18,6 +18,9 @@ type icons struct {
 	change string
 	delete string
 
+	inbox    string
+	favorite string
+
 	progress progressIcons
 }
 
@@ -29,6 +32,9 @@ var nerdIcons = icons{
 	add:    "+",
 	change: "~",
 	delete: "-",
+
+	inbox:    "",
+	favorite: "",
 
 	progress: progressIcons{
 		none:      "─",
@@ -46,6 +52,9 @@ var textIcons = icons{
 	add:    "+",
 	change: "~",
 	delete: "-",
+
+	inbox:    "IN",
+	favorite: "*",
 
 	progress: progressIcons{
 		none:      "─",
