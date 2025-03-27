@@ -13,7 +13,7 @@ import (
 func (c *cli) PrintTasks(ts []*model.Task) {
 	tbl := table.NewTable()
 	tbl.AddHeader("ID", "  ", "Project", "Name", "Description", "Labels", "Due")
-	tbl.SetHeaderStyle(&table.CellStyle{CellAttrs: text.Colors{text.FgGreen, text.Underline}})
+	tbl.SetHeaderStyle(headerStyle)
 
 	for _, t := range ts {
 		row := []any{}
