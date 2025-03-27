@@ -27,7 +27,7 @@ var taskListCmd = &cli.Command{
 		defer conn.Close()
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
-		resp := []*model.Item{}
+		resp := []*model.Task{}
 		if err := cli.CallResult(ctx, "listTasks", nil, &resp); err != nil {
 			fmt.Printf("Error calling taskLists: %v\n", err)
 		}

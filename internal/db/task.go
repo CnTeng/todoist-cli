@@ -8,52 +8,52 @@ import (
 )
 
 const (
-	storeItemQuery = `INSERT INTO items (id, data) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET data = excluded.data`
-	getItemQuery   = `SELECT data FROM items WHERE id = ?`
-	listItemsQuery = `SELECT data FROM items`
+	storeTaskQuery = `INSERT INTO tasks (id, data) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET data = excluded.data`
+	getTaskQuery   = `SELECT data FROM tasks WHERE id = ?`
+	listTasksQuery = `SELECT data FROM tasks`
 )
 
-func (db *DB) StoreItem(item *sync.Item) error {
-	data, err := json.Marshal(item)
+func (db *DB) StoreTask(task *sync.Item) error {
+	data, err := json.Marshal(task)
 	if err != nil {
 		return err
 	}
 
-	if _, err := db.Exec(storeItemQuery, item.ID, data); err != nil {
+	if _, err := db.Exec(storeTaskQuery, task.ID, data); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (db *DB) GetTask(id string) (*model.Item, error) {
+func (db *DB) GetTask(id string) (*model.Task, error) {
 	var data []byte
-	if err := db.QueryRow(getItemQuery, id).Scan(&data); err != nil {
+	if err := db.QueryRow(getTaskQuery, id).Scan(&data); err != nil {
 		return nil, err
 	}
 
-	task := &model.Item{Item: &sync.Item{}}
-	if err := json.Unmarshal(data, task); err != nil {
+	t := &model.Task{Item: &sync.Item{}}
+	if err := json.Unmarshal(data, t); err != nil {
 		return nil, err
 	}
 
-	project, err := db.GetProject(task.ProjectID)
+	project, err := db.GetProject(t.ProjectID)
 	if err != nil {
 		return nil, err
 	}
 
-	task.Project = project.Name
+	t.Project = project.Name
 
-	return task, nil
+	return t, nil
 }
 
-func (db *DB) ListTasks() ([]*model.Item, error) {
-	rows, err := db.Query(listItemsQuery)
+func (db *DB) ListTasks() ([]*model.Task, error) {
+	rows, err := db.Query(listTasksQuery)
 	if err != nil {
 		return nil, err
 	}
 
-	ts := []*model.Item{}
+	ts := []*model.Task{}
 
 	for rows.Next() {
 		var data []byte
@@ -61,7 +61,7 @@ func (db *DB) ListTasks() ([]*model.Item, error) {
 			return nil, err
 		}
 
-		t := &model.Item{Item: &sync.Item{}}
+		t := &model.Task{Item: &sync.Item{}}
 		if err := json.Unmarshal(data, t); err != nil {
 			return nil, err
 		}

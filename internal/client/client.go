@@ -20,6 +20,6 @@ func NewClient(db *db.DB, sc *sync.Client) *Client {
 	}
 }
 
-func (c *Client) ListTasks(ctx context.Context) ([]*model.Item, error) {
+func (c *Client) ListTasks(ctx context.Context) ([]*model.Task, error) {
 	return c.db.ListTasks()
 }

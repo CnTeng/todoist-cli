@@ -10,7 +10,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-func (c *cli) PrintTasks(ts []*model.Item) {
+func (c *cli) PrintTasks(ts []*model.Task) {
 	tbl := table.NewTable()
 	tbl.AddHeader("ID", "  ", "Project", "Name", "Description", "Labels", "Due")
 	tbl.SetHeaderStyle(&table.CellStyle{CellAttrs: text.Colors{text.FgGreen, text.Underline}})
