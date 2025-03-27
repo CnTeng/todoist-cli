@@ -36,9 +36,10 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	defer lst.Close()
 
 	svc := server.Static(handler.Map{
-		"getTask":   handler.New(d.db.GetTask),
-		"listTasks": handler.New(d.db.ListTasks),
-		"sync":      handler.New(d.client.Sync),
+		GetTask:   handler.New(d.db.GetTask),
+		ListTasks: handler.New(d.db.ListTasks),
+		AddTask:   handler.New(d.client.AddItem),
+		Sync:      handler.NewPos(d.client.Sync, "isForce"),
 	})
 
 	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{
