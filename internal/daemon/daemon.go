@@ -4,8 +4,10 @@ import (
 	"context"
 	"log"
 	"net"
+	"net/http"
 
-	"github.com/CnTeng/todoist-cli/internal/client"
+	"github.com/CnTeng/todoist-api-go/sync/v9"
+	"github.com/CnTeng/todoist-cli/internal/db"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 	"github.com/creachadair/jrpc2/handler"
@@ -14,13 +16,15 @@ import (
 
 type Daemon struct {
 	address string
-	*client.Client
+	client  *sync.Client
+	db      *db.DB
 }
 
-func NewDaemon(address string, c *client.Client) *Daemon {
+func NewDaemon(address string, token string, db *db.DB) *Daemon {
 	return &Daemon{
 		address: address,
-		Client:  c,
+		client:  sync.NewClientWithHandler(http.DefaultClient, token, db),
+		db:      db,
 	}
 }
 
@@ -32,8 +36,9 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	defer lst.Close()
 
 	svc := server.Static(handler.Map{
-		"listTasks": handler.New(d.ListTasks),
-		"sync":      handler.New(d.Sync),
+		"getTask":   handler.New(d.db.GetTask),
+		"listTasks": handler.New(d.db.ListTasks),
+		"sync":      handler.New(d.client.Sync),
 	})
 
 	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/CnTeng/todoist-api-go/sync/v9"
@@ -26,7 +27,7 @@ func (db *DB) StoreTask(task *sync.Item) error {
 	return nil
 }
 
-func (db *DB) GetTask(id string) (*model.Task, error) {
+func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 	var data []byte
 	if err := db.QueryRow(getTaskQuery, id).Scan(&data); err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func (db *DB) GetTask(id string) (*model.Task, error) {
 	return t, nil
 }
 
-func (db *DB) ListTasks() ([]*model.Task, error) {
+func (db *DB) ListTasks(ctx context.Context) ([]*model.Task, error) {
 	rows, err := db.Query(listTasksQuery)
 	if err != nil {
 		return nil, err
