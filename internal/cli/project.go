@@ -27,7 +27,7 @@ func (c *cli) PrintProjects(ps []*sync.Project) {
 		row = append(row, p.Name)
 		row = append(row, color.BgRGB(p.Color.RGB()).Sprint(p.Color))
 
-		tbl.AddRow(row...)
+		tbl.AddRow(row)
 	}
 
 	fmt.Print(tbl.Render())

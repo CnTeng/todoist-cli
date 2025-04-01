@@ -21,20 +21,26 @@ type icons struct {
 	inbox    string
 	favorite string
 
+	indent     string
+	lastIndent string
+
 	progress progressIcons
 }
 
 var nerdIcons = icons{
-	done:   "",
-	undone: "",
+	done:   " ",
+	undone: " ",
 
-	none:   " ",
+	none:   "  ",
 	add:    "+",
 	change: "~",
 	delete: "-",
 
 	inbox:    "",
 	favorite: "",
+
+	indent:     "│ ",
+	lastIndent: "└ ",
 
 	progress: progressIcons{
 		none:      "─",
