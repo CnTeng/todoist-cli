@@ -1,6 +1,6 @@
 package model
 
-import "github.com/CnTeng/todoist-api-go/sync/v9"
+import "github.com/CnTeng/todoist-api-go/sync"
 
 type Task struct {
 	*sync.Item

@@ -3,7 +3,7 @@ module github.com/CnTeng/todoist-cli
 go 1.24.1
 
 require (
-	github.com/CnTeng/table v0.1.2
+	github.com/CnTeng/table v0.1.5
 	github.com/CnTeng/todoist-api-go v0.0.0
 	github.com/creachadair/jrpc2 v1.3.1
 	github.com/fatih/color v1.18.0
