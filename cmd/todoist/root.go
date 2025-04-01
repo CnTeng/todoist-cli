@@ -44,7 +44,14 @@ var rootCmd = &cli.Command{
 		return ctx, nil
 	},
 
-	Commands: []*cli.Command{taskListCmd, taskAddCmd, daemonCmd, syncCmd, ProjectCmd},
+	Commands: []*cli.Command{
+		taskListCmd,
+		taskAddCmd,
+		taskDeleteCmd,
+		daemonCmd,
+		syncCmd,
+		ProjectCmd,
+	},
 }
 
 func Execute() error {
