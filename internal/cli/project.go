@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/CnTeng/table"
-	"github.com/CnTeng/todoist-api-go/sync/v9"
+	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/fatih/color"
 )
 
@@ -27,7 +27,7 @@ func (c *cli) PrintProjects(ps []*sync.Project) {
 		row = append(row, p.Name)
 		row = append(row, color.BgRGB(p.Color.RGB()).Sprint(p.Color))
 
-		tbl.AddRow(row...)
+		tbl.AddRow(row)
 	}
 
 	fmt.Print(tbl.Render())
