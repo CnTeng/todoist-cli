@@ -1,12 +1,23 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	_ "embed"
 	"fmt"
 	"os"
 
 	_ "modernc.org/sqlite"
+)
+
+const (
+	cleanQuery = `
+		PRAGMA foreign_keys = OFF;
+		DELETE FROM tasks;
+		DELETE FROM projects;
+		DELETE FROM labels;
+		PRAGMA foreign_keys = ON;
+	`
 )
 
 type DB struct {
@@ -43,14 +54,19 @@ func NewDB(path string) (*DB, error) {
 	return &DB{database}, nil
 }
 
+func (db *DB) clean(ctx context.Context, tx *sql.Tx) error {
+	if _, err := tx.ExecContext(ctx, cleanQuery); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (db *DB) withTx(fn func(tx *sql.Tx) error) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
+	defer func() { _ = tx.Rollback() }()
 
 	if err := fn(tx); err != nil {
 		return err
