@@ -21,7 +21,7 @@ var daemonCmd = &cli.Command{
 			fmt.Printf("Error migrating database: %v\n", err)
 		}
 
-		daemon := daemon.NewDaemon("@todo.sock", cfg.Token, db)
+		daemon := daemon.NewDaemon("@todo.sock", cfg.Token, cfg.WSToken, db)
 
 		if err := daemon.Serve(context.Background()); err != nil {
 			fmt.Printf("Error starting daemon: %v\n", err)

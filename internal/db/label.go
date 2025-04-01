@@ -3,7 +3,7 @@ package db
 import (
 	"encoding/json"
 
-	"github.com/CnTeng/todoist-api-go/sync/v9"
+	"github.com/CnTeng/todoist-api-go/sync"
 )
 
 const (

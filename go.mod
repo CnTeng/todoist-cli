@@ -13,6 +13,7 @@ require (
 )
 
 require (
+	github.com/coder/websocket v1.8.13 // indirect
 	github.com/creachadair/mds v0.24.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
