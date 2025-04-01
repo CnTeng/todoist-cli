@@ -4,6 +4,7 @@ import "github.com/CnTeng/todoist-api-go/sync"
 
 type Task struct {
 	*sync.Item
-	Project string        `json:"project"`
-	Labels  []*sync.Label `json:"label"`
+	Project  *sync.Project `json:"project"`
+	SubTasks []*Task       `json:"sub_tasks"`
+	Labels   []*sync.Label `json:"labels"`
 }

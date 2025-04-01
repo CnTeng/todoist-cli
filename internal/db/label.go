@@ -1,6 +1,8 @@
 package db
 
 import (
+	"context"
+	"database/sql"
 	"encoding/json"
 
 	"github.com/CnTeng/todoist-api-go/sync"
@@ -28,6 +30,20 @@ func (db *DB) StoreLabel(label *sync.Label) error {
 func (db *DB) GetLabelByID(id string) (*sync.Label, error) {
 	var data []byte
 	if err := db.QueryRow(getLabelQueryByID, id).Scan(&data); err != nil {
+		return nil, err
+	}
+
+	label := &sync.Label{}
+	if err := json.Unmarshal(data, label); err != nil {
+		return nil, err
+	}
+
+	return label, nil
+}
+
+func (db *DB) getLabelByName(ctx context.Context, tx *sql.Tx, name string) (*sync.Label, error) {
+	var data []byte
+	if err := tx.QueryRow(getLabelQueryByName, name).Scan(&data); err != nil {
 		return nil, err
 	}
 

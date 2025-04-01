@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/CnTeng/table"
-	"github.com/CnTeng/todoist-api-go/sync/v9"
+	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/fatih/color"
 )
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/CnTeng/todoist-api-go/sync/v9"
+	"github.com/CnTeng/todoist-api-go/sync"
 	tcli "github.com/CnTeng/todoist-cli/internal/cli"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/creachadair/jrpc2"
