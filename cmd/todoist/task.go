@@ -17,6 +17,15 @@ import (
 var taskListCmd = &cli.Command{
 	Name:    "list",
 	Aliases: []string{"ls"},
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:     "tree",
+			Aliases:  []string{"t"},
+			Usage:    "list tasks in tree format",
+			OnlyOnce: true,
+			Value:    false,
+		},
+	},
 	Action: func(ctx context.Context, cmd *cli.Command) error {
 		conn, err := net.Dial("unix", "@todo.sock")
 		if err != nil {
@@ -31,7 +40,7 @@ var taskListCmd = &cli.Command{
 		}
 
 		c := tcli.NewCLI(tcli.Nerd)
-		c.PrintTasks(resp)
+		c.PrintTasks(resp, cmd.Bool("tree"))
 
 		return nil
 	},
@@ -80,7 +89,7 @@ var taskAddCmd = &cli.Command{
 		}
 
 		c := tcli.NewCLI(tcli.Nerd)
-		c.PrintTasks(resp)
+		c.PrintTasks(resp, false)
 
 		return nil
 	},

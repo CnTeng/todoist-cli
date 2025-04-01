@@ -33,7 +33,7 @@ func (c *cli) taskStatusIcon(t *model.Task) string {
 	return c.icons.undone
 }
 
-func (c *cli) renderTask(t *model.Task, depth []bool) []table.Row {
+func (c *cli) renderTask(t *model.Task, depth []bool, tree bool) []table.Row {
 	project := color.RGB(t.Project.Color.RGB()).Sprint(t.Project.Name)
 
 	labels := []string{}
@@ -77,6 +77,10 @@ func (c *cli) renderTask(t *model.Task, depth []bool) []table.Row {
 				b.WriteString(c.icons.none)
 			}
 
+			if isFirst && !tree && t.SubTaskStatus.Total > 0 {
+				fmt.Fprintf(b, "(%d/%d) ", t.SubTaskStatus.Completed, t.SubTaskStatus.Total)
+			}
+
 			return b.String()
 		},
 	}
@@ -84,14 +88,18 @@ func (c *cli) renderTask(t *model.Task, depth []bool) []table.Row {
 	row := table.Row{t.ID, project, content, t.Description, strings.Join(labels, " "), due, deadline}
 
 	rows := []table.Row{row}
+	if !tree {
+		return rows
+	}
+
 	for i, st := range t.SubTasks {
 		lastIdx := len(t.SubTasks) - 1
-		rows = append(rows, c.renderTask(st, append(depth, i == lastIdx))...)
+		rows = append(rows, c.renderTask(st, append(depth, i == lastIdx), tree)...)
 	}
 	return rows
 }
 
-func (c *cli) PrintTasks(ts []*model.Task) {
+func (c *cli) PrintTasks(ts []*model.Task, tree bool) {
 	tbl := table.NewTable()
 	tbl.AddHeader("ID", "Project", "Name", "Description", "Labels", "Due", "Deadline")
 	tbl.SetHeaderStyle(&table.CellStyle{CellAttrs: text.Colors{text.Underline}})
@@ -99,7 +107,7 @@ func (c *cli) PrintTasks(ts []*model.Task) {
 	tbl.SetColStyle(3, &table.CellStyle{WrapText: table.BoolPtr(true)})
 
 	for _, t := range ts {
-		tbl.AddRows(c.renderTask(t, []bool{}))
+		tbl.AddRows(c.renderTask(t, []bool{}, tree))
 	}
 
 	fmt.Print(tbl.Render())

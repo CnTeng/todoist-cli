@@ -32,17 +32,15 @@ const (
 
 	taskListSubQuery = `
 		SELECT
-			t.data AS task_data,
-			p.data AS project_data
+			data
 		FROM
-			tasks t
-			JOIN projects p ON p.id = t.data ->> 'project_id'
+			tasks
 		WHERE
-			t.data ->> 'parent_id' = ?
+			data ->> 'parent_id' = ?
 		ORDER BY
-			t.data ->> 'child_order' ASC`
+			data ->> 'child_order' ASC`
 
-	taskListByProject = `
+	taskListByProjectQuery = `
 		SELECT
 			data
 		FROM
@@ -101,53 +99,49 @@ func (db *DB) getTask(ctx context.Context, tx *sql.Tx, id string) (*model.Task, 
 	return t, nil
 }
 
-func (db *DB) getSubTasks(ctx context.Context, tx *sql.Tx, id string) ([]*model.Task, error) {
-	rows, err := tx.QueryContext(ctx, taskListSubQuery, id)
+func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, task *model.Task) error {
+	rows, err := tx.QueryContext(ctx, taskListSubQuery, task.ID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	ts := []*model.Task{}
+	task.SubTasks = []*model.Task{}
 	for rows.Next() {
-		var tdata []byte
-		var pdata []byte
-		if err := rows.Scan(&tdata, &pdata); err != nil {
-			return nil, err
+		var data []byte
+		if err := rows.Scan(&data); err != nil {
+			return err
 		}
 
-		t := &model.Task{Item: &sync.Item{}}
-		if err := json.Unmarshal(tdata, t.Item); err != nil {
-			return nil, err
+		st := &model.Task{Item: &sync.Item{}, Project: task.Project}
+		if err := json.Unmarshal(data, st.Item); err != nil {
+			return err
 		}
 
-		p := &sync.Project{}
-		if err := json.Unmarshal(pdata, p); err != nil {
-			return nil, err
+		if err := db.listSubTasks(ctx, tx, st); err != nil {
+			return err
 		}
-		t.Project = p
 
-		subTasks, err := db.getSubTasks(ctx, tx, t.ID)
-		if err != nil {
-			return nil, err
-		}
-		t.SubTasks = subTasks
-
-		for _, ln := range t.Item.Labels {
+		for _, ln := range st.Item.Labels {
 			label, err := db.getLabelByName(ctx, tx, ln)
 			if err != nil {
-				return nil, err
+				return err
 			}
-			t.Labels = append(t.Labels, label)
+			st.Labels = append(st.Labels, label)
 		}
 
-		ts = append(ts, t)
+		task.SubTaskStatus.Total++
+		if st.CompletedAt != nil {
+			task.SubTaskStatus.Completed++
+		}
+
+		task.SubTasks = append(task.SubTasks, st)
 	}
 
-	return ts, nil
+	return nil
 }
 
 func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.Project) ([]*model.Task, error) {
-	rows, err := tx.QueryContext(ctx, taskListByProject, project.ID)
+	rows, err := tx.QueryContext(ctx, taskListByProjectQuery, project.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -165,11 +159,9 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 			return nil, err
 		}
 
-		subTasks, err := db.getSubTasks(ctx, tx, t.ID)
-		if err != nil {
+		if err := db.listSubTasks(ctx, tx, t); err != nil {
 			return nil, err
 		}
-		t.SubTasks = subTasks
 
 		for _, ln := range t.Item.Labels {
 			label, err := db.getLabelByName(ctx, tx, ln)
