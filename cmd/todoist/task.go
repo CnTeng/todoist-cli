@@ -29,6 +29,14 @@ var taskListCmd = &cli.Command{
 	Aliases: []string{"ls"},
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
+			Name:        "all",
+			Aliases:     []string{"a"},
+			Usage:       "list tasks include completed tasks",
+			OnlyOnce:    true,
+			Value:       false,
+			Destination: &taskListArgs.Completed,
+		},
+		&cli.BoolFlag{
 			Name:        "description",
 			Aliases:     []string{"d"},
 			Usage:       "list tasks include description",
@@ -54,8 +62,11 @@ var taskListCmd = &cli.Command{
 
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
+		params := &struct {
+			All bool `json:"all"`
+		}{cmd.Bool("all")}
 		resp := []*model.Task{}
-		if err := cli.CallResult(ctx, daemon.TaskList, nil, &resp); err != nil {
+		if err := cli.CallResult(ctx, daemon.TaskList, params, &resp); err != nil {
 			fmt.Printf("Error calling taskLists: %v\n", err)
 		}
 

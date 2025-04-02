@@ -56,9 +56,10 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	defer lst.Close()
 
 	svc := server.Static(handler.Map{
-		Sync:          handler.NewPos(d.client.Sync, "isForce"),
+		Sync:          handler.New(d.sync),
+		CompletedGet:  handler.New(d.client.GetCompletedInfo),
 		TaskGet:       handler.New(d.db.GetTask),
-		TaskList:      handler.New(d.db.ListTasks),
+		TaskList:      handler.NewPos(d.db.ListTasks, "all"),
 		TaskAdd:       handler.New(d.client.AddItem),
 		TaskModify:    handler.New(d.client.UpdateItem),
 		TaskRemove:    handler.New(d.client.DeleteItem),

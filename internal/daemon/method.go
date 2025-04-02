@@ -2,6 +2,7 @@ package daemon
 
 const (
 	Sync          string = "sync"
+	CompletedGet  string = "Completed.Get"
 	TaskGet       string = "Task.Get"
 	TaskList      string = "Task.List"
 	TaskAdd       string = "Task.Add"

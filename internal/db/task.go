@@ -30,7 +30,7 @@ const (
 		WHERE
 			id = ?`
 
-	taskListSubQuery = `
+	taskListAllSubQuery = `
 		SELECT
 			data
 		FROM
@@ -40,13 +40,36 @@ const (
 		ORDER BY
 			data ->> 'child_order' ASC`
 
-	taskListByProjectQuery = `
+	taskListUndoneSubQuery = `
+		SELECT
+			data
+		FROM
+			tasks
+		WHERE
+			data ->> 'parent_id' = ?
+			AND data ->> 'completed_at' IS NULL
+		ORDER BY
+			data ->> 'child_order' ASC`
+
+	taskListAllByProjectQuery = `
 		SELECT
 			data
 		FROM
 			tasks
 		WHERE
 			data ->> 'parent_id' IS NULL
+			AND data ->> 'project_id' = ?
+		ORDER BY
+			data ->> 'child_order' ASC`
+
+	taskListUndoneByProjectQuery = `
+		SELECT
+			data
+		FROM
+			tasks
+		WHERE
+			data ->> 'parent_id' IS NULL
+			AND data ->> 'completed_at' IS NULL
 			AND data ->> 'project_id' = ?
 		ORDER BY
 			data ->> 'child_order' ASC`
@@ -99,8 +122,8 @@ func (db *DB) getTask(ctx context.Context, tx *sql.Tx, id string) (*model.Task, 
 	return t, nil
 }
 
-func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, task *model.Task) error {
-	rows, err := tx.QueryContext(ctx, taskListSubQuery, task.ID)
+func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, query string, task *model.Task) error {
+	rows, err := tx.QueryContext(ctx, query, task.ID)
 	if err != nil {
 		return err
 	}
@@ -118,7 +141,7 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, task *model.Task) er
 			return err
 		}
 
-		if err := db.listSubTasks(ctx, tx, st); err != nil {
+		if err := db.listSubTasks(ctx, tx, query, st); err != nil {
 			return err
 		}
 
@@ -141,7 +164,14 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, task *model.Task) er
 	return nil
 }
 
-func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.Project) ([]*model.Task, error) {
+func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.Project, all bool) ([]*model.Task, error) {
+	taskListByProjectQuery := taskListUndoneByProjectQuery
+	taskListSubQuery := taskListUndoneSubQuery
+	if all {
+		taskListByProjectQuery = taskListAllByProjectQuery
+		taskListSubQuery = taskListAllSubQuery
+	}
+
 	rows, err := tx.QueryContext(ctx, taskListByProjectQuery, project.ID)
 	if err != nil {
 		return nil, err
@@ -160,7 +190,7 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 			return nil, err
 		}
 
-		if err := db.listSubTasks(ctx, tx, t); err != nil {
+		if err := db.listSubTasks(ctx, tx, taskListSubQuery, t); err != nil {
 			return nil, err
 		}
 
@@ -187,7 +217,7 @@ func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 	})
 }
 
-func (db *DB) ListTasks(ctx context.Context) ([]*model.Task, error) {
+func (db *DB) ListTasks(ctx context.Context, all bool) ([]*model.Task, error) {
 	ts := []*model.Task{}
 
 	if err := db.withTx(func(tx *sql.Tx) error {
@@ -197,7 +227,7 @@ func (db *DB) ListTasks(ctx context.Context) ([]*model.Task, error) {
 		}
 
 		for _, p := range ps {
-			t, err := db.listTasksByProject(ctx, tx, p)
+			t, err := db.listTasksByProject(ctx, tx, p, all)
 			if err != nil {
 				return err
 			}

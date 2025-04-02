@@ -14,6 +14,7 @@ import (
 )
 
 type TaskListArgs struct {
+	Completed   bool
 	Tree        bool
 	Description bool
 }

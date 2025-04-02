@@ -11,15 +11,26 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+var syncArgs = &daemon.SyncArgs{}
+
 var syncCmd = &cli.Command{
 	Name: "sync",
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
-			Name:     "force",
-			Aliases:  []string{"f"},
-			Usage:    "force sync",
-			OnlyOnce: true,
-			Value:    false,
+			Name:        "force",
+			Aliases:     []string{"f"},
+			Usage:       "force sync",
+			OnlyOnce:    true,
+			Value:       false,
+			Destination: &syncArgs.IsForce,
+		},
+		&cli.BoolFlag{
+			Name:        "all",
+			Aliases:     []string{"a"},
+			Usage:       "sync all items",
+			OnlyOnce:    true,
+			Value:       false,
+			Destination: &syncArgs.All,
 		},
 	},
 	Action: func(ctx context.Context, cmd *cli.Command) error {
@@ -30,10 +41,7 @@ var syncCmd = &cli.Command{
 		defer conn.Close()
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
-		params := &struct {
-			IsForce bool `json:"isForce"`
-		}{cmd.Bool("force")}
-		if _, err := cli.Call(ctx, daemon.Sync, params); err != nil {
+		if _, err := cli.Call(ctx, daemon.Sync, syncArgs); err != nil {
 			fmt.Printf("Error calling sync: %v\n", err)
 		}
 

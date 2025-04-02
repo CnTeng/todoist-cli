@@ -52,6 +52,7 @@ var rootCmd = &cli.Command{
 		taskAddCmd,
 		taskModifyCmd,
 		taskRemoveCmd,
+		taskCloseCmd,
 		ProjectCmd,
 	},
 }
