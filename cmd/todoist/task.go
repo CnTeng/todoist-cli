@@ -19,6 +19,7 @@ import (
 var (
 	taskListArgs   = &tcli.TaskListArgs{}
 	taskAddArgs    = &sync.ItemAddArgs{}
+	taskModifyArgs = &sync.ItemUpdateArgs{}
 	taskRemoveArgs = []string{}
 )
 
@@ -166,6 +167,118 @@ var taskAddCmd = &cli.Command{
 		}
 
 		fmt.Printf("Task added: %s\n", taskAddArgs.Content)
+
+		return nil
+	},
+}
+
+var taskModifyCmd = &cli.Command{
+	Name:                  "modify",
+	Aliases:               []string{"m"},
+	EnableShellCompletion: true,
+	Arguments: []cli.Argument{
+		&cli.StringArg{
+			Name:        "ID",
+			Destination: &taskModifyArgs.ID,
+			Min:         1,
+			Max:         1,
+			Config:      cli.StringConfig{TrimSpace: true},
+		},
+	},
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:     "content",
+			Aliases:  []string{"c"},
+			Usage:    "Task content",
+			OnlyOnce: true,
+		},
+		&cli.StringFlag{
+			Name:     "description",
+			Aliases:  []string{"D"},
+			Usage:    "Task description",
+			OnlyOnce: true,
+		},
+		&cli.StringFlag{
+			Name:     "due",
+			Aliases:  []string{"d"},
+			Usage:    "Due date",
+			OnlyOnce: true,
+		},
+		&cli.TimestampFlag{
+			Name:     "deadline",
+			Usage:    "Deadline date",
+			OnlyOnce: true,
+			Config: cli.TimestampConfig{
+				Layouts: []string{time.DateOnly},
+			},
+		},
+		&cli.IntFlag{
+			Name:     "priority",
+			Aliases:  []string{"p"},
+			Usage:    "Task priority",
+			OnlyOnce: true,
+		},
+		&cli.StringFlag{
+			Name:     "parent",
+			Usage:    "Parent task ID",
+			OnlyOnce: true,
+		},
+		&cli.StringSliceFlag{
+			Name:     "labels",
+			Aliases:  []string{"l"},
+			Usage:    "Labels",
+			OnlyOnce: true,
+		},
+		&cli.StringFlag{
+			Name:     "duration",
+			Usage:    "Duration",
+			OnlyOnce: true,
+			Validator: func(v string) error {
+				_, err := sync.ParseDuration(v)
+				return err
+			},
+		},
+	},
+	Action: func(ctx context.Context, cmd *cli.Command) error {
+		conn, err := net.Dial("unix", "@todo.sock")
+		if err != nil {
+			return err
+		}
+		defer func() { _ = conn.Close() }()
+
+		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
+
+		if cmd.IsSet("content") {
+			taskModifyArgs.Content = utils.StringPtr(cmd.String("content"))
+		}
+		if cmd.IsSet("description") {
+			taskModifyArgs.Description = utils.StringPtr(cmd.String("description"))
+		}
+		if cmd.IsSet("due") {
+			taskModifyArgs.Due = &sync.Due{String: utils.StringPtr(cmd.String("due"))}
+		}
+		if cmd.IsSet("deadline") {
+			taskModifyArgs.Deadline = &sync.Deadline{Date: cmd.Timestamp("deadline"), Lang: cfg.Lang}
+		}
+		if cmd.IsSet("priority") {
+			taskModifyArgs.Priority = utils.IntPtr(int(cmd.Int("priority")))
+		}
+		if cmd.IsSet("labels") {
+			taskModifyArgs.Labels = cmd.StringSlice("labels")
+		}
+		if cmd.IsSet("duration") {
+			duration, err := sync.ParseDuration(cmd.String("duration"))
+			if err != nil {
+				fmt.Printf("Error parsing duration: %v\n", err)
+			}
+			taskModifyArgs.Duration = duration
+		}
+
+		if _, err := cli.Call(ctx, daemon.TaskModify, taskModifyArgs); err != nil {
+			fmt.Printf("Error calling add task: %v\n", err)
+		}
+
+		fmt.Printf("Task modified: %s\n", taskModifyArgs.ID)
 
 		return nil
 	},
