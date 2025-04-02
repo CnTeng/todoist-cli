@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/CnTeng/todoist-cli/cmd/todoist"
 )
 
 func main() {
 	if err := cmd.Execute(); err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 }
