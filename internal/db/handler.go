@@ -37,6 +37,10 @@ func (db *DB) HandleResponse(resp any) error {
 				}
 			}
 
+			if err := db.storeSyncToken(tx, r.SyncToken); err != nil {
+				return err
+			}
+
 			return nil
 		})
 		if err != nil {
@@ -47,10 +51,6 @@ func (db *DB) HandleResponse(resp any) error {
 			if err := db.StoreProject(project); err != nil {
 				return err
 			}
-		}
-
-		if err := db.storeSyncToken(r.SyncToken); err != nil {
-			return err
 		}
 	}
 
