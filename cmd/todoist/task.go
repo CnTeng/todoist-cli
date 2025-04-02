@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	tcli "github.com/CnTeng/todoist-cli/internal/cli"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/model"
+	"github.com/CnTeng/todoist-cli/internal/utils"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
@@ -16,6 +18,7 @@ import (
 
 var (
 	taskListArgs   = &tcli.TaskListArgs{}
+	taskAddArgs    = &sync.ItemAddArgs{}
 	taskRemoveArgs = []string{}
 )
 
@@ -61,54 +64,112 @@ var taskListCmd = &cli.Command{
 }
 
 var taskAddCmd = &cli.Command{
-	Name:    "add",
-	Aliases: []string{"a"},
+	Name:                  "add",
+	Aliases:               []string{"a"},
+	EnableShellCompletion: true,
+	Arguments: []cli.Argument{
+		&cli.StringArg{
+			Name:        "content",
+			Destination: &taskAddArgs.Content,
+			Min:         1,
+			Max:         1,
+			Config:      cli.StringConfig{TrimSpace: true},
+		},
+	},
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:     "content",
-			Aliases:  []string{"c"},
-			Usage:    "Task content",
-			Required: true,
+			Name:     "description",
+			Aliases:  []string{"D"},
+			Usage:    "Task description",
 			OnlyOnce: true,
 		},
 		&cli.StringFlag{
-			Name:     "description",
+			Name:     "project",
+			Aliases:  []string{"P"},
+			Usage:    "Project ID",
+			OnlyOnce: true,
+		},
+		&cli.StringFlag{
+			Name:     "due",
 			Aliases:  []string{"d"},
-			Usage:    "Task description",
+			Usage:    "Due date",
+			OnlyOnce: true,
+		},
+		&cli.TimestampFlag{
+			Name:     "deadline",
+			Usage:    "Deadline date",
+			OnlyOnce: true,
+			Config: cli.TimestampConfig{
+				Layouts: []string{time.DateOnly},
+			},
+		},
+		&cli.IntFlag{
+			Name:     "priority",
+			Aliases:  []string{"p"},
+			Usage:    "Task priority",
+			OnlyOnce: true,
+		},
+		&cli.StringFlag{
+			Name:     "parent",
+			Usage:    "Parent task ID",
+			OnlyOnce: true,
+		},
+		&cli.StringFlag{
+			Name:     "section",
+			Aliases:  []string{"s"},
+			Usage:    "Section ID",
+			OnlyOnce: true,
+		},
+		&cli.StringSliceFlag{
+			Name:     "labels",
+			Aliases:  []string{"l"},
+			Usage:    "Labels",
 			OnlyOnce: true,
 		},
 	},
 	Action: func(ctx context.Context, cmd *cli.Command) error {
 		conn, err := net.Dial("unix", "@todo.sock")
 		if err != nil {
-			fmt.Printf("Error dialing daemon: %v\n", err)
+			return err
 		}
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
+
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
-		args := &sync.ItemAddArgs{}
-		args.Content = cmd.String("content")
 		if cmd.IsSet("description") {
-			description := cmd.String("description")
-			args.Description = &description
+			taskAddArgs.Description = utils.StringPtr(cmd.String("description"))
+		}
+		if cmd.IsSet("project") {
+			taskAddArgs.ProjectID = utils.StringPtr(cmd.String("project"))
+		}
+		if cmd.IsSet("due") {
+			taskAddArgs.Due = &sync.Due{String: utils.StringPtr(cmd.String("due"))}
+		}
+		if cmd.IsSet("deadline") {
+			taskAddArgs.Deadline = &sync.Deadline{Date: cmd.Timestamp("deadline"), Lang: cfg.Lang}
+		}
+		if cmd.IsSet("priority") {
+			taskAddArgs.Priority = utils.IntPtr(int(cmd.Int("priority")))
+		}
+		if cmd.IsSet("parent") {
+			taskAddArgs.ParentID = utils.StringPtr(cmd.String("parent"))
+		}
+		if cmd.IsSet("section") {
+			taskAddArgs.SectionID = utils.StringPtr(cmd.String("section"))
+		}
+		if cmd.IsSet("labels") {
+			taskAddArgs.Labels = cmd.StringSlice("labels")
 		}
 
-		if _, err := cli.Call(ctx, daemon.AddTask, args); err != nil {
+		if _, err := cli.Call(ctx, daemon.AddTask, taskAddArgs); err != nil {
 			fmt.Printf("Error calling add task: %v\n", err)
 		}
 
-		resp := []*model.Task{}
-		if err := cli.CallResult(ctx, daemon.GetTask, nil, &resp); err != nil {
-			fmt.Printf("Error calling taskLists: %v\n", err)
-		}
-
-		c := tcli.NewCLI(tcli.Nerd)
-		c.PrintTasks(resp, false)
+		fmt.Printf("Task added: %s\n", taskAddArgs.Content)
 
 		return nil
 	},
 }
-var taskRemoveArgs = []string{}
 
 var taskDeleteCmd = &cli.Command{
 	Name:    "remove",
