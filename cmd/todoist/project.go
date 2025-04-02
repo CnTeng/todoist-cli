@@ -31,7 +31,7 @@ var projectListCmd = &cli.Command{
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
 		result := []*sync.Project{}
-		if err := cli.CallResult(ctx, daemon.ListProjects, nil, &result); err != nil {
+		if err := cli.CallResult(ctx, daemon.ProjectList, nil, &result); err != nil {
 			fmt.Printf("Error calling List Projects: %v\n", err)
 		}
 

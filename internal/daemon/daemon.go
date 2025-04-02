@@ -56,22 +56,24 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	defer lst.Close()
 
 	svc := server.Static(handler.Map{
-		GetTask:      handler.New(d.db.GetTask),
-		ListTasks:    handler.New(d.db.ListTasks),
-		AddTask:      handler.New(d.client.AddItem),
-		TaskDelete:   handler.New(d.client.DeleteItem),
-		TaskModify:   handler.New(d.client.UpdateItem),
-		Sync:         handler.NewPos(d.client.Sync, "isForce"),
-		ListProjects: handler.New(d.db.ListProjects),
+		Sync:          handler.NewPos(d.client.Sync, "isForce"),
+		TaskGet:       handler.New(d.db.GetTask),
+		TaskList:      handler.New(d.db.ListTasks),
+		TaskAdd:       handler.New(d.client.AddItem),
+		TaskModify:    handler.New(d.client.UpdateItem),
+		TaskRemove:    handler.New(d.client.DeleteItem),
+		ProjectGet:    handler.New(d.db.GetProject),
+		ProjectList:   handler.New(d.db.ListProjects),
+		ProjectAdd:    handler.New(d.client.AddProject),
+		ProjectModify: handler.New(d.client.UpdateProject),
+		ProjectRemove: handler.New(d.client.DeleteProject),
+		LabelGet:      handler.New(d.db.GetLabel),
+		LabelList:     handler.New(d.db.ListLabels),
 	})
 
-	if err := server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{
+	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{
 		ServerOptions: &jrpc2.ServerOptions{
 			Logger: jrpc2.StdLogger(d.log),
 		},
-	}); err != nil {
-		return err
-	}
-
-	return nil
+	})
 }

@@ -54,7 +54,7 @@ var taskListCmd = &cli.Command{
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
 		resp := []*model.Task{}
-		if err := cli.CallResult(ctx, "listTasks", nil, &resp); err != nil {
+		if err := cli.CallResult(ctx, daemon.TaskList, nil, &resp); err != nil {
 			fmt.Printf("Error calling taskLists: %v\n", err)
 		}
 
@@ -163,7 +163,7 @@ var taskAddCmd = &cli.Command{
 			taskAddArgs.Labels = cmd.StringSlice("labels")
 		}
 
-		if _, err := cli.Call(ctx, daemon.AddTask, taskAddArgs); err != nil {
+		if _, err := cli.Call(ctx, daemon.TaskAdd, taskAddArgs); err != nil {
 			fmt.Printf("Error calling add task: %v\n", err)
 		}
 
@@ -285,7 +285,7 @@ var taskModifyCmd = &cli.Command{
 	},
 }
 
-var taskDeleteCmd = &cli.Command{
+var taskRemoveCmd = &cli.Command{
 	Name:    "remove",
 	Aliases: []string{"rm"},
 	Arguments: []cli.Argument{
@@ -306,7 +306,7 @@ var taskDeleteCmd = &cli.Command{
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
 		for _, id := range taskRemoveArgs {
-			if _, err := cli.Call(ctx, daemon.TaskDelete, &sync.ItemDeleteArgs{ID: id}); err != nil {
+			if _, err := cli.Call(ctx, daemon.TaskRemove, &sync.ItemDeleteArgs{ID: id}); err != nil {
 				fmt.Printf("Error calling delete task: %v\n", err)
 			}
 			fmt.Printf("Task deleted: %s\n", id)
