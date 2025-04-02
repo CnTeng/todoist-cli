@@ -127,7 +127,7 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, query string, task *
 	if err != nil {
 		return err
 	}
-	defer func() { _ = rows.Close() }()
+	defer rows.Close()
 
 	task.SubTasks = []*model.Task{}
 	for rows.Next() {
@@ -176,7 +176,7 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = rows.Close() }()
+	defer rows.Close()
 
 	ts := []*model.Task{}
 	for rows.Next() {

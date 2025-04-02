@@ -58,7 +58,7 @@ var taskListCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-		defer func() { _ = conn.Close() }()
+		defer conn.Close()
 
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
@@ -146,7 +146,7 @@ var taskAddCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-		defer func() { _ = conn.Close() }()
+		defer conn.Close()
 
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
@@ -257,7 +257,7 @@ var taskModifyCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-		defer func() { _ = conn.Close() }()
+		defer conn.Close()
 
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
@@ -313,7 +313,7 @@ var taskRemoveCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-		defer func() { _ = conn.Close() }()
+		defer conn.Close()
 
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
@@ -344,7 +344,7 @@ var taskCloseCmd = &cli.Command{
 		if err != nil {
 			return err
 		}
-		defer func() { _ = conn.Close() }()
+		defer conn.Close()
 
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 

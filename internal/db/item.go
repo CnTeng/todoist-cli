@@ -25,7 +25,7 @@ func listItems[T any](ctx context.Context, tx *sql.Tx, query string) ([]*T, erro
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = rows.Close() }()
+	defer rows.Close()
 
 	items := []*T{}
 	for rows.Next() {

@@ -29,7 +29,10 @@ func NewDB(path string) (*DB, error) {
 		if err != nil {
 			return nil, err
 		}
-		file.Close()
+
+		if err := file.Close(); err != nil {
+			return nil, err
+		}
 	}
 
 	dbPath := fmt.Sprintf("file:%s?_time_format=sqlite", path)
@@ -65,7 +68,7 @@ func (db *DB) withTx(fn func(tx *sql.Tx) error) error {
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer func() { _ = tx.Rollback() }()
+	defer tx.Rollback()
 
 	if err := fn(tx); err != nil {
 		return err
