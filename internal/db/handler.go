@@ -31,16 +31,16 @@ func (db *DB) HandleResponse(resp any) error {
 				}
 			}
 
+			for _, label := range r.Labels {
+				if err := db.storeLabel(tx, label); err != nil {
+					return err
+				}
+			}
+
 			return nil
 		})
 		if err != nil {
 			return err
-		}
-
-		for _, label := range r.Labels {
-			if err := db.StoreLabel(label); err != nil {
-				return err
-			}
 		}
 
 		for _, project := range r.Projects {
