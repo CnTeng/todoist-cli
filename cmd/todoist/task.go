@@ -47,9 +47,10 @@ var taskListCmd = &cli.Command{
 	Action: func(ctx context.Context, cmd *cli.Command) error {
 		conn, err := net.Dial("unix", "@todo.sock")
 		if err != nil {
-			fmt.Printf("Error dialing daemon: %v\n", err)
+			return err
 		}
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
+
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
 		resp := []*model.Task{}
@@ -298,24 +299,18 @@ var taskDeleteCmd = &cli.Command{
 	Action: func(ctx context.Context, cmd *cli.Command) error {
 		conn, err := net.Dial("unix", "@todo.sock")
 		if err != nil {
-			fmt.Printf("Error dialing daemon: %v\n", err)
+			return err
 		}
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
+
 		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
 		for _, id := range taskRemoveArgs {
 			if _, err := cli.Call(ctx, daemon.TaskDelete, &sync.ItemDeleteArgs{ID: id}); err != nil {
 				fmt.Printf("Error calling delete task: %v\n", err)
 			}
+			fmt.Printf("Task deleted: %s\n", id)
 		}
-
-		// resp := []*model.Task{}
-		// if err := cli.CallResult(ctx, daemon.GetTask, nil, &resp); err != nil {
-		// 	fmt.Printf("Error calling taskLists: %v\n", err)
-		// }
-		//
-		// c := tcli.NewCLI(tcli.Nerd)
-		// c.PrintTasks(resp, false)
 
 		return nil
 	},

@@ -104,6 +104,7 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, task *model.Task) er
 	if err != nil {
 		return err
 	}
+	defer func() { _ = rows.Close() }()
 
 	task.SubTasks = []*model.Task{}
 	for rows.Next() {
