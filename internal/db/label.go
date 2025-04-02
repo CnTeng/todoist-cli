@@ -41,55 +41,20 @@ func (db *DB) storeLabel(tx *sql.Tx, label *sync.Label) error {
 	return nil
 }
 
-func (db *DB) getLabel(ctx context.Context, tx *sql.Tx, name string) (*sync.Label, error) {
-	var data []byte
-	if err := tx.QueryRowContext(ctx, labelGetQuery, name).Scan(&data); err != nil {
-		return nil, err
-	}
-
-	label := &sync.Label{}
-	if err := json.Unmarshal(data, label); err != nil {
-		return nil, err
-	}
-
-	return label, nil
-}
-
-func (db *DB) listGetLabel(ctx context.Context, tx *sql.Tx) ([]*sync.Label, error) {
-	rows, err := tx.QueryContext(ctx, labelListQuery)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	ls := []*sync.Label{}
-	for rows.Next() {
-		var data []byte
-		if err := rows.Scan(&data); err != nil {
-			return nil, err
-		}
-
-		label := &sync.Label{}
-		if err := json.Unmarshal(data, label); err != nil {
-			return nil, err
-		}
-
-		ls = append(ls, label)
-	}
-
-	return ls, nil
+func (db *DB) GetLabel(ctx context.Context, name string) (*sync.Label, error) {
+	l := &sync.Label{}
+	return l, db.withTx(func(tx *sql.Tx) error {
+		var err error
+		l, err = getItem[sync.Label](ctx, tx, labelGetQuery, name)
+		return err
+	})
 }
 
 func (db *DB) ListLabels(ctx context.Context) ([]*sync.Label, error) {
 	ls := []*sync.Label{}
-
-	if err := db.withTx(func(tx *sql.Tx) error {
+	return ls, db.withTx(func(tx *sql.Tx) error {
 		var err error
-		ls, err = db.listGetLabel(ctx, tx)
+		ls, err = listItems[sync.Label](ctx, tx, labelListQuery)
 		return err
-	}); err != nil {
-		return nil, err
-	}
-
-	return ls, nil
+	})
 }
