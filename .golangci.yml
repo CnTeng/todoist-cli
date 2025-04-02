@@ -1,8 +1,8 @@
 version: "2"
-
 linters:
+  enable:
+    - makezero
+    - misspell
   exclusions:
-    rules:
-      - linters:
-          - errcheck
-        source: "^\\s*defer\\s+"
+    presets:
+      - std-error-handling
