@@ -17,6 +17,7 @@ const (
 		ON CONFLICT (id) DO UPDATE
 		SET
 			data = excluded.data`
+	projectDeleteQuery = `DELETE FROM projects WHERE id = ?`
 
 	projectGetQuery  = `SELECT data FROM projects WHERE id = ?`
 	projectListQuery = `
@@ -29,13 +30,18 @@ const (
 			data ->> 'child_order' ASC`
 )
 
-func (db *DB) StoreProject(project *sync.Project) error {
+func (db *DB) storeProject(tx *sql.Tx, project *sync.Project) error {
+	if project.IsDeleted {
+		_, err := tx.Exec(projectDeleteQuery, project.ID)
+		return err
+	}
+
 	data, err := json.Marshal(project)
 	if err != nil {
 		return err
 	}
 
-	if _, err := db.Exec(projectStoreQuery, project.ID, data); err != nil {
+	if _, err := tx.Exec(projectStoreQuery, project.ID, data); err != nil {
 		return err
 	}
 
