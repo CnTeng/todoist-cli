@@ -17,6 +17,7 @@ const (
 		ON CONFLICT (id) DO UPDATE
 		SET
 			data = excluded.data`
+	projectDeleteQuery = `DELETE FROM projects WHERE id = ?`
 
 	projectGetQuery  = `SELECT data FROM projects WHERE id = ?`
 	projectListQuery = `
@@ -29,68 +30,38 @@ const (
 			data ->> 'child_order' ASC`
 )
 
-func (db *DB) StoreProject(project *sync.Project) error {
+func (db *DB) storeProject(tx *sql.Tx, project *sync.Project) error {
+	if project.IsDeleted {
+		_, err := tx.Exec(projectDeleteQuery, project.ID)
+		return err
+	}
+
 	data, err := json.Marshal(project)
 	if err != nil {
 		return err
 	}
 
-	if _, err := db.Exec(projectStoreQuery, project.ID, data); err != nil {
+	if _, err := tx.Exec(projectStoreQuery, project.ID, data); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (db *DB) GetProject(id string) (*sync.Project, error) {
-	var data []byte
-	if err := db.QueryRow(projectGetQuery, id).Scan(&data); err != nil {
-		return nil, err
-	}
-
-	project := &sync.Project{}
-	if err := json.Unmarshal(data, project); err != nil {
-		return nil, err
-	}
-
-	return project, nil
-}
-
-func (db *DB) listProjects(ctx context.Context, tx *sql.Tx) ([]*sync.Project, error) {
-	rows, err := tx.QueryContext(ctx, projectListQuery)
-	if err != nil {
-		return nil, err
-	}
-	defer func() { _ = rows.Close() }()
-
-	ps := []*sync.Project{}
-	for rows.Next() {
-		var data []byte
-		if err := rows.Scan(&data); err != nil {
-			return nil, err
-		}
-
-		p := &sync.Project{}
-		if err := json.Unmarshal(data, p); err != nil {
-			return nil, err
-		}
-
-		ps = append(ps, p)
-	}
-
-	return ps, nil
+func (db *DB) GetProject(ctx context.Context, id string) (*sync.Project, error) {
+	p := &sync.Project{}
+	return p, db.withTx(func(tx *sql.Tx) error {
+		var err error
+		p, err = getItem[sync.Project](ctx, tx, projectGetQuery, id)
+		return err
+	})
 }
 
 func (db *DB) ListProjects(ctx context.Context) ([]*sync.Project, error) {
 	ps := []*sync.Project{}
-
-	if err := db.withTx(func(tx *sql.Tx) error {
+	return ps, db.withTx(func(tx *sql.Tx) error {
 		var err error
-		ps, err = db.listProjects(ctx, tx)
+		ps, err = listItems[sync.Project](ctx, tx, projectListQuery)
 		return err
-	}); err != nil {
-		return nil, err
-	}
-
-	return ps, nil
+	})
 }

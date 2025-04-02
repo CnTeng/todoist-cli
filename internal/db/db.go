@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	_ "embed"
 	"fmt"
 	"os"
 

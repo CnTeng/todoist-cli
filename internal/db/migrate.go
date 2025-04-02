@@ -1,15 +1,28 @@
 package db
 
-import (
-	"database/sql"
-	_ "embed"
-)
+import "database/sql"
 
-//go:embed migrations/0001_create.sql
-var m0001CreateQuery string
+const createTableQuery = `
+	CREATE TABLE IF NOT EXISTS tasks (id text PRIMARY KEY, data jsonb NOT NULL);
+
+	CREATE TABLE IF NOT EXISTS projects (id text PRIMARY KEY, data jsonb NOT NULL);
+
+	CREATE TABLE IF NOT EXISTS labels (id text PRIMARY KEY, data jsonb NOT NULL);
+
+	CREATE TABLE IF NOT EXISTS sync_token (
+		id integer PRIMARY KEY CHECK (id = 1),
+		token text NOT NULL,
+		last_sync DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	);
+
+	INSERT INTO
+		sync_token (id, token)
+	VALUES
+		(1, "*")
+	ON CONFLICT (id) DO NOTHING;`
 
 var migrations = []string{
-	m0001CreateQuery,
+	createTableQuery,
 }
 
 func (db *DB) Migrate() error {

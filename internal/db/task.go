@@ -89,7 +89,7 @@ func (db *DB) getTask(ctx context.Context, tx *sql.Tx, id string) (*model.Task, 
 	t.Project = p
 
 	for _, ln := range t.Item.Labels {
-		label, err := db.getLabel(ctx, tx, ln)
+		label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +123,7 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, task *model.Task) er
 		}
 
 		for _, ln := range st.Item.Labels {
-			label, err := db.getLabel(ctx, tx, ln)
+			label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
 			if err != nil {
 				return err
 			}
@@ -165,7 +165,7 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 		}
 
 		for _, ln := range t.Item.Labels {
-			label, err := db.getLabel(ctx, tx, ln)
+			label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
 			if err != nil {
 				return nil, err
 			}
@@ -191,7 +191,7 @@ func (db *DB) ListTasks(ctx context.Context) ([]*model.Task, error) {
 	ts := []*model.Task{}
 
 	if err := db.withTx(func(tx *sql.Tx) error {
-		ps, err := db.listProjects(ctx, tx)
+		ps, err := listItems[sync.Project](ctx, tx, projectListQuery)
 		if err != nil {
 			return err
 		}
