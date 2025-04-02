@@ -32,28 +32,26 @@ var rootCmd = &cli.Command{
 	Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
 		file, err := os.ReadFile(configFile)
 		if err != nil {
-			fmt.Printf("Error opening config file: %v\n", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("error reading config file: %v", err)
 		}
 
 		cfg = &config{}
 		if err := json.Unmarshal(file, cfg); err != nil {
-			fmt.Printf("Error decoding config file: %v\n", err)
-			os.Exit(1)
+			return nil, fmt.Errorf("error decoding config file: %v", err)
 		}
 
 		return ctx, nil
 	},
 
 	Commands: []*cli.Command{
-		daemonCmd,
-		syncCmd,
 		taskListCmd,
 		taskAddCmd,
 		taskModifyCmd,
-		taskRemoveCmd,
 		taskCloseCmd,
+		taskRemoveCmd,
 		ProjectCmd,
+		syncCmd,
+		daemonCmd,
 	},
 }
 
