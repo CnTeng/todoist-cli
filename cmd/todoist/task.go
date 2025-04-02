@@ -21,6 +21,7 @@ var (
 	taskAddArgs    = &sync.ItemAddArgs{}
 	taskModifyArgs = &sync.ItemUpdateArgs{}
 	taskRemoveArgs = []string{}
+	taskCloseArgs  = []string{}
 )
 
 var taskListCmd = &cli.Command{
@@ -310,6 +311,37 @@ var taskRemoveCmd = &cli.Command{
 				fmt.Printf("Error calling delete task: %v\n", err)
 			}
 			fmt.Printf("Task deleted: %s\n", id)
+		}
+
+		return nil
+	},
+}
+
+var taskCloseCmd = &cli.Command{
+	Name:    "close",
+	Aliases: []string{"done"},
+	Arguments: []cli.Argument{
+		&cli.StringArg{
+			Name:   "id",
+			Values: &taskCloseArgs,
+			Min:    1,
+			Max:    -1,
+		},
+	},
+	Action: func(ctx context.Context, cmd *cli.Command) error {
+		conn, err := net.Dial("unix", "@todo.sock")
+		if err != nil {
+			return err
+		}
+		defer func() { _ = conn.Close() }()
+
+		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
+
+		for _, id := range taskCloseArgs {
+			if _, err := cli.Call(ctx, daemon.TaskClose, &sync.ItemCloseArgs{ID: id}); err != nil {
+				fmt.Printf("Error calling delete task: %v\n", err)
+			}
+			fmt.Printf("Task close: %s\n", id)
 		}
 
 		return nil
