@@ -59,28 +59,6 @@ func (c *cli) PrintTasks(ts []*model.Task, opt *TaskListArgs) {
 	fmt.Print(tbl.Render())
 }
 
-func (c *cli) taskPriorityColor(t *model.Task) text.Color {
-	switch t.Priority {
-	case 1:
-		return text.FgWhite
-	case 2:
-		return text.FgBlue
-	case 3:
-		return text.FgYellow
-	case 4:
-		return text.FgRed
-	default:
-		return text.FgWhite
-	}
-}
-
-func (c *cli) taskStatusIcon(t *model.Task) string {
-	if t.CompletedAt != nil {
-		return c.icons.done
-	}
-	return c.icons.undone
-}
-
 func (c *cli) taskProject(t *model.Task) string {
 	return color.RGB(t.Project.Color.RGB()).Sprint(t.Project.Name)
 }
@@ -116,6 +94,24 @@ func (c *cli) taskDuration(t *model.Task) string {
 
 func (c *cli) taskContent(t *model.Task, depth []bool, args *TaskListArgs) *table.Cell {
 	depth = slices.Clone(depth)
+
+	pColor := text.FgWhite
+	switch t.Priority {
+	case 1:
+		pColor = text.FgWhite
+	case 2:
+		pColor = text.FgBlue
+	case 3:
+		pColor = text.FgYellow
+	case 4:
+		pColor = text.FgRed
+	}
+
+	sIcon := c.icons.undone
+	if t.CompletedAt != nil {
+		sIcon = c.icons.done
+	}
+
 	return &table.Cell{
 		Content: t.Content,
 		PrefixFunc: func(isFirst, isLast bool) string {
@@ -136,7 +132,7 @@ func (c *cli) taskContent(t *model.Task, depth []bool, args *TaskListArgs) *tabl
 			}
 
 			if isFirst {
-				b.WriteString(c.taskPriorityColor(t).Sprint(c.taskStatusIcon(t)))
+				b.WriteString(pColor.Sprint(sIcon))
 			} else {
 				b.WriteString(c.icons.none)
 			}
