@@ -14,7 +14,10 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var taskAddArgs = &sync.ItemAddArgs{}
+var (
+	taskAddArgs      = &sync.ItemAddArgs{}
+	taskQuickAddArgs = &sync.ItemQuickAddParams{}
+)
 
 var taskAddCmd = &cli.Command{
 	Name:        "add",
@@ -127,6 +130,38 @@ var taskAddCmd = &cli.Command{
 		}
 
 		fmt.Printf("Task added: %s\n", taskAddArgs.Content)
+
+		return nil
+	},
+}
+
+var taskQuickAddCmd = &cli.Command{
+	Name:        "quick-add",
+	Aliases:     []string{"qa"},
+	Usage:       "Quick add a task",
+	Description: "Quick Add a task to todoist",
+	Arguments: []cli.Argument{
+		&cli.StringArg{
+			Name:        "text",
+			Min:         1,
+			Max:         1,
+			Destination: &taskQuickAddArgs.Text,
+			Config:      cli.StringConfig{TrimSpace: true},
+		},
+	},
+	Action: func(ctx context.Context, cmd *cli.Command) error {
+		conn, err := net.Dial("unix", "@todo.sock")
+		if err != nil {
+			return err
+		}
+		defer conn.Close()
+
+		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
+		if _, err := cli.Call(ctx, daemon.TaskQuickAdd, taskQuickAddArgs); err != nil {
+			return err
+		}
+
+		fmt.Printf("Task added: %s\n", taskQuickAddArgs.Text)
 
 		return nil
 	},

@@ -6,6 +6,7 @@ const (
 	TaskGet       string = "Task.Get"
 	TaskList      string = "Task.List"
 	TaskAdd       string = "Task.Add"
+	TaskQuickAdd  string = "Task.QuickAdd"
 	TaskModify    string = "Task.Modify"
 	TaskRemove    string = "Task.Remove"
 	TaskClose     string = "Task.Close"

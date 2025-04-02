@@ -61,6 +61,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		TaskGet:       handler.New(d.db.GetTask),
 		TaskList:      handler.NewPos(d.db.ListTasks, "all"),
 		TaskAdd:       handler.New(d.client.AddItem),
+		TaskQuickAdd:  handler.New(d.client.QuickAddItem),
 		TaskModify:    handler.New(d.client.UpdateItem),
 		TaskRemove:    handler.New(d.client.DeleteItem),
 		TaskClose:     handler.New(d.client.CloseItem),

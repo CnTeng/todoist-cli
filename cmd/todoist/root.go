@@ -46,6 +46,7 @@ var rootCmd = &cli.Command{
 	Commands: []*cli.Command{
 		taskListCmd,
 		taskAddCmd,
+		taskQuickAddCmd,
 		taskModifyCmd,
 		taskCloseCmd,
 		taskRemoveCmd,
