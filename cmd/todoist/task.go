@@ -14,16 +14,30 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+var (
+	taskListArgs   = &tcli.TaskListArgs{}
+	taskRemoveArgs = []string{}
+)
+
 var taskListCmd = &cli.Command{
 	Name:    "list",
 	Aliases: []string{"ls"},
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
-			Name:     "tree",
-			Aliases:  []string{"t"},
-			Usage:    "list tasks in tree format",
-			OnlyOnce: true,
-			Value:    false,
+			Name:        "description",
+			Aliases:     []string{"d"},
+			Usage:       "list tasks include description",
+			OnlyOnce:    true,
+			Value:       false,
+			Destination: &taskListArgs.Description,
+		},
+		&cli.BoolFlag{
+			Name:        "tree",
+			Aliases:     []string{"t"},
+			Usage:       "list tasks in tree format",
+			OnlyOnce:    true,
+			Value:       false,
+			Destination: &taskListArgs.Tree,
 		},
 	},
 	Action: func(ctx context.Context, cmd *cli.Command) error {
@@ -40,7 +54,7 @@ var taskListCmd = &cli.Command{
 		}
 
 		c := tcli.NewCLI(tcli.Nerd)
-		c.PrintTasks(resp, cmd.Bool("tree"))
+		c.PrintTasks(resp, taskListArgs)
 
 		return nil
 	},
