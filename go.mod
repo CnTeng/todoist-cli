@@ -5,6 +5,7 @@ go 1.24.1
 require (
 	github.com/CnTeng/table v0.1.5
 	github.com/CnTeng/todoist-api-go v0.0.0-20250328055207-3e26ff8fab05
+	github.com/adrg/xdg v0.5.3
 	github.com/creachadair/jrpc2 v1.3.1
 	github.com/fatih/color v1.18.0
 	github.com/jedib0t/go-pretty/v6 v6.6.7
