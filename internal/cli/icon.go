@@ -21,8 +21,8 @@ var nerdIcons = icons{
 
 	none: "  ",
 
-	inbox:    "",
-	favorite: "",
+	inbox:    " ",
+	favorite: " ",
 
 	indent:     "│ ",
 	lastIndent: "└ ",
@@ -32,10 +32,10 @@ var textIcons = icons{
 	done:   "[x]",
 	undone: "[ ]",
 
-	none: " ",
+	none: "  ",
 
 	inbox:    "IN",
-	favorite: "*",
+	favorite: "* ",
 }
 
 type iconType int

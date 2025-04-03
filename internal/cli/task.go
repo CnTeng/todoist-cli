@@ -49,7 +49,7 @@ func (c *cli) PrintTasks(ts []*model.Task, opt *TaskListArgs) {
 	} else {
 		tbl.AddHeader("ID", "Project", "Name", "Labels", "Due", "Deadline", "Duration")
 	}
-	tbl.SetHeaderStyle(&table.CellStyle{CellAttrs: text.Colors{text.Underline}})
+	tbl.SetHeaderStyle(headerStyle)
 	tbl.SetColStyle(2, &table.CellStyle{WrapText: utils.BoolPtr(true)})
 	tbl.SetColStyle(3, &table.CellStyle{WrapText: utils.BoolPtr(true)})
 
