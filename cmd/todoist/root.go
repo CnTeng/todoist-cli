@@ -49,6 +49,7 @@ func newCmd() *cli.Command {
 			task.NewQuickAddCmd(),
 			task.NewModifyCmd(cfg),
 			task.NewCloseCmd(),
+			task.NewReopenCmd(),
 			task.NewRemoveCmd(),
 			task.NewMoveCmd(),
 			project.NewCmd(),

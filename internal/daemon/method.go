@@ -11,6 +11,7 @@ const (
 	TaskRemove    string = "Task.Remove"
 	TaskClose     string = "Task.Close"
 	TaskMove      string = "Task.Move"
+	TaskReopen    string = "Task.Reopen"
 	ProjectGet    string = "Project.Get"
 	ProjectList   string = "Project.List"
 	ProjectAdd    string = "Project.Add"
