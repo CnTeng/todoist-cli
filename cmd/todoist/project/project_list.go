@@ -2,7 +2,6 @@ package project
 
 import (
 	"context"
-	"fmt"
 	"net"
 
 	"github.com/CnTeng/todoist-api-go/sync"
@@ -20,14 +19,14 @@ func NewListCmd() *cli.Command {
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			conn, err := net.Dial("unix", "@todo.sock")
 			if err != nil {
-				fmt.Printf("Error dialing daemon: %v\n", err)
+				return err
 			}
 			defer conn.Close()
 			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 
 			result := []*sync.Project{}
 			if err := cli.CallResult(ctx, daemon.ProjectList, nil, &result); err != nil {
-				fmt.Printf("Error calling List Projects: %v\n", err)
+				return err
 			}
 
 			c := tcli.NewCLI(tcli.Nerd)
