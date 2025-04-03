@@ -12,36 +12,37 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-var taskRemoveArgs = []string{}
-
-var taskRemoveCmd = &cli.Command{
-	Name:        "remove",
-	Aliases:     []string{"rm"},
-	Usage:       "Remove a task",
-	Description: "Remove a task in todoist",
-	Arguments: []cli.Argument{
-		&cli.StringArg{
-			Name:   "id",
-			Min:    1,
-			Max:    -1,
-			Values: &taskRemoveArgs,
+func taskRemoveCmd() *cli.Command {
+	params := []string{}
+	return &cli.Command{
+		Name:        "remove",
+		Aliases:     []string{"rm"},
+		Usage:       "Remove a task",
+		Description: "Remove a task in todoist",
+		Arguments: []cli.Argument{
+			&cli.StringArg{
+				Name:   "id",
+				Min:    1,
+				Max:    -1,
+				Values: &params,
+			},
 		},
-	},
-	Action: func(ctx context.Context, cmd *cli.Command) error {
-		conn, err := net.Dial("unix", "@todo.sock")
-		if err != nil {
-			return err
-		}
-		defer conn.Close()
-
-		cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
-		for _, id := range taskRemoveArgs {
-			if _, err := cli.Call(ctx, daemon.TaskRemove, &sync.ItemDeleteArgs{ID: id}); err != nil {
+		Action: func(ctx context.Context, cmd *cli.Command) error {
+			conn, err := net.Dial("unix", "@todo.sock")
+			if err != nil {
 				return err
 			}
-			fmt.Printf("Task deleted: %s\n", id)
-		}
+			defer conn.Close()
 
-		return nil
-	},
+			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
+			for _, id := range params {
+				if _, err := cli.Call(ctx, daemon.TaskRemove, &sync.ItemDeleteArgs{ID: id}); err != nil {
+					return err
+				}
+				fmt.Printf("Task deleted: %s\n", id)
+			}
+
+			return nil
+		},
+	}
 }

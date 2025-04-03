@@ -44,16 +44,16 @@ var rootCmd = &cli.Command{
 	},
 
 	Commands: []*cli.Command{
-		taskListCmd,
-		taskAddCmd,
-		taskQuickAddCmd,
-		taskModifyCmd,
-		taskCloseCmd,
-		taskRemoveCmd,
-		taskMoveCmd,
-		ProjectCmd,
-		syncCmd,
-		daemonCmd,
+		taskListCmd(),
+		taskAddCmd(),
+		taskQuickAddCmd(),
+		taskModifyCmd(),
+		taskCloseCmd(),
+		taskRemoveCmd(),
+		taskMoveCmd(),
+		projectCmd(),
+		syncCmd(),
+		daemonCmd(),
 	},
 }
 
