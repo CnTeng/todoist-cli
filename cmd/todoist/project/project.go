@@ -9,6 +9,7 @@ func NewCmd() *cli.Command {
 		Commands: []*cli.Command{
 			NewListCmd(),
 			NewAddCmd(),
+			NewRemoveCmd(),
 		},
 	}
 }
