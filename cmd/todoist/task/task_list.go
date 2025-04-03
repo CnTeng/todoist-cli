@@ -1,4 +1,4 @@
-package cmd
+package task
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func taskListCmd() *cli.Command {
+func NewListCmd() *cli.Command {
 	params := &tcli.TaskListArgs{}
 	return &cli.Command{
 		Name:                   "list",

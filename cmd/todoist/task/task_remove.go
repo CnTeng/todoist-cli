@@ -1,4 +1,4 @@
-package cmd
+package task
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func taskRemoveCmd() *cli.Command {
+func NewRemoveCmd() *cli.Command {
 	params := []string{}
 	return &cli.Command{
 		Name:        "remove",

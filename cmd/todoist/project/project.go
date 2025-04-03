@@ -1,13 +1,13 @@
-package cmd
+package project
 
 import "github.com/urfave/cli/v3"
 
-func projectCmd() *cli.Command {
+func NewCmd() *cli.Command {
 	return &cli.Command{
 		Name:  "project",
 		Usage: "project commands",
 		Commands: []*cli.Command{
-			projectListCmd(),
+			NewListCmd(),
 		},
 	}
 }

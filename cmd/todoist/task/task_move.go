@@ -1,4 +1,4 @@
-package cmd
+package task
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func taskMoveCmd() *cli.Command {
+func NewMoveCmd() *cli.Command {
 	params := &sync.ItemMoveArgs{}
 	return &cli.Command{
 		Name:        "move",

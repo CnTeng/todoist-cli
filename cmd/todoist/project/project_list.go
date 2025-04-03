@@ -1,4 +1,4 @@
-package cmd
+package project
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func projectListCmd() *cli.Command {
+func NewListCmd() *cli.Command {
 	return &cli.Command{
 		Name:    "list",
 		Aliases: []string{"ls"},

@@ -1,4 +1,4 @@
-package cmd
+package task
 
 import (
 	"context"
@@ -8,13 +8,14 @@ import (
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/CnTeng/todoist-cli/internal/utils"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func taskAddCmd() *cli.Command {
+func NewAddCmd(cfg *model.Config) *cli.Command {
 	params := &sync.ItemAddArgs{}
 	return &cli.Command{
 		Name:        "add",
@@ -133,7 +134,7 @@ func taskAddCmd() *cli.Command {
 	}
 }
 
-func taskQuickAddCmd() *cli.Command {
+func NewQuickAddCmd() *cli.Command {
 	params := &sync.ItemQuickAddParams{}
 	return &cli.Command{
 		Name:        "quick-add",

@@ -1,4 +1,4 @@
-package cmd
+package task
 
 import (
 	"context"
@@ -8,13 +8,14 @@ import (
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/CnTeng/todoist-cli/internal/utils"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func taskModifyCmd() *cli.Command {
+func NewModifyCmd(cfg *model.Config) *cli.Command {
 	params := &sync.ItemUpdateArgs{}
 	return &cli.Command{
 		Name:        "modify",

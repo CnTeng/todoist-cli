@@ -1,4 +1,4 @@
-package cmd
+package sync
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func syncCmd() *cli.Command {
+func NewCmd() *cli.Command {
 	params := &daemon.SyncArgs{}
 	return &cli.Command{
 		Name: "sync",

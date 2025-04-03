@@ -1,4 +1,4 @@
-package cmd
+package daemon
 
 import (
 	"context"
@@ -6,10 +6,11 @@ import (
 
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/db"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/urfave/cli/v3"
 )
 
-func daemonCmd() *cli.Command {
+func NewCmd(cfg *model.Config) *cli.Command {
 	return &cli.Command{
 		Name: "daemon",
 		Action: func(ctx context.Context, cmd *cli.Command) error {
