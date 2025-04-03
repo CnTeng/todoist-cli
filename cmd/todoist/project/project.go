@@ -8,6 +8,7 @@ func NewCmd() *cli.Command {
 		Usage: "project commands",
 		Commands: []*cli.Command{
 			NewListCmd(),
+			NewAddCmd(),
 		},
 	}
 }
