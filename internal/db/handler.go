@@ -27,7 +27,7 @@ func (db *DB) HandleResponse(resp any) error {
 }
 
 func (db *DB) handleSyncResponse(resp *sync.SyncResponse) error {
-	return db.withTx(func(tx *sql.Tx) error {
+	if err := db.withTx(func(tx *sql.Tx) error {
 		if resp.FullSync {
 			if err := db.clean(context.Background(), tx); err != nil {
 				return err
@@ -57,7 +57,16 @@ func (db *DB) handleSyncResponse(resp *sync.SyncResponse) error {
 		}
 
 		return nil
-	})
+	}); err != nil {
+		return err
+	}
+
+	for _, syncErr := range resp.SyncStatus {
+		if syncErr != nil {
+			return syncErr
+		}
+	}
+	return nil
 }
 
 func (db *DB) handleCompletedGetResponse(resp *sync.CompletedGetResponse) error {
