@@ -3,8 +3,8 @@ package util
 import (
 	"net"
 
-	"github.com/CnTeng/todoist-cli/internal/cli"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/view"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
 )
@@ -13,7 +13,7 @@ type Factory struct {
 	RpcClient    *jrpc2.Client
 	DeamonConfig *daemon.Config `toml:"daemon"`
 	Lang         string         `toml:"lang"`
-	Cli          *cli.Cli
+	Icons        *view.Icons
 
 	conn net.Conn
 }
@@ -23,7 +23,7 @@ func NewFactory() *Factory {
 		RpcClient:    nil,
 		DeamonConfig: &daemon.Config{},
 		Lang:         "en",
-		Cli:          cli.NewCLI(cli.Nerd),
+		Icons:        &view.NerdIcons,
 	}
 }
 

@@ -2,10 +2,12 @@ package project
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/view"
 	"github.com/urfave/cli/v3"
 )
 
@@ -19,7 +21,8 @@ func NewListCmd(f *util.Factory) *cli.Command {
 				return err
 			}
 
-			f.Cli.PrintProjects(result)
+			v := view.NewProjectView(result, f.Icons)
+			fmt.Print(v.Render())
 			return nil
 		},
 	}

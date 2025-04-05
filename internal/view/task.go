@@ -1,4 +1,4 @@
-package cli
+package view
 
 import (
 	"fmt"
@@ -13,38 +13,29 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type TaskListArgs struct {
+type TaskViewOptions struct {
 	Completed   bool
 	Tree        bool
 	Description bool
 }
 
-func (c *Cli) renderTask(t *model.Task, depth []bool, opt *TaskListArgs) []table.Row {
-	row := table.Row{
-		t.ID,
-		c.taskProject(t),
-		c.taskContent(t, depth, opt),
-	}
-	if opt.Description {
-		row = append(row, t.Description)
-	}
-	row = append(row, c.taskLabels(t), c.taskDue(t), c.taskDeadline(t), c.taskDuration(t))
-
-	rows := []table.Row{row}
-	if !opt.Tree {
-		return rows
-	}
-
-	for i, st := range t.SubTasks {
-		lastIdx := len(t.SubTasks) - 1
-		rows = append(rows, c.renderTask(st, append(depth, i == lastIdx), opt)...)
-	}
-	return rows
+type taskView struct {
+	icons   *Icons
+	tasks   []*model.Task
+	options *TaskViewOptions
 }
 
-func (c *Cli) PrintTasks(ts []*model.Task, opt *TaskListArgs) {
+func NewTaskView(tasks []*model.Task, icons *Icons, options *TaskViewOptions) View {
+	return &taskView{
+		icons:   icons,
+		tasks:   tasks,
+		options: options,
+	}
+}
+
+func (v *taskView) Render() string {
 	tbl := table.NewTable()
-	if opt.Description {
+	if v.options.Description {
 		tbl.AddHeader("ID", "Project", "Name", "Description", "Labels", "Due", "Deadline", "Duration")
 	} else {
 		tbl.AddHeader("ID", "Project", "Name", "Labels", "Due", "Deadline", "Duration")
@@ -53,18 +44,41 @@ func (c *Cli) PrintTasks(ts []*model.Task, opt *TaskListArgs) {
 	tbl.SetColStyle(2, &table.CellStyle{WrapText: utils.BoolPtr(true)})
 	tbl.SetColStyle(3, &table.CellStyle{WrapText: utils.BoolPtr(true)})
 
-	for _, t := range ts {
-		tbl.AddRows(c.renderTask(t, []bool{}, opt))
+	for _, t := range v.tasks {
+		tbl.AddRows(v.renderTask(t, []bool{}))
 	}
 
-	fmt.Print(tbl.Render())
+	return tbl.Render()
 }
 
-func (c *Cli) taskProject(t *model.Task) string {
+func (v *taskView) renderTask(t *model.Task, depth []bool) []table.Row {
+	row := table.Row{
+		t.ID,
+		v.taskProject(t),
+		v.taskContent(t, depth),
+	}
+	if v.options.Description {
+		row = append(row, t.Description)
+	}
+	row = append(row, v.taskLabels(t), v.taskDue(t), v.taskDeadline(t), v.taskDuration(t))
+
+	rows := []table.Row{row}
+	if !v.options.Tree {
+		return rows
+	}
+
+	for i, st := range t.SubTasks {
+		lastIdx := len(t.SubTasks) - 1
+		rows = append(rows, v.renderTask(st, append(depth, i == lastIdx))...)
+	}
+	return rows
+}
+
+func (v *taskView) taskProject(t *model.Task) string {
 	return color.RGB(t.Project.Color.RGB()).Sprint(t.Project.Name)
 }
 
-func (c *Cli) taskLabels(t *model.Task) string {
+func (v *taskView) taskLabels(t *model.Task) string {
 	labels := []string{}
 	for _, l := range t.Labels {
 		labels = append(labels, color.BgRGB(l.Color.RGB()).Sprint(l.Name))
@@ -72,28 +86,28 @@ func (c *Cli) taskLabels(t *model.Task) string {
 	return strings.Join(labels, " ")
 }
 
-func (c *Cli) taskDue(t *model.Task) string {
+func (v *taskView) taskDue(t *model.Task) string {
 	if t.Due != nil && t.Due.String != nil {
 		return *t.Due.String
 	}
 	return ""
 }
 
-func (c *Cli) taskDeadline(t *model.Task) string {
+func (v *taskView) taskDeadline(t *model.Task) string {
 	if t.Deadline != nil {
 		return t.Deadline.Date.Format(time.DateOnly)
 	}
 	return ""
 }
 
-func (c *Cli) taskDuration(t *model.Task) string {
+func (v *taskView) taskDuration(t *model.Task) string {
 	if t.Duration != nil {
 		return t.Duration.String()
 	}
 	return ""
 }
 
-func (c *Cli) taskContent(t *model.Task, depth []bool, args *TaskListArgs) *table.Cell {
+func (v *taskView) taskContent(t *model.Task, depth []bool) *table.Cell {
 	depth = slices.Clone(depth)
 
 	pColor := text.FgWhite
@@ -108,9 +122,9 @@ func (c *Cli) taskContent(t *model.Task, depth []bool, args *TaskListArgs) *tabl
 		pColor = text.FgRed
 	}
 
-	sIcon := c.icons.undone
+	sIcon := v.icons.undone
 	if t.CompletedAt != nil {
-		sIcon = c.icons.done
+		sIcon = v.icons.done
 	}
 
 	return &table.Cell{
@@ -121,24 +135,24 @@ func (c *Cli) taskContent(t *model.Task, depth []bool, args *TaskListArgs) *tabl
 
 			for i, d := range depth {
 				if !d {
-					b.WriteString(c.icons.indent)
+					b.WriteString(v.icons.indent)
 					continue
 				}
 
 				if isFirst && i == lastIdx {
-					b.WriteString(c.icons.lastIndent)
+					b.WriteString(v.icons.lastIndent)
 				} else {
-					b.WriteString(c.icons.none)
+					b.WriteString(v.icons.none)
 				}
 			}
 
 			if isFirst {
 				b.WriteString(pColor.Sprint(sIcon))
 			} else {
-				b.WriteString(c.icons.none)
+				b.WriteString(v.icons.none)
 			}
 
-			if isFirst && !args.Tree && t.SubTaskStatus.Total > 0 {
+			if isFirst && !v.options.Tree && t.SubTaskStatus.Total > 0 {
 				fmt.Fprintf(b, "(%d/%d) ", t.SubTaskStatus.Completed, t.SubTaskStatus.Total)
 			}
 

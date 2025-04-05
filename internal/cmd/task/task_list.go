@@ -2,16 +2,17 @@ package task
 
 import (
 	"context"
+	"fmt"
 
-	tcli "github.com/CnTeng/todoist-cli/internal/cli"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/model"
+	"github.com/CnTeng/todoist-cli/internal/view"
 	"github.com/urfave/cli/v3"
 )
 
 func NewListCmd(f *util.Factory) *cli.Command {
-	params := &tcli.TaskListArgs{}
+	params := &view.TaskViewOptions{}
 	return &cli.Command{
 		Name:                   "list",
 		Aliases:                []string{"ls"},
@@ -58,7 +59,8 @@ func NewListCmd(f *util.Factory) *cli.Command {
 				return err
 			}
 
-			f.Cli.PrintTasks(result, params)
+			v := view.NewTaskView(result, f.Icons, params)
+			fmt.Print(v.Render())
 			return nil
 		},
 	}

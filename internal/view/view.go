@@ -1,16 +1,12 @@
-package cli
+package view
 
 import (
 	"github.com/CnTeng/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type Cli struct {
-	icons *icons
-}
-
-func NewCLI(iconType iconType) *Cli {
-	return &Cli{icons: newIcons(iconType).withColor()}
+type View interface {
+	Render() string
 }
 
 var headerStyle = &table.CellStyle{

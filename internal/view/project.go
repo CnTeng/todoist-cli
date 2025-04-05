@@ -1,39 +1,49 @@
-package cli
+package view
 
 import (
-	"fmt"
-
 	"github.com/CnTeng/table"
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/utils"
 	"github.com/fatih/color"
 )
 
-func (c *Cli) PrintProjects(ps []*sync.Project) {
+type projectView struct {
+	icons    *Icons
+	projects []*sync.Project
+}
+
+func NewProjectView(projects []*sync.Project, icons *Icons) View {
+	return &projectView{
+		icons:    icons,
+		projects: projects,
+	}
+}
+
+func (v *projectView) Render() string {
 	tbl := table.NewTable()
 	tbl.AddHeader("ID", "Name", "Color")
 	tbl.SetHeaderStyle(headerStyle)
 	tbl.SetColStyle(1, &table.CellStyle{WrapText: utils.BoolPtr(true)})
 
-	for _, p := range ps {
+	for _, p := range v.projects {
 		row := table.Row{}
 
 		row = append(row, p.ID)
-		row = append(row, c.projectName(p))
+		row = append(row, v.projectName(p))
 		row = append(row, color.BgRGB(p.Color.RGB()).Sprint(p.Color))
 
 		tbl.AddRow(row)
 	}
 
-	fmt.Print(tbl.Render())
+	return tbl.Render()
 }
 
-func (c *Cli) projectName(p *sync.Project) *table.Cell {
-	icon := c.icons.none
+func (v *projectView) projectName(p *sync.Project) *table.Cell {
+	icon := v.icons.none
 	if p.InboxProject {
-		icon = c.icons.inbox
+		icon = v.icons.inbox
 	} else if p.IsFavorite {
-		icon = c.icons.favorite
+		icon = v.icons.favorite
 	}
 	return &table.Cell{
 		Content: p.Name,
@@ -41,7 +51,7 @@ func (c *Cli) projectName(p *sync.Project) *table.Cell {
 			if isFirst {
 				return icon
 			}
-			return c.icons.none
+			return v.icons.none
 		},
 	}
 }
