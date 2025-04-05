@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/urfave/cli/v3"
 )

@@ -1,22 +1,23 @@
-package project
+package task
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/urfave/cli/v3"
 )
 
-func NewRemoveCmd(f *util.Factory) *cli.Command {
+func NewReopenCmd(f *util.Factory) *cli.Command {
 	params := []string{}
 	return &cli.Command{
-		Name:        "remove",
-		Aliases:     []string{"rm"},
-		Usage:       "Remove a project",
-		Description: "Remove a project in todoist",
+		Name:        "reopen",
+		Aliases:     []string{"r"},
+		Usage:       "Reopen a task",
+		Description: "Reopen a task in todoist",
+		Category:    "task",
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:   "id",
@@ -27,10 +28,10 @@ func NewRemoveCmd(f *util.Factory) *cli.Command {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			for _, id := range params {
-				if _, err := f.RpcClient.Call(ctx, daemon.ProjectRemove, &sync.ProjectDeleteArgs{ID: id}); err != nil {
+				if _, err := f.RpcClient.Call(ctx, daemon.TaskReopen, &sync.ItemUncompleteArgs{ID: id}); err != nil {
 					return err
 				}
-				fmt.Printf("Project deleted: %s\n", id)
+				fmt.Printf("Task reopen: %s\n", id)
 			}
 
 			return nil

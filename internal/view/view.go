@@ -1,18 +1,18 @@
-package cli
+package view
 
 import (
 	"github.com/CnTeng/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type cli struct {
-	icons *icons
-}
-
-func NewCLI(iconType iconType) *cli {
-	return &cli{icons: newIcons(iconType).withColor()}
+type View interface {
+	Render() string
 }
 
 var headerStyle = &table.CellStyle{
 	CellAttrs: text.Colors{text.FgGreen, text.Underline},
+}
+
+func boolPtr(v bool) *bool {
+	return &v
 }

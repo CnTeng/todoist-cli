@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/urfave/cli/v3"
 )
@@ -27,35 +27,9 @@ func NewMoveCmd(f *util.Factory) *cli.Command {
 			},
 		},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "section",
-				Aliases:  []string{"s"},
-				Usage:    "Section ID",
-				OnlyOnce: true,
-				Action: func(_ context.Context, _ *cli.Command, v string) error {
-					params.SectionID = &v
-					return nil
-				},
-			},
-			&cli.StringFlag{
-				Name:     "parent",
-				Usage:    "Parent task ID",
-				OnlyOnce: true,
-				Action: func(_ context.Context, _ *cli.Command, v string) error {
-					params.ParentID = &v
-					return nil
-				},
-			},
-			&cli.StringFlag{
-				Name:     "project",
-				Aliases:  []string{"P"},
-				Usage:    "Project ID",
-				OnlyOnce: true,
-				Action: func(_ context.Context, _ *cli.Command, v string) error {
-					params.ProjectID = &v
-					return nil
-				},
-			},
+			newSectionFlag(params.SectionID),
+			newParentFlag(params.ParentID),
+			newProjectFlag(params.ProjectID),
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if _, err := f.RpcClient.Call(ctx, daemon.TaskMove, params); err != nil {
