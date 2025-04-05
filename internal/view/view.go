@@ -12,3 +12,7 @@ type View interface {
 var headerStyle = &table.CellStyle{
 	CellAttrs: text.Colors{text.FgGreen, text.Underline},
 }
+
+func boolPtr(v bool) *bool {
+	return &v
+}

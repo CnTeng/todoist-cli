@@ -3,7 +3,6 @@ package view
 import (
 	"github.com/CnTeng/table"
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/CnTeng/todoist-cli/internal/utils"
 	"github.com/fatih/color"
 )
 
@@ -23,7 +22,7 @@ func (v *projectView) Render() string {
 	tbl := table.NewTable()
 	tbl.AddHeader("ID", "Name", "Color")
 	tbl.SetHeaderStyle(headerStyle)
-	tbl.SetColStyle(1, &table.CellStyle{WrapText: utils.BoolPtr(true)})
+	tbl.SetColStyle(1, &table.CellStyle{WrapText: boolPtr(true)})
 
 	for _, p := range v.projects {
 		row := table.Row{}

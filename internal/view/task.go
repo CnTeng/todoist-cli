@@ -8,7 +8,6 @@ import (
 
 	"github.com/CnTeng/table"
 	"github.com/CnTeng/todoist-cli/internal/model"
-	"github.com/CnTeng/todoist-cli/internal/utils"
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/text"
 )
@@ -41,8 +40,8 @@ func (v *taskView) Render() string {
 		tbl.AddHeader("ID", "Project", "Name", "Labels", "Due", "Deadline", "Duration")
 	}
 	tbl.SetHeaderStyle(headerStyle)
-	tbl.SetColStyle(2, &table.CellStyle{WrapText: utils.BoolPtr(true)})
-	tbl.SetColStyle(3, &table.CellStyle{WrapText: utils.BoolPtr(true)})
+	tbl.SetColStyle(2, &table.CellStyle{WrapText: boolPtr(true)})
+	tbl.SetColStyle(3, &table.CellStyle{WrapText: boolPtr(true)})
 
 	for _, t := range v.tasks {
 		tbl.AddRows(v.renderTask(t, []bool{}))

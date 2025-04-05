@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/CnTeng/todoist-cli/internal/utils"
 )
 
 type SyncArgs struct {
@@ -27,9 +26,10 @@ func (d *Daemon) sync(ctx context.Context, args *SyncArgs) error {
 	}
 
 	for _, p := range ps {
+		AnnotateItems := true
 		params := &sync.CompletedGetParams{
 			ProjectID:     &p.ID,
-			AnnotateItems: utils.BoolPtr(true),
+			AnnotateItems: &AnnotateItems,
 		}
 
 		if _, err := d.client.GetCompletedInfo(ctx, params); err != nil {
