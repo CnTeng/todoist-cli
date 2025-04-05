@@ -3,16 +3,14 @@ package project
 import (
 	"context"
 	"fmt"
-	"net"
 
 	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func NewAddCmd() *cli.Command {
+func NewAddCmd(f *util.Factory) *cli.Command {
 	params := &sync.ProjectAddArgs{}
 	return &cli.Command{
 		Name:        "add",
@@ -54,14 +52,7 @@ func NewAddCmd() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			conn, err := net.Dial("unix", "@todo.sock")
-			if err != nil {
-				return err
-			}
-			defer conn.Close()
-
-			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
-			if _, err := cli.Call(ctx, daemon.ProjectAdd, params); err != nil {
+			if _, err := f.RpcClient.Call(ctx, daemon.ProjectAdd, params); err != nil {
 				return err
 			}
 

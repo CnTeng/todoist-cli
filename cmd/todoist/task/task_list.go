@@ -2,23 +2,22 @@ package task
 
 import (
 	"context"
-	"net"
 
+	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
 	tcli "github.com/CnTeng/todoist-cli/internal/cli"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/model"
-	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func NewListCmd() *cli.Command {
+func NewListCmd(f *util.Factory) *cli.Command {
 	params := &tcli.TaskListArgs{}
 	return &cli.Command{
 		Name:                   "list",
 		Aliases:                []string{"ls"},
 		Usage:                  "List tasks",
 		Description:            "List tasks in todoist",
+		Category:               "task",
 		UseShortOptionHandling: true,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
@@ -47,15 +46,8 @@ func NewListCmd() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			conn, err := net.Dial("unix", "@todo.sock")
-			if err != nil {
-				return err
-			}
-			defer conn.Close()
-
-			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 			result := []*model.Task{}
-			if err := cli.CallResult(
+			if err := f.RpcClient.CallResult(
 				ctx,
 				daemon.TaskList,
 				struct {

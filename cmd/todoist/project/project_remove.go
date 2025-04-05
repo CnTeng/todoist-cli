@@ -3,16 +3,14 @@ package project
 import (
 	"context"
 	"fmt"
-	"net"
 
 	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func NewRemoveCmd() *cli.Command {
+func NewRemoveCmd(f *util.Factory) *cli.Command {
 	params := []string{}
 	return &cli.Command{
 		Name:        "remove",
@@ -28,15 +26,8 @@ func NewRemoveCmd() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			conn, err := net.Dial("unix", "@todo.sock")
-			if err != nil {
-				return err
-			}
-			defer conn.Close()
-
-			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
 			for _, id := range params {
-				if _, err := cli.Call(ctx, daemon.ProjectRemove, &sync.ProjectDeleteArgs{ID: id}); err != nil {
+				if _, err := f.RpcClient.Call(ctx, daemon.ProjectRemove, &sync.ProjectDeleteArgs{ID: id}); err != nil {
 					return err
 				}
 				fmt.Printf("Project deleted: %s\n", id)

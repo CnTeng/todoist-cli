@@ -3,15 +3,13 @@ package sync
 import (
 	"context"
 	"fmt"
-	"net"
 
+	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func NewCmd() *cli.Command {
+func NewCmd(f *util.Factory) *cli.Command {
 	params := &daemon.SyncArgs{}
 	return &cli.Command{
 		Name: "sync",
@@ -34,17 +32,11 @@ func NewCmd() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			conn, err := net.Dial("unix", "@todo.sock")
-			if err != nil {
-				fmt.Printf("Error dialing daemon: %v\n", err)
-			}
-			defer conn.Close()
-			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
-
-			if _, err := cli.Call(ctx, daemon.Sync, params); err != nil {
-				fmt.Printf("Error calling sync: %v\n", err)
+			if _, err := f.RpcClient.Call(ctx, daemon.Sync, params); err != nil {
+				return err
 			}
 
+			fmt.Println("Sync success")
 			return nil
 		},
 	}

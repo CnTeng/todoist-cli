@@ -3,25 +3,23 @@ package task
 import (
 	"context"
 	"fmt"
-	"net"
 	"time"
 
 	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/CnTeng/todoist-cli/internal/utils"
-	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func NewAddCmd(cfg *model.Config) *cli.Command {
+func NewAddCmd(f *util.Factory) *cli.Command {
 	params := &sync.ItemAddArgs{}
 	return &cli.Command{
 		Name:        "add",
 		Aliases:     []string{"a"},
 		Usage:       "Add a task",
 		Description: "Add a task to todoist",
+		Category:    "task",
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:        "content",
@@ -70,7 +68,7 @@ func NewAddCmd(cfg *model.Config) *cli.Command {
 					Layouts: []string{time.DateOnly},
 				},
 				Action: func(_ context.Context, _ *cli.Command, v time.Time) error {
-					params.Deadline = &sync.Deadline{Date: v, Lang: cfg.Lang}
+					params.Deadline = &sync.Deadline{Date: v, Lang: f.Config.Lang}
 					return nil
 				},
 			},
@@ -116,31 +114,24 @@ func NewAddCmd(cfg *model.Config) *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			conn, err := net.Dial("unix", "@todo.sock")
-			if err != nil {
-				return err
-			}
-			defer conn.Close()
-
-			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
-			if _, err := cli.Call(ctx, daemon.TaskAdd, params); err != nil {
+			if _, err := f.RpcClient.Call(ctx, daemon.TaskAdd, params); err != nil {
 				return err
 			}
 
 			fmt.Printf("Task added: %s\n", params.Content)
-
 			return nil
 		},
 	}
 }
 
-func NewQuickAddCmd() *cli.Command {
+func NewQuickAddCmd(f *util.Factory) *cli.Command {
 	params := &sync.ItemQuickAddParams{}
 	return &cli.Command{
 		Name:        "quick-add",
 		Aliases:     []string{"qa"},
 		Usage:       "Quick add a task",
 		Description: "Quick Add a task to todoist",
+		Category:    "task",
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:        "text",
@@ -151,19 +142,11 @@ func NewQuickAddCmd() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			conn, err := net.Dial("unix", "@todo.sock")
-			if err != nil {
-				return err
-			}
-			defer conn.Close()
-
-			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
-			if _, err := cli.Call(ctx, daemon.TaskQuickAdd, params); err != nil {
+			if _, err := f.RpcClient.Call(ctx, daemon.TaskQuickAdd, params); err != nil {
 				return err
 			}
 
 			fmt.Printf("Task added: %s\n", params.Text)
-
 			return nil
 		},
 	}

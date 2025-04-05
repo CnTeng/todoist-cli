@@ -1,15 +1,18 @@
 package project
 
-import "github.com/urfave/cli/v3"
+import (
+	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
+	"github.com/urfave/cli/v3"
+)
 
-func NewCmd() *cli.Command {
+func NewCmd(f *util.Factory) *cli.Command {
 	return &cli.Command{
 		Name:  "project",
 		Usage: "project commands",
 		Commands: []*cli.Command{
-			NewListCmd(),
-			NewAddCmd(),
-			NewRemoveCmd(),
+			NewListCmd(f),
+			NewAddCmd(f),
+			NewRemoveCmd(f),
 		},
 	}
 }

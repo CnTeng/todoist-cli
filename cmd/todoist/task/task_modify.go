@@ -3,25 +3,23 @@ package task
 import (
 	"context"
 	"fmt"
-	"net"
 	"time"
 
 	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/CnTeng/todoist-cli/internal/utils"
-	"github.com/creachadair/jrpc2"
-	"github.com/creachadair/jrpc2/channel"
 	"github.com/urfave/cli/v3"
 )
 
-func NewModifyCmd(cfg *model.Config) *cli.Command {
+func NewModifyCmd(f *util.Factory) *cli.Command {
 	params := &sync.ItemUpdateArgs{}
 	return &cli.Command{
 		Name:        "modify",
 		Aliases:     []string{"m"},
 		Usage:       "Modify a task",
 		Description: "Modify a task in todoist",
+		Category:    "task",
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:        "ID",
@@ -70,7 +68,7 @@ func NewModifyCmd(cfg *model.Config) *cli.Command {
 					Layouts: []string{time.DateOnly},
 				},
 				Action: func(_ context.Context, _ *cli.Command, v time.Time) error {
-					params.Deadline = &sync.Deadline{Date: v, Lang: cfg.Lang}
+					params.Deadline = &sync.Deadline{Date: v, Lang: f.Config.Lang}
 					return nil
 				},
 			},
@@ -109,19 +107,11 @@ func NewModifyCmd(cfg *model.Config) *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			conn, err := net.Dial("unix", "@todo.sock")
-			if err != nil {
-				return err
-			}
-			defer conn.Close()
-
-			cli := jrpc2.NewClient(channel.Line(conn, conn), nil)
-			if _, err := cli.Call(ctx, daemon.TaskModify, params); err != nil {
+			if _, err := f.RpcClient.Call(ctx, daemon.TaskModify, params); err != nil {
 				return err
 			}
 
 			fmt.Printf("Task modified: %s\n", params.ID)
-
 			return nil
 		},
 	}
