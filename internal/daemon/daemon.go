@@ -15,6 +15,12 @@ import (
 	"github.com/creachadair/jrpc2/server"
 )
 
+type Config struct {
+	Address  string `toml:"address"`
+	ApiToken string `toml:"api_token"`
+	WsToken  string `toml:"ws_token"`
+}
+
 type Daemon struct {
 	address string
 	client  *sync.Client
@@ -23,14 +29,14 @@ type Daemon struct {
 	log     *log.Logger
 }
 
-func NewDaemon(address string, token string, wsToken string, db *db.DB) *Daemon {
+func NewDaemon(config *Config, db *db.DB) *Daemon {
 	d := &Daemon{
-		address: address,
-		client:  sync.NewClient(http.DefaultClient, token, db),
+		address: config.Address,
+		client:  sync.NewClient(http.DefaultClient, config.ApiToken, db),
 		db:      db,
 		log:     log.New(log.Writer(), "daemon: ", log.Flags()),
 	}
-	d.ws = ws.NewClient(wsToken, d)
+	d.ws = ws.NewClient(config.WsToken, d)
 
 	return d
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func (c *cli) PrintProjects(ps []*sync.Project) {
+func (c *Cli) PrintProjects(ps []*sync.Project) {
 	tbl := table.NewTable()
 	tbl.AddHeader("ID", "Name", "Color")
 	tbl.SetHeaderStyle(headerStyle)
@@ -28,7 +28,7 @@ func (c *cli) PrintProjects(ps []*sync.Project) {
 	fmt.Print(tbl.Render())
 }
 
-func (c *cli) projectName(p *sync.Project) *table.Cell {
+func (c *Cli) projectName(p *sync.Project) *table.Cell {
 	icon := c.icons.none
 	if p.InboxProject {
 		icon = c.icons.inbox

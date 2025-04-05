@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/utils"
 	"github.com/urfave/cli/v3"
@@ -68,7 +68,7 @@ func NewAddCmd(f *util.Factory) *cli.Command {
 					Layouts: []string{time.DateOnly},
 				},
 				Action: func(_ context.Context, _ *cli.Command, v time.Time) error {
-					params.Deadline = &sync.Deadline{Date: v, Lang: f.Config.Lang}
+					params.Deadline = &sync.Deadline{Date: v, Lang: f.Lang}
 					return nil
 				},
 			},

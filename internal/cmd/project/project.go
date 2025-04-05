@@ -1,7 +1,7 @@
 package project
 
 import (
-	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/urfave/cli/v3"
 )
 

@@ -3,8 +3,8 @@ package task
 import (
 	"context"
 
-	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
 	tcli "github.com/CnTeng/todoist-cli/internal/cli"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/urfave/cli/v3"
@@ -58,9 +58,7 @@ func NewListCmd(f *util.Factory) *cli.Command {
 				return err
 			}
 
-			c := tcli.NewCLI(tcli.Nerd)
-			c.PrintTasks(result, params)
-
+			f.Cli.PrintTasks(result, params)
 			return nil
 		},
 	}

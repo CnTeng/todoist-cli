@@ -19,7 +19,7 @@ type TaskListArgs struct {
 	Description bool
 }
 
-func (c *cli) renderTask(t *model.Task, depth []bool, opt *TaskListArgs) []table.Row {
+func (c *Cli) renderTask(t *model.Task, depth []bool, opt *TaskListArgs) []table.Row {
 	row := table.Row{
 		t.ID,
 		c.taskProject(t),
@@ -42,7 +42,7 @@ func (c *cli) renderTask(t *model.Task, depth []bool, opt *TaskListArgs) []table
 	return rows
 }
 
-func (c *cli) PrintTasks(ts []*model.Task, opt *TaskListArgs) {
+func (c *Cli) PrintTasks(ts []*model.Task, opt *TaskListArgs) {
 	tbl := table.NewTable()
 	if opt.Description {
 		tbl.AddHeader("ID", "Project", "Name", "Description", "Labels", "Due", "Deadline", "Duration")
@@ -60,11 +60,11 @@ func (c *cli) PrintTasks(ts []*model.Task, opt *TaskListArgs) {
 	fmt.Print(tbl.Render())
 }
 
-func (c *cli) taskProject(t *model.Task) string {
+func (c *Cli) taskProject(t *model.Task) string {
 	return color.RGB(t.Project.Color.RGB()).Sprint(t.Project.Name)
 }
 
-func (c *cli) taskLabels(t *model.Task) string {
+func (c *Cli) taskLabels(t *model.Task) string {
 	labels := []string{}
 	for _, l := range t.Labels {
 		labels = append(labels, color.BgRGB(l.Color.RGB()).Sprint(l.Name))
@@ -72,28 +72,28 @@ func (c *cli) taskLabels(t *model.Task) string {
 	return strings.Join(labels, " ")
 }
 
-func (c *cli) taskDue(t *model.Task) string {
+func (c *Cli) taskDue(t *model.Task) string {
 	if t.Due != nil && t.Due.String != nil {
 		return *t.Due.String
 	}
 	return ""
 }
 
-func (c *cli) taskDeadline(t *model.Task) string {
+func (c *Cli) taskDeadline(t *model.Task) string {
 	if t.Deadline != nil {
 		return t.Deadline.Date.Format(time.DateOnly)
 	}
 	return ""
 }
 
-func (c *cli) taskDuration(t *model.Task) string {
+func (c *Cli) taskDuration(t *model.Task) string {
 	if t.Duration != nil {
 		return t.Duration.String()
 	}
 	return ""
 }
 
-func (c *cli) taskContent(t *model.Task, depth []bool, args *TaskListArgs) *table.Cell {
+func (c *Cli) taskContent(t *model.Task, depth []bool, args *TaskListArgs) *table.Cell {
 	depth = slices.Clone(depth)
 
 	pColor := text.FgWhite

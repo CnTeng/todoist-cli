@@ -4,8 +4,7 @@ import (
 	"context"
 
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/CnTeng/todoist-cli/cmd/todoist/util"
-	tcli "github.com/CnTeng/todoist-cli/internal/cli"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/urfave/cli/v3"
 )
@@ -20,9 +19,7 @@ func NewListCmd(f *util.Factory) *cli.Command {
 				return err
 			}
 
-			c := tcli.NewCLI(tcli.Nerd)
-			c.PrintProjects(result)
-
+			f.Cli.PrintProjects(result)
 			return nil
 		},
 	}
