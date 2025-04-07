@@ -13,7 +13,7 @@ func NewCmd(f *util.Factory) *cli.Command {
 	return &cli.Command{
 		Name: "daemon",
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			db, err := db.NewDB("test/todoist.db")
+			db, err := db.NewDB(f.DBConfig)
 			if err != nil {
 				return err
 			}

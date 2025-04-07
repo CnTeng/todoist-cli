@@ -4,6 +4,7 @@ import (
 	"net"
 
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/db"
 	"github.com/CnTeng/todoist-cli/internal/view"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
@@ -12,6 +13,7 @@ import (
 type Factory struct {
 	DeamonConfig *daemon.Config   `toml:"daemon"`
 	ViewConfig   *view.ViewConfig `toml:"view"`
+	DBConfig     *db.Config       `toml:"database"`
 	IconConfig   *view.IconConfig `toml:"icon"`
 
 	Lang string `toml:"lang"`
