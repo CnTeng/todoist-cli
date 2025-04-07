@@ -21,7 +21,7 @@ func NewListCmd(f *util.Factory) *cli.Command {
 				return err
 			}
 
-			v := view.NewProjectView(result, f.Icons)
+			v := view.NewProjectView(result, f.IconConfig.Icons)
 			fmt.Print(v.Render())
 			return nil
 		},

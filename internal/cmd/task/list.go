@@ -12,7 +12,7 @@ import (
 )
 
 func NewListCmd(f *util.Factory) *cli.Command {
-	params := &view.TaskViewOptions{}
+	params := &view.TaskViewConfig{}
 	return &cli.Command{
 		Name:                   "list",
 		Aliases:                []string{"ls"},
@@ -59,7 +59,7 @@ func NewListCmd(f *util.Factory) *cli.Command {
 				return err
 			}
 
-			v := view.NewTaskView(result, f.Icons, params)
+			v := view.NewTaskView(result, f.IconConfig.Icons, params)
 			fmt.Print(v.Render())
 			return nil
 		},

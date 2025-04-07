@@ -1,44 +1,97 @@
 package view
 
+import "fmt"
+
+type iconType string
+
+const (
+	Nerd iconType = "nerd"
+	Text iconType = "text"
+)
+
+type IconConfig struct {
+	IconType iconType `toml:"default"`
+	*Icons
+}
+
+func (c *IconConfig) UnmarshalTOML(p any) error {
+	data, ok := p.(map[string]any)
+	if !ok {
+		return fmt.Errorf("expected map[string]any, got %T", p)
+	}
+
+	if _, ok := data["default"]; ok {
+		c.IconType = iconType(data["default"].(string))
+		switch c.IconType {
+		case Nerd:
+			c.Icons = &NerdIcons
+		case Text:
+			c.Icons = &TextIcons
+		}
+	}
+
+	if v, ok := data["none"].(string); ok {
+		c.None = v
+	}
+	if v, ok := data["done"].(string); ok {
+		c.Done = v
+	}
+	if v, ok := data["undone"].(string); ok {
+		c.Undone = v
+	}
+	if v, ok := data["inbox"].(string); ok {
+		c.Inbox = v
+	}
+	if v, ok := data["favorite"].(string); ok {
+		c.Favorite = v
+	}
+	if v, ok := data["indent"].(string); ok {
+		c.Indent = v
+	}
+	if v, ok := data["last_indent"].(string); ok {
+		c.LastIndent = v
+	}
+
+	return nil
+}
+
+var DefaultIconConfig = &IconConfig{
+	IconType: Nerd,
+	Icons:    &NerdIcons,
+}
+
 type Icons struct {
-	none   string
-	done   string
-	undone string
+	None   string `toml:"none"`
+	Done   string `toml:"done"`
+	Undone string `toml:"undone"`
 
-	inbox    string
-	favorite string
+	Inbox    string `toml:"inbox"`
+	Favorite string `toml:"favorite"`
 
-	indent     string
-	lastIndent string
+	Indent     string `toml:"indent"`
+	LastIndent string `toml:"last_indent"`
 }
 
 var NerdIcons = Icons{
-	none:   "  ",
-	done:   " ",
-	undone: " ",
+	None:   "  ",
+	Done:   " ",
+	Undone: " ",
 
-	inbox:    " ",
-	favorite: " ",
+	Inbox:    " ",
+	Favorite: " ",
 
-	indent:     "│ ",
-	lastIndent: "└ ",
+	Indent:     "│ ",
+	LastIndent: "└ ",
 }
 
 var TextIcons = Icons{
-	none:   "  ",
-	done:   "[x]",
-	undone: "[ ]",
+	None:   "  ",
+	Done:   "[x]",
+	Undone: "[ ]",
 
-	inbox:    "IN",
-	favorite: "* ",
+	Inbox:    "IN",
+	Favorite: "* ",
 
-	indent:     "  ",
-	lastIndent: "  ",
+	Indent:     "  ",
+	LastIndent: "  ",
 }
-
-type iconType int
-
-const (
-	Nerd iconType = iota
-	Text
-)

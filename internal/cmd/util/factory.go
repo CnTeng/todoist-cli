@@ -11,19 +11,22 @@ import (
 
 type Factory struct {
 	RpcClient    *jrpc2.Client
-	DeamonConfig *daemon.Config `toml:"daemon"`
-	Lang         string         `toml:"lang"`
-	Icons        *view.Icons
+	DeamonConfig *daemon.Config   `toml:"daemon"`
+	ViewConfig   *view.ViewConfig `toml:"view"`
+	IconConfig   *view.IconConfig `toml:"icon"`
+
+	Lang string `toml:"lang"`
 
 	conn net.Conn
 }
 
 func NewFactory() *Factory {
 	return &Factory{
-		RpcClient:    nil,
-		DeamonConfig: &daemon.Config{},
-		Lang:         "en",
-		Icons:        &view.NerdIcons,
+		DeamonConfig: daemon.DefaultConfig,
+		ViewConfig:   view.DefaultViewConfig,
+		IconConfig:   view.DefaultIconConfig,
+
+		Lang: "en",
 	}
 }
 
