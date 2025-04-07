@@ -13,9 +13,9 @@ import (
 )
 
 type TaskViewConfig struct {
-	Completed   bool `toml:"completed"`
-	Tree        bool `toml:"tree"`
-	Description bool `toml:"description"`
+	Completed   bool `json:"completed"`
+	Tree        bool `json:"-"`
+	Description bool `json:"-"`
 }
 
 type taskView struct {

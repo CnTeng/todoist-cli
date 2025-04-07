@@ -12,7 +12,6 @@ import (
 
 type Factory struct {
 	DeamonConfig *daemon.Config   `toml:"daemon"`
-	ViewConfig   *view.ViewConfig `toml:"view"`
 	DBConfig     *db.Config       `toml:"database"`
 	IconConfig   *view.IconConfig `toml:"icon"`
 
@@ -25,7 +24,6 @@ type Factory struct {
 func NewFactory() *Factory {
 	return &Factory{
 		DeamonConfig: daemon.DefaultConfig,
-		ViewConfig:   view.DefaultViewConfig,
 		IconConfig:   view.DefaultIconConfig,
 
 		Lang: "en",
@@ -34,7 +32,7 @@ func NewFactory() *Factory {
 
 func (f *Factory) Dial() error {
 	var err error
-	f.conn, err = net.Dial("unix", "@todo.sock")
+	f.conn, err = net.Dial(jrpc2.Network(f.DeamonConfig.Address))
 	if err != nil {
 		return err
 	}

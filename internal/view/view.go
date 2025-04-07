@@ -9,18 +9,6 @@ type View interface {
 	Render() string
 }
 
-type ViewConfig struct {
-	*TaskViewConfig
-}
-
-var DefaultViewConfig = &ViewConfig{
-	TaskViewConfig: &TaskViewConfig{
-		Completed:   false,
-		Description: false,
-		Tree:        false,
-	},
-}
-
 var headerStyle = &table.CellStyle{
 	CellAttrs: text.Colors{text.FgGreen, text.Underline},
 }

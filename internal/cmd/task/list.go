@@ -48,14 +48,7 @@ func NewListCmd(f *util.Factory) *cli.Command {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			result := []*model.Task{}
-			if err := f.CallResult(
-				ctx,
-				daemon.TaskList,
-				struct {
-					All bool `json:"all"`
-				}{All: params.Completed},
-				&result,
-			); err != nil {
+			if err := f.CallResult(ctx, daemon.TaskList, params, &result); err != nil {
 				return err
 			}
 
