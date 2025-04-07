@@ -32,7 +32,7 @@ func NewMoveCmd(f *util.Factory) *cli.Command {
 			newProjectFlag(params.ProjectID),
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.RpcClient.Call(ctx, daemon.TaskMove, params); err != nil {
+			if _, err := f.Call(ctx, daemon.TaskMove, params); err != nil {
 				return err
 			}
 

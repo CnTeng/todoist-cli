@@ -17,7 +17,7 @@ func NewListCmd(f *util.Factory) *cli.Command {
 		Aliases: []string{"ls"},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			result := []*sync.Project{}
-			if err := f.RpcClient.CallResult(ctx, daemon.ProjectList, nil, &result); err != nil {
+			if err := f.CallResult(ctx, daemon.ProjectList, nil, &result); err != nil {
 				return err
 			}
 

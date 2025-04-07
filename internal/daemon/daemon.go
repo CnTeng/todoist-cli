@@ -21,6 +21,10 @@ type Config struct {
 	WsToken  string `toml:"ws_token"`
 }
 
+var DefaultConfig = &Config{
+	Address: "@todo.sock",
+}
+
 type Daemon struct {
 	address string
 	client  *sync.Client

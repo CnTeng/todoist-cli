@@ -37,7 +37,7 @@ func NewModifyCmd(f *util.Factory) *cli.Command {
 			newDurationFlag(params.Duration),
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.RpcClient.Call(ctx, daemon.TaskModify, params); err != nil {
+			if _, err := f.Call(ctx, daemon.TaskModify, params); err != nil {
 				return err
 			}
 

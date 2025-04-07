@@ -10,7 +10,6 @@ import (
 )
 
 type Factory struct {
-	RpcClient    *jrpc2.Client
 	DeamonConfig *daemon.Config   `toml:"daemon"`
 	ViewConfig   *view.ViewConfig `toml:"view"`
 	IconConfig   *view.IconConfig `toml:"icon"`
@@ -18,6 +17,7 @@ type Factory struct {
 	Lang string `toml:"lang"`
 
 	conn net.Conn
+	*jrpc2.Client
 }
 
 func NewFactory() *Factory {
@@ -37,7 +37,7 @@ func (f *Factory) Dial() error {
 		return err
 	}
 
-	f.RpcClient = jrpc2.NewClient(channel.Line(f.conn, f.conn), nil)
+	f.Client = jrpc2.NewClient(channel.Line(f.conn, f.conn), nil)
 	return nil
 }
 

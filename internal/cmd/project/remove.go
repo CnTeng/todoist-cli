@@ -27,7 +27,7 @@ func NewRemoveCmd(f *util.Factory) *cli.Command {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			for _, id := range params {
-				if _, err := f.RpcClient.Call(ctx, daemon.ProjectRemove, &sync.ProjectDeleteArgs{ID: id}); err != nil {
+				if _, err := f.Call(ctx, daemon.ProjectRemove, &sync.ProjectDeleteArgs{ID: id}); err != nil {
 					return err
 				}
 				fmt.Printf("Project deleted: %s\n", id)

@@ -32,7 +32,7 @@ func NewCmd(f *util.Factory) *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.RpcClient.Call(ctx, daemon.Sync, params); err != nil {
+			if _, err := f.Call(ctx, daemon.Sync, params); err != nil {
 				return err
 			}
 
