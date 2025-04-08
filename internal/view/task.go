@@ -12,29 +12,29 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 )
 
-type TaskViewOptions struct {
-	Completed   bool
-	Tree        bool
-	Description bool
+type TaskViewConfig struct {
+	Completed   bool `json:"completed"`
+	Tree        bool `json:"-"`
+	Description bool `json:"-"`
 }
 
 type taskView struct {
-	icons   *Icons
-	tasks   []*model.Task
-	options *TaskViewOptions
+	icons  *Icons
+	tasks  []*model.Task
+	config *TaskViewConfig
 }
 
-func NewTaskView(tasks []*model.Task, icons *Icons, options *TaskViewOptions) View {
+func NewTaskView(tasks []*model.Task, icons *Icons, config *TaskViewConfig) View {
 	return &taskView{
-		icons:   icons,
-		tasks:   tasks,
-		options: options,
+		icons:  icons,
+		tasks:  tasks,
+		config: config,
 	}
 }
 
 func (v *taskView) Render() string {
 	tbl := table.NewTable()
-	if v.options.Description {
+	if v.config.Description {
 		tbl.AddHeader("ID", "Project", "Name", "Description", "Labels", "Due", "Deadline", "Duration")
 	} else {
 		tbl.AddHeader("ID", "Project", "Name", "Labels", "Due", "Deadline", "Duration")
@@ -56,13 +56,13 @@ func (v *taskView) renderTask(t *model.Task, depth []bool) []table.Row {
 		v.taskProject(t),
 		v.taskContent(t, depth),
 	}
-	if v.options.Description {
+	if v.config.Description {
 		row = append(row, t.Description)
 	}
 	row = append(row, v.taskLabels(t), v.taskDue(t), v.taskDeadline(t), v.taskDuration(t))
 
 	rows := []table.Row{row}
-	if !v.options.Tree {
+	if !v.config.Tree {
 		return rows
 	}
 
@@ -121,9 +121,9 @@ func (v *taskView) taskContent(t *model.Task, depth []bool) *table.Cell {
 		pColor = text.FgRed
 	}
 
-	sIcon := v.icons.undone
+	sIcon := v.icons.Undone
 	if t.CompletedAt != nil {
-		sIcon = v.icons.done
+		sIcon = v.icons.Done
 	}
 
 	return &table.Cell{
@@ -134,24 +134,24 @@ func (v *taskView) taskContent(t *model.Task, depth []bool) *table.Cell {
 
 			for i, d := range depth {
 				if !d {
-					b.WriteString(v.icons.indent)
+					b.WriteString(v.icons.Indent)
 					continue
 				}
 
 				if isFirst && i == lastIdx {
-					b.WriteString(v.icons.lastIndent)
+					b.WriteString(v.icons.LastIndent)
 				} else {
-					b.WriteString(v.icons.none)
+					b.WriteString(v.icons.None)
 				}
 			}
 
 			if isFirst {
 				b.WriteString(pColor.Sprint(sIcon))
 			} else {
-				b.WriteString(v.icons.none)
+				b.WriteString(v.icons.None)
 			}
 
-			if isFirst && !v.options.Tree && t.SubTaskStatus.Total > 0 {
+			if isFirst && !v.config.Tree && t.SubTaskStatus.Total > 0 {
 				fmt.Fprintf(b, "(%d/%d) ", t.SubTaskStatus.Completed, t.SubTaskStatus.Total)
 			}
 

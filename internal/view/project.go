@@ -38,11 +38,11 @@ func (v *projectView) Render() string {
 }
 
 func (v *projectView) projectName(p *sync.Project) *table.Cell {
-	icon := v.icons.none
+	icon := v.icons.None
 	if p.InboxProject {
-		icon = v.icons.inbox
+		icon = v.icons.Inbox
 	} else if p.IsFavorite {
-		icon = v.icons.favorite
+		icon = v.icons.Favorite
 	}
 	return &table.Cell{
 		Content: p.Name,
@@ -50,7 +50,7 @@ func (v *projectView) projectName(p *sync.Project) *table.Cell {
 			if isFirst {
 				return icon
 			}
-			return v.icons.none
+			return v.icons.None
 		},
 	}
 }

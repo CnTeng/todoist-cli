@@ -38,7 +38,7 @@ func NewAddCmd(f *util.Factory) *cli.Command {
 			newLabelsFlag(&params.Labels),
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.RpcClient.Call(ctx, daemon.TaskAdd, params); err != nil {
+			if _, err := f.Call(ctx, daemon.TaskAdd, params); err != nil {
 				return err
 			}
 
@@ -66,7 +66,7 @@ func NewQuickAddCmd(f *util.Factory) *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.RpcClient.Call(ctx, daemon.TaskQuickAdd, params); err != nil {
+			if _, err := f.Call(ctx, daemon.TaskQuickAdd, params); err != nil {
 				return err
 			}
 

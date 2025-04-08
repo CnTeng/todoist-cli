@@ -28,7 +28,7 @@ func NewRemoveCmd(f *util.Factory) *cli.Command {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			for _, id := range params {
-				if _, err := f.RpcClient.Call(ctx, daemon.TaskRemove, &sync.ItemDeleteArgs{ID: id}); err != nil {
+				if _, err := f.Call(ctx, daemon.TaskRemove, &sync.ItemDeleteArgs{ID: id}); err != nil {
 					return err
 				}
 				fmt.Printf("Task deleted: %s\n", id)

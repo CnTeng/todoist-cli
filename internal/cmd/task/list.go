@@ -12,7 +12,7 @@ import (
 )
 
 func NewListCmd(f *util.Factory) *cli.Command {
-	params := &view.TaskViewOptions{}
+	params := &view.TaskViewConfig{}
 	return &cli.Command{
 		Name:                   "list",
 		Aliases:                []string{"ls"},
@@ -48,18 +48,11 @@ func NewListCmd(f *util.Factory) *cli.Command {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			result := []*model.Task{}
-			if err := f.RpcClient.CallResult(
-				ctx,
-				daemon.TaskList,
-				struct {
-					All bool `json:"all"`
-				}{All: params.Completed},
-				&result,
-			); err != nil {
+			if err := f.CallResult(ctx, daemon.TaskList, params, &result); err != nil {
 				return err
 			}
 
-			v := view.NewTaskView(result, f.Icons, params)
+			v := view.NewTaskView(result, f.IconConfig.Icons, params)
 			fmt.Print(v.Render())
 			return nil
 		},
