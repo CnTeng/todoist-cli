@@ -1,6 +1,0 @@
-{
-  "language": "sqlite",
-  "keywordCase": "upper",
-  "dataTypeCase": "lower",
-  "functionCase": "lower"
-}
