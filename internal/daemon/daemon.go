@@ -111,7 +111,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		TaskAdd:       handler.New(d.client.AddItem),
 		TaskQuickAdd:  handler.New(d.client.QuickAddItem),
 		TaskModify:    handler.New(d.client.UpdateItem),
-		TaskRemove:    handler.New(d.client.DeleteItem),
+		TaskRemove:    handler.New(d.client.DeleteItems),
 		TaskClose:     handler.New(d.client.CloseItem),
 		TaskMove:      handler.New(d.client.MoveItem),
 		TaskReopen:    handler.New(d.client.UncompleteItem),
@@ -119,7 +119,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		ProjectList:   handler.New(d.db.ListProjects),
 		ProjectAdd:    handler.New(d.client.AddProject),
 		ProjectModify: handler.New(d.client.UpdateProject),
-		ProjectRemove: handler.New(d.client.DeleteProject),
+		ProjectRemove: handler.New(d.client.DeleteProjects),
 		LabelGet:      handler.New(d.db.GetLabel),
 		LabelList:     handler.New(d.db.ListLabels),
 	})

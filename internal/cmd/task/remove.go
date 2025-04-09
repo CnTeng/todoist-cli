@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
@@ -11,7 +12,7 @@ import (
 )
 
 func NewRemoveCmd(f *util.Factory) *cli.Command {
-	params := []string{}
+	ids := []string{}
 	return &cli.Command{
 		Name:        "remove",
 		Aliases:     []string{"rm"},
@@ -23,17 +24,20 @@ func NewRemoveCmd(f *util.Factory) *cli.Command {
 				Name:   "id",
 				Min:    1,
 				Max:    -1,
-				Values: &params,
+				Values: &ids,
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			for _, id := range params {
-				if _, err := f.Call(ctx, daemon.TaskRemove, &sync.ItemDeleteArgs{ID: id}); err != nil {
-					return err
-				}
-				fmt.Printf("Task deleted: %s\n", id)
+			params := make([]*sync.ItemDeleteArgs, 0, len(ids))
+			for _, id := range ids {
+				params = append(params, &sync.ItemDeleteArgs{ID: id})
 			}
 
+			if _, err := f.Call(ctx, daemon.TaskRemove, params); err != nil {
+				return err
+			}
+
+			fmt.Printf("Task deleted: %s\n", strings.Join(ids, ", "))
 			return nil
 		},
 	}

@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/CnTeng/table v0.1.6-0.20250409033911-12e9296e47ac
-	github.com/CnTeng/todoist-api-go v0.0.0-20250409130637-8a8cb5e993b2
+	github.com/CnTeng/todoist-api-go v0.0.0-20250409151217-b2bc9074ea3e
 	github.com/adrg/xdg v0.5.3
 	github.com/creachadair/jrpc2 v1.3.1
 	github.com/fatih/color v1.18.0
