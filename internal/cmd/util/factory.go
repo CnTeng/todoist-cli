@@ -1,8 +1,11 @@
 package util
 
 import (
+	"bytes"
 	"net"
+	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/view"
 	"github.com/creachadair/jrpc2"
@@ -31,6 +34,26 @@ func NewFactory(configFile, dataFile string) *Factory {
 		ConfigFilePath: configFile,
 		DataFilePath:   dataFile,
 	}
+}
+
+func (f *Factory) ReadConfig() error {
+	data, err := os.ReadFile(f.ConfigFilePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return err
+		}
+
+		buf := new(bytes.Buffer)
+		encoder := toml.NewEncoder(buf)
+		encoder.Indent = ""
+		if err := encoder.Encode(f); err != nil {
+			return err
+		}
+
+		return os.WriteFile(f.ConfigFilePath, buf.Bytes(), 0o644)
+	}
+
+	return toml.Unmarshal(data, f)
 }
 
 func (f *Factory) Dial() error {

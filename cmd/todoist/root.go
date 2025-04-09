@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/BurntSushi/toml"
 	"github.com/CnTeng/todoist-cli/internal/cmd/daemon"
 	"github.com/CnTeng/todoist-cli/internal/cmd/project"
 	"github.com/CnTeng/todoist-cli/internal/cmd/sync"
@@ -45,12 +44,7 @@ func newCmd() (*cli.Command, error) {
 			},
 		},
 		Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
-			file, err := os.ReadFile(f.ConfigFilePath)
-			if err != nil {
-				return nil, err
-			}
-
-			if err := toml.Unmarshal(file, f); err != nil {
+			if err := f.ReadConfig(); err != nil {
 				return nil, err
 			}
 
