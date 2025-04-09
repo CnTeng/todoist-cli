@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 	"github.com/CnTeng/todoist-cli/internal/cmd/daemon"
@@ -15,33 +15,43 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
+const (
+	appName    = "todoist"
+	configFile = "config.toml"
+	cacheFile  = "todoist.db"
+)
+
 func newCmd() (*cli.Command, error) {
-	appName := "todoist"
-	configFilePath, err := xdg.ConfigFile(appName + "/config.toml")
+	configFilePath, err := xdg.ConfigFile(filepath.Join(appName, configFile))
 	if err != nil {
-		return nil, fmt.Errorf("getting config file path: %v", err)
+		return nil, err
+	}
+	dataFilePath, err := xdg.DataFile(filepath.Join(appName, cacheFile))
+	if err != nil {
+		return nil, err
 	}
 
-	f := util.NewFactory()
+	f := util.NewFactory(configFilePath, dataFilePath)
+
 	return &cli.Command{
-		Name:  "todoist",
+		Name:  appName,
 		Usage: "A CLI for Todoist",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "config",
 				Usage:       "config file",
-				Value:       configFilePath,
-				Destination: &configFilePath,
+				Value:       f.ConfigFilePath,
+				Destination: &f.ConfigFilePath,
 			},
 		},
 		Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
-			file, err := os.ReadFile(configFilePath)
+			file, err := os.ReadFile(f.ConfigFilePath)
 			if err != nil {
-				return nil, fmt.Errorf("error reading config file: %v", err)
+				return nil, err
 			}
 
 			if err := toml.Unmarshal(file, f); err != nil {
-				return nil, fmt.Errorf("error decoding config file: %v", err)
+				return nil, err
 			}
 
 			if cmd.Args().First() == "daemon" {

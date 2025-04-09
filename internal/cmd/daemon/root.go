@@ -12,15 +12,8 @@ import (
 func NewCmd(f *util.Factory) *cli.Command {
 	return &cli.Command{
 		Name: "daemon",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:     "address",
-				Usage:    "Address to listen on",
-				OnlyOnce: true,
-			},
-		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			db, err := db.NewDB(f.DBConfig)
+			db, err := db.NewDB(f.DataFilePath)
 			if err != nil {
 				return err
 			}

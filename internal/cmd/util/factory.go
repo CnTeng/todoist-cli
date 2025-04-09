@@ -4,7 +4,6 @@ import (
 	"net"
 
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/CnTeng/todoist-cli/internal/db"
 	"github.com/CnTeng/todoist-cli/internal/view"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
@@ -12,21 +11,25 @@ import (
 
 type Factory struct {
 	DeamonConfig *daemon.Config   `toml:"daemon"`
-	DBConfig     *db.Config       `toml:"database"`
 	IconConfig   *view.IconConfig `toml:"icon"`
 
 	Lang string `toml:"lang"`
+
+	ConfigFilePath string `toml:"-"`
+	DataFilePath   string `toml:"-"`
 
 	conn net.Conn
 	*jrpc2.Client
 }
 
-func NewFactory() *Factory {
+func NewFactory(configFile, dataFile string) *Factory {
 	return &Factory{
 		DeamonConfig: daemon.DefaultConfig,
 		IconConfig:   view.DefaultIconConfig,
+		Lang:         "en",
 
-		Lang: "en",
+		ConfigFilePath: configFile,
+		DataFilePath:   dataFile,
 	}
 }
 

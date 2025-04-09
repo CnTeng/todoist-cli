@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 
 	_ "modernc.org/sqlite"
 )
@@ -23,23 +22,8 @@ type DB struct {
 	*sql.DB
 }
 
-type Config struct {
-	Path string `toml:"path"`
-}
-
-func NewDB(config *Config) (*DB, error) {
-	if _, err := os.Stat(config.Path); os.IsNotExist(err) {
-		file, err := os.Create(config.Path)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := file.Close(); err != nil {
-			return nil, err
-		}
-	}
-
-	dbPath := fmt.Sprintf("file:%s?_time_format=sqlite", config.Path)
+func NewDB(path string) (*DB, error) {
+	dbPath := fmt.Sprintf("file:%s?_time_format=sqlite", path)
 	database, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		return nil, err
