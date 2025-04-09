@@ -27,9 +27,9 @@ func NewMoveCmd(f *util.Factory) *cli.Command {
 			},
 		},
 		Flags: []cli.Flag{
-			newSectionFlag(params.SectionID),
-			newParentFlag(params.ParentID),
-			newProjectFlag(params.ProjectID),
+			newSectionFlag(&params.SectionID),
+			newParentFlag(&params.ParentID),
+			newProjectFlag(&params.ProjectID),
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if _, err := f.Call(ctx, daemon.TaskMove, params); err != nil {

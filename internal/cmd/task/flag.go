@@ -8,59 +8,59 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func newContentFlag(destination *string) cli.Flag {
+func newContentFlag(destination **string) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "content",
 		Aliases:  []string{"c"},
 		Usage:    "Task content",
 		OnlyOnce: true,
 		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			destination = &v
+			*destination = &v
 			return nil
 		},
 	}
 }
 
-func newDescriptionFlag(destination *string) cli.Flag {
+func newDescriptionFlag(destination **string) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "description",
 		Aliases:  []string{"D"},
 		Usage:    "Task description",
 		OnlyOnce: true,
 		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			destination = &v
+			*destination = &v
 			return nil
 		},
 	}
 }
 
-func newProjectFlag(destination *string) cli.Flag {
+func newProjectFlag(destination **string) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "project",
 		Aliases:  []string{"P"},
 		Usage:    "Project ID",
 		OnlyOnce: true,
 		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			destination = &v
+			*destination = &v
 			return nil
 		},
 	}
 }
 
-func newDueFlag(destination *sync.Due) cli.Flag {
+func newDueFlag(destination **sync.Due) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "due",
 		Aliases:  []string{"d"},
 		Usage:    "Due date",
 		OnlyOnce: true,
 		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			destination = &sync.Due{String: &v}
+			*destination = &sync.Due{String: &v}
 			return nil
 		},
 	}
 }
 
-func newDeadlineFlag(destination *sync.Deadline, lang string) cli.Flag {
+func newDeadlineFlag(destination **sync.Deadline) cli.Flag {
 	return &cli.TimestampFlag{
 		Name:     "deadline",
 		Usage:    "Deadline date",
@@ -69,14 +69,14 @@ func newDeadlineFlag(destination *sync.Deadline, lang string) cli.Flag {
 			Layouts: []string{time.DateOnly},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command, v time.Time) error {
-			destination = &sync.Deadline{Date: v, Lang: lang}
+			*destination = &sync.Deadline{Date: &v}
 
 			return nil
 		},
 	}
 }
 
-func newPriorityFlag(destination *int) cli.Flag {
+func newPriorityFlag(destination **int) cli.Flag {
 	return &cli.IntFlag{
 		Name:     "priority",
 		Aliases:  []string{"p"},
@@ -85,32 +85,32 @@ func newPriorityFlag(destination *int) cli.Flag {
 		OnlyOnce: true,
 		Action: func(ctx context.Context, cmd *cli.Command, v int64) error {
 			priority := int(v)
-			destination = &priority
+			*destination = &priority
 			return nil
 		},
 	}
 }
 
-func newParentFlag(destination *string) cli.Flag {
+func newParentFlag(destination **string) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "parent",
 		Usage:    "Parent task ID",
 		OnlyOnce: true,
 		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			destination = &v
+			*destination = &v
 			return nil
 		},
 	}
 }
 
-func newSectionFlag(destination *string) cli.Flag {
+func newSectionFlag(destination **string) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "section",
 		Aliases:  []string{"s"},
 		Usage:    "Section ID",
 		OnlyOnce: true,
 		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			destination = &v
+			*destination = &v
 			return nil
 		},
 	}
@@ -129,7 +129,7 @@ func newLabelsFlag(destination *[]string) cli.Flag {
 	}
 }
 
-func newDurationFlag(destination *sync.Duration) cli.Flag {
+func newDurationFlag(destination **sync.Duration) cli.Flag {
 	return &cli.StringFlag{
 		Name:     "duration",
 		Usage:    "Duration",
@@ -139,7 +139,7 @@ func newDurationFlag(destination *sync.Duration) cli.Flag {
 			if err != nil {
 				return err
 			}
-			destination = duration
+			*destination = duration
 			return nil
 		},
 	}

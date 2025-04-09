@@ -28,13 +28,13 @@ func NewModifyCmd(f *util.Factory) *cli.Command {
 			},
 		},
 		Flags: []cli.Flag{
-			newContentFlag(params.Content),
-			newDescriptionFlag(params.Description),
-			newDueFlag(params.Due),
-			newDeadlineFlag(params.Deadline, f.Lang),
-			newPriorityFlag(params.Priority),
+			newContentFlag(&params.Content),
+			newDescriptionFlag(&params.Description),
+			newDueFlag(&params.Due),
+			newDeadlineFlag(&params.Deadline),
+			newPriorityFlag(&params.Priority),
 			newLabelsFlag(&params.Labels),
-			newDurationFlag(params.Duration),
+			newDurationFlag(&params.Duration),
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if _, err := f.Call(ctx, daemon.TaskModify, params); err != nil {

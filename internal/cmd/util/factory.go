@@ -16,8 +16,6 @@ type Factory struct {
 	DeamonConfig *daemon.Config   `toml:"daemon"`
 	IconConfig   *view.IconConfig `toml:"icon"`
 
-	Lang string `toml:"lang"`
-
 	ConfigFilePath string `toml:"-"`
 	DataFilePath   string `toml:"-"`
 
@@ -29,7 +27,6 @@ func NewFactory(configFile, dataFile string) *Factory {
 	return &Factory{
 		DeamonConfig: daemon.DefaultConfig,
 		IconConfig:   view.DefaultIconConfig,
-		Lang:         "en",
 
 		ConfigFilePath: configFile,
 		DataFilePath:   dataFile,
