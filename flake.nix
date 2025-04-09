@@ -18,7 +18,7 @@
   };
 
   outputs =
-    inputs@{ flake-parts, ... }:
+    inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "x86_64-linux"
@@ -30,9 +30,30 @@
         inputs.treefmt.flakeModule
       ];
 
+      flake.overlays.default = final: prev: {
+        todoist-cli = final.callPackage ./nix/package.nix { };
+      };
+
+      flake.homeManagerModules.default = import ./nix/hm-module.nix self;
+
       perSystem =
-        { config, pkgs, ... }:
         {
+          config,
+          pkgs,
+          system,
+          ...
+        }:
+        {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+            overlays = [ self.overlays.default ];
+          };
+
+          packages = {
+            default = config.packages.todoist-cli;
+            todoist-cli = pkgs.todoist-cli;
+          };
+
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               go
