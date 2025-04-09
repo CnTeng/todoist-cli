@@ -36,7 +36,7 @@ func NewFactory(configFile, dataFile string) *Factory {
 func (f *Factory) ReadConfig() error {
 	data, err := os.ReadFile(f.ConfigFilePath)
 	if err != nil {
-		if os.IsNotExist(err) {
+		if !os.IsNotExist(err) {
 			return err
 		}
 
