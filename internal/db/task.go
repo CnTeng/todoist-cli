@@ -197,7 +197,8 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 		for _, ln := range t.Item.Labels {
 			label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
 			if err != nil {
-				return nil, err
+				// TODO: shared labels
+				label = &sync.Label{Name: ln, Color: sync.Grey}
 			}
 			t.Labels = append(t.Labels, label)
 		}
