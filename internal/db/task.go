@@ -38,6 +38,7 @@ const (
 		WHERE
 			data ->> 'parent_id' = ?
 		ORDER BY
+			(data ->> 'completed_at' IS NOT NULL) ASC,
 			data ->> 'child_order' ASC`
 
 	taskListUndoneSubQuery = `
@@ -60,6 +61,7 @@ const (
 			data ->> 'parent_id' IS NULL
 			AND data ->> 'project_id' = ?
 		ORDER BY
+			(data ->> 'completed_at' IS NOT NULL) ASC,
 			data ->> 'child_order' ASC`
 
 	taskListUndoneByProjectQuery = `
