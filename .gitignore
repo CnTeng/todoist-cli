@@ -27,4 +27,5 @@ go.work.sum
 .direnv/
 .pre-commit-config.yaml
 
+result
 test
