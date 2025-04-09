@@ -3,8 +3,9 @@ module github.com/CnTeng/todoist-cli
 go 1.24.1
 
 require (
-	github.com/CnTeng/table v0.1.5
-	github.com/CnTeng/todoist-api-go v0.0.0-20250328055207-3e26ff8fab05
+	github.com/BurntSushi/toml v1.5.0
+	github.com/CnTeng/table v0.1.6-0.20250402014340-ca594e47aafc
+	github.com/CnTeng/todoist-api-go v0.0.0-20250403152413-87168c5d3d8c
 	github.com/adrg/xdg v0.5.3
 	github.com/creachadair/jrpc2 v1.3.1
 	github.com/fatih/color v1.18.0
@@ -15,7 +16,7 @@ require (
 
 require (
 	github.com/coder/websocket v1.8.13 // indirect
-	github.com/creachadair/mds v0.24.1 // indirect
+	github.com/creachadair/mds v0.24.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -25,11 +26,11 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	modernc.org/libc v1.62.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.9.1 // indirect
