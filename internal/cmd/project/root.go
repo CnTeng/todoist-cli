@@ -7,11 +7,13 @@ import (
 
 func NewCmd(f *util.Factory) *cli.Command {
 	return &cli.Command{
-		Name:  "project",
-		Usage: "project commands",
+		Name:    "project",
+		Aliases: []string{"proj"},
+		Usage:   "project commands",
 		Commands: []*cli.Command{
 			NewListCmd(f),
 			NewAddCmd(f),
+			NewModifyCmd(f),
 			NewRemoveCmd(f),
 		},
 	}

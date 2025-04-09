@@ -10,33 +10,34 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func NewAddCmd(f *util.Factory) *cli.Command {
-	params := &sync.ProjectAddArgs{}
+func NewModifyCmd(f *util.Factory) *cli.Command {
+	params := &sync.ProjectUpdateArgs{}
 	return &cli.Command{
-		Name:        "add",
-		Aliases:     []string{"a"},
-		Usage:       "Add a project",
-		Description: "Add a project to todoist",
+		Name:        "modify",
+		Aliases:     []string{"m"},
+		Usage:       "Modify a task",
+		Description: "Modify a task in todoist",
+		Category:    "task",
 		Arguments: []cli.Argument{
 			&cli.StringArg{
-				Name:        "name",
+				Name:        "ID",
 				Min:         1,
 				Max:         1,
-				Destination: &params.Name,
+				Destination: &params.ID,
 				Config:      cli.StringConfig{TrimSpace: true},
 			},
 		},
 		Flags: []cli.Flag{
+			newNameFlag(&params.Name),
 			newColorFlag(&params.Color),
 			newFavoriteFlag(&params.IsFavorite),
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.Call(ctx, daemon.ProjectAdd, params); err != nil {
+			if _, err := f.Call(ctx, daemon.ProjectModify, params); err != nil {
 				return err
 			}
 
-			fmt.Printf("Project added: %s\n", params.Name)
-
+			fmt.Printf("Project modified: %s\n", params.ID)
 			return nil
 		},
 	}
