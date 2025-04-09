@@ -12,7 +12,8 @@ import (
 func NewCmd(f *util.Factory) *cli.Command {
 	params := &daemon.SyncArgs{}
 	return &cli.Command{
-		Name: "sync",
+		Name:                   "sync",
+		UseShortOptionHandling: true,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:        "force",
