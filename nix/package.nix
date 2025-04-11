@@ -8,7 +8,7 @@ buildGoModule {
 
   src = ../.;
 
-  vendorHash = "sha256-Zig/atP/vbE8OPpbMzAa8dgbBiotOkh9bdkAMwBuy0U=";
+  vendorHash = "sha256-PCsi/YC7QnA9/dn14DFMbfoqZr3gcIpzN4CZr/7m95M=";
 
   postFixup = ''
     mv $out/bin/todoist-cli $out/bin/todoist

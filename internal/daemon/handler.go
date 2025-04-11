@@ -8,12 +8,16 @@ import (
 )
 
 func (d *Daemon) HandleMessage(ctx context.Context, msg ws.Message) error {
-	if msg != ws.SyncNeeded {
-		return nil
+	switch msg {
+	case ws.Connected:
+		fallthrough
+	case ws.SyncNeeded:
+		d.log.Println("sync needed")
+		if _, err := d.client.Sync(ctx, false); err != nil {
+			return err
+		}
 	}
-	d.log.Println("sync needed")
-	_, err := d.client.Sync(ctx, false)
-	return err
+	return nil
 }
 
 type SyncArgs struct {
