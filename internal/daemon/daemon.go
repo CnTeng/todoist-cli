@@ -84,9 +84,7 @@ func (d *Daemon) LoadTokens() error {
 }
 
 func (d *Daemon) Serve(ctx context.Context) error {
-	if err := d.ws.Listen(ctx); err != nil {
-		return err
-	}
+	d.ws.Listen(ctx)
 
 	lst, err := net.Listen(jrpc2.Network(d.address))
 	if err != nil {
