@@ -22,7 +22,10 @@ func (v *projectView) Render() string {
 	tbl := table.NewTable()
 	tbl.AddHeader("ID", "Name", "Color")
 	tbl.SetHeaderStyle(headerStyle)
-	tbl.SetColStyle(1, &table.CellStyle{WrapText: boolPtr(true)})
+	tbl.SetColStyle(1, &table.CellStyle{
+		WrapText: boolPtr(true),
+		Markdown: boolPtr(true),
+	})
 
 	for _, p := range v.projects {
 		row := table.Row{}

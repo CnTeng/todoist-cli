@@ -2,6 +2,8 @@ github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg
 github.com/BurntSushi/toml v1.5.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/CnTeng/table v0.1.6-0.20250409033911-12e9296e47ac h1:VtM6ZBUPJNG0WmRPtJ7FT+iNTIb+oFmzYTNfm+NI4XQ=
 github.com/CnTeng/table v0.1.6-0.20250409033911-12e9296e47ac/go.mod h1:DjAgAxnrNPu6NA4RDLwoKgVUP/gIbeXCAwIKbL+N/u0=
+github.com/CnTeng/table v0.1.6-0.20250411032542-36cfbfd6c510 h1:9sEgowhCBaaWcgO//vCzeahQihHiBL2sVB9FBwzb9BM=
+github.com/CnTeng/table v0.1.6-0.20250411032542-36cfbfd6c510/go.mod h1:gao9u3ZiwOhVqOO2cVONZycxCEzgOpWGo1qZj/N9Ttw=
 github.com/CnTeng/todoist-api-go v0.0.0-20250403152413-87168c5d3d8c h1:RhXOR8eyfWzX/86XH8JmPVg60vZpvlpZ8JddT+ufyjg=
 github.com/CnTeng/todoist-api-go v0.0.0-20250403152413-87168c5d3d8c/go.mod h1:bJNjQW8lK8eyvJ4pFogMOPcKSpGsYAyugsOegePH3bY=
 github.com/CnTeng/todoist-api-go v0.0.0-20250409130637-8a8cb5e993b2 h1:g6W8FXi3NxPuV3BkbTFRViJ1Fp9HBc1QMnU6cWQSmFo=
@@ -56,6 +58,8 @@ github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOf
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/urfave/cli/v3 v3.1.1 h1:bNnl8pFI5dxPOjeONvFCDFoECLQsceDG4ejahs4Jtxk=
 github.com/urfave/cli/v3 v3.1.1/go.mod h1:FJSKtM/9AiiTOJL4fJ6TbMUkxBXn7GO9guZqoZtpYpo=
+github.com/yuin/goldmark v1.7.8 h1:iERMLn0/QJeHFhxSt3p6PeN9mGnvIKSpG9YYorDMnic=
+github.com/yuin/goldmark v1.7.8/go.mod h1:uzxRWxtg69N339t3louHJ7+O03ezfj6PlliRlaOzY1E=
 golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 h1:R84qjqJb5nVJMxqWYb3np9L5ZsaDtB+a39EqjV0JSUM=
 golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0/go.mod h1:S9Xr4PYopiDyqSyp5NjCrhFrqg6A5zA2E/iPHPhqnS8=
 golang.org/x/mod v0.24.0 h1:ZfthKaKaT4NrhGVZHO1/WDTwGES4De8KtWO0SIbNJMU=

@@ -40,8 +40,14 @@ func (v *taskView) Render() string {
 		tbl.AddHeader("ID", "Project", "Name", "Labels", "Due", "Deadline", "Duration")
 	}
 	tbl.SetHeaderStyle(headerStyle)
-	tbl.SetColStyle(2, &table.CellStyle{WrapText: boolPtr(true)})
-	tbl.SetColStyle(3, &table.CellStyle{WrapText: boolPtr(true)})
+	tbl.SetColStyle(2, &table.CellStyle{
+		WrapText: boolPtr(true),
+		Markdown: boolPtr(true),
+	})
+	tbl.SetColStyle(3, &table.CellStyle{
+		WrapText: boolPtr(true),
+		Markdown: boolPtr(true),
+	})
 
 	for _, t := range v.tasks {
 		tbl.AddRows(v.renderTask(t, []bool{}))
