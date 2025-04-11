@@ -4,7 +4,17 @@ import (
 	"context"
 
 	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-api-go/ws"
 )
+
+func (d *Daemon) HandleMessage(ctx context.Context, msg ws.Message) error {
+	if msg != ws.SyncNeeded {
+		return nil
+	}
+	d.log.Println("sync needed")
+	_, err := d.client.Sync(ctx, false)
+	return err
+}
 
 type SyncArgs struct {
 	IsForce bool `json:"isForce"`

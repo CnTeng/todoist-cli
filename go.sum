@@ -8,6 +8,8 @@ github.com/CnTeng/todoist-api-go v0.0.0-20250409130637-8a8cb5e993b2 h1:g6W8FXi3N
 github.com/CnTeng/todoist-api-go v0.0.0-20250409130637-8a8cb5e993b2/go.mod h1:bJNjQW8lK8eyvJ4pFogMOPcKSpGsYAyugsOegePH3bY=
 github.com/CnTeng/todoist-api-go v0.0.0-20250409151217-b2bc9074ea3e h1:uqkY1KOU0Hydv5MRgtyUxyZ71KaJtXI0wsVn6amu8TE=
 github.com/CnTeng/todoist-api-go v0.0.0-20250409151217-b2bc9074ea3e/go.mod h1:bJNjQW8lK8eyvJ4pFogMOPcKSpGsYAyugsOegePH3bY=
+github.com/CnTeng/todoist-api-go v0.0.0-20250410165638-5822de537ffc h1:2b8CbCrATDOHqDpgshu0lre6WIPPq6R0GuKXVqexSJY=
+github.com/CnTeng/todoist-api-go v0.0.0-20250410165638-5822de537ffc/go.mod h1:bJNjQW8lK8eyvJ4pFogMOPcKSpGsYAyugsOegePH3bY=
 github.com/adrg/xdg v0.5.3 h1:xRnxJXne7+oWDatRhR1JLnvuccuIeCoBu2rtuLqQB78=
 github.com/adrg/xdg v0.5.3/go.mod h1:nlTsY+NNiCBGCK2tpm09vRqfVzrc2fLmXGpBLF0zlTQ=
 github.com/coder/websocket v1.8.13 h1:f3QZdXy7uGVz+4uCJy2nTZyM0yTBj8yANEHhqlXZ9FE=

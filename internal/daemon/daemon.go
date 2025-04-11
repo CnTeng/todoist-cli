@@ -83,15 +83,6 @@ func (d *Daemon) LoadTokens() error {
 	return nil
 }
 
-func (d *Daemon) HandleNotification(ctx context.Context, noti ws.Notification) error {
-	if noti != ws.SyncNeeded {
-		return nil
-	}
-	d.log.Println("sync needed")
-	_, err := d.client.Sync(ctx, false)
-	return err
-}
-
 func (d *Daemon) Serve(ctx context.Context) error {
 	if err := d.ws.Listen(ctx); err != nil {
 		return err
