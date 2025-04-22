@@ -10,7 +10,7 @@ require (
 	github.com/creachadair/jrpc2 v1.3.1
 	github.com/fatih/color v1.18.0
 	github.com/jedib0t/go-pretty/v6 v6.6.7
-	github.com/urfave/cli/v3 v3.1.1
+	github.com/urfave/cli/v3 v3.2.0
 	modernc.org/sqlite v1.37.0
 )
 
