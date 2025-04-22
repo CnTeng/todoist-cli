@@ -21,8 +21,6 @@ func NewMoveCmd(f *util.Factory) *cli.Command {
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:        "id",
-				Min:         1,
-				Max:         1,
 				Destination: &params.ID,
 			},
 		},

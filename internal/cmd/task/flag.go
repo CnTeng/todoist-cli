@@ -70,7 +70,6 @@ func newDeadlineFlag(destination **sync.Deadline) cli.Flag {
 		},
 		Action: func(ctx context.Context, cmd *cli.Command, v time.Time) error {
 			*destination = &sync.Deadline{Date: &v}
-
 			return nil
 		},
 	}
@@ -83,9 +82,8 @@ func newPriorityFlag(destination **int) cli.Flag {
 		Usage:    "Task priority",
 		Value:    1,
 		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v int64) error {
-			priority := int(v)
-			*destination = &priority
+		Action: func(ctx context.Context, cmd *cli.Command, v int) error {
+			*destination = &v
 			return nil
 		},
 	}

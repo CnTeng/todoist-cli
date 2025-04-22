@@ -21,8 +21,6 @@ func NewModifyCmd(f *util.Factory) *cli.Command {
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:        "ID",
-				Min:         1,
-				Max:         1,
 				Destination: &params.ID,
 				Config:      cli.StringConfig{TrimSpace: true},
 			},

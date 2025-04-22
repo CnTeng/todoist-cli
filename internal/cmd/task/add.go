@@ -21,8 +21,6 @@ func NewAddCmd(f *util.Factory) *cli.Command {
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:        "content",
-				Min:         1,
-				Max:         1,
 				Destination: &params.Content,
 				Config:      cli.StringConfig{TrimSpace: true},
 			},
@@ -59,8 +57,6 @@ func NewQuickAddCmd(f *util.Factory) *cli.Command {
 		Arguments: []cli.Argument{
 			&cli.StringArg{
 				Name:        "text",
-				Min:         1,
-				Max:         1,
 				Destination: &params.Text,
 				Config:      cli.StringConfig{TrimSpace: true},
 			},

@@ -19,11 +19,11 @@ func NewReopenCmd(f *util.Factory) *cli.Command {
 		Description: "Reopen a task in todoist",
 		Category:    "task",
 		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:   "id",
-				Min:    1,
-				Max:    -1,
-				Values: &params,
+			&cli.StringArgs{
+				Name:        "id",
+				Min:         1,
+				Max:         -1,
+				Destination: &params,
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {

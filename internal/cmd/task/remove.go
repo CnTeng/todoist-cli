@@ -20,11 +20,11 @@ func NewRemoveCmd(f *util.Factory) *cli.Command {
 		Description: "Remove a task in todoist",
 		Category:    "task",
 		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:   "id",
-				Min:    1,
-				Max:    -1,
-				Values: &ids,
+			&cli.StringArgs{
+				Name:        "id",
+				Min:         1,
+				Max:         -1,
+				Destination: &ids,
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
