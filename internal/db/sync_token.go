@@ -1,12 +1,15 @@
 package db
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+)
 
 const (
 	syncTokenStoreQuery = `
 		INSERT INTO
 			sync_token (id, token)
-		VALUES 
+		VALUES
 			(1, ?)
 		ON CONFLICT (id) DO UPDATE
 		SET
@@ -20,9 +23,9 @@ func (db *DB) storeSyncToken(tx *sql.Tx, token string) error {
 	return err
 }
 
-func (db *DB) getSyncToken() (*string, error) {
+func (db *DB) getSyncToken(ctx context.Context) (*string, error) {
 	var token string
-	if err := db.QueryRow(syncTokenGetQuery).Scan(&token); err != nil {
+	if err := db.QueryRowContext(ctx, syncTokenGetQuery).Scan(&token); err != nil {
 		return nil, err
 	}
 	return &token, nil

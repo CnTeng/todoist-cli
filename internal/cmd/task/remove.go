@@ -28,9 +28,9 @@ func NewRemoveCmd(f *util.Factory) *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			params := make([]*sync.ItemDeleteArgs, 0, len(ids))
+			params := make([]*sync.TaskDeleteArgs, 0, len(ids))
 			for _, id := range ids {
-				params = append(params, &sync.ItemDeleteArgs{ID: id})
+				params = append(params, &sync.TaskDeleteArgs{ID: id})
 			}
 
 			if _, err := f.Call(ctx, daemon.TaskRemove, params); err != nil {

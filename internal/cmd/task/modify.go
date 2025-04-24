@@ -11,7 +11,7 @@ import (
 )
 
 func NewModifyCmd(f *util.Factory) *cli.Command {
-	params := &sync.ItemUpdateArgs{}
+	params := &sync.TaskUpdateArgs{}
 	return &cli.Command{
 		Name:        "modify",
 		Aliases:     []string{"m"},

@@ -8,7 +8,7 @@ type SubTaskStatus struct {
 }
 
 type Task struct {
-	*sync.Item
+	*sync.Task
 	Project       *sync.Project `json:"project"`
 	SubTasks      []*Task       `json:"sub_tasks"`
 	SubTaskStatus SubTaskStatus `json:"sub_task_status"`

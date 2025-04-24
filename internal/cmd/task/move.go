@@ -11,7 +11,7 @@ import (
 )
 
 func NewMoveCmd(f *util.Factory) *cli.Command {
-	params := &sync.ItemMoveArgs{}
+	params := &sync.TaskMoveArgs{}
 	return &cli.Command{
 		Name:        "move",
 		Aliases:     []string{"mv"},

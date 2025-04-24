@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/CnTeng/todoist-api-go/rest"
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
@@ -11,7 +12,7 @@ import (
 )
 
 func NewAddCmd(f *util.Factory) *cli.Command {
-	params := &sync.ItemAddArgs{}
+	params := &sync.TaskAddArgs{}
 	return &cli.Command{
 		Name:        "add",
 		Aliases:     []string{"a"},
@@ -47,7 +48,7 @@ func NewAddCmd(f *util.Factory) *cli.Command {
 }
 
 func NewQuickAddCmd(f *util.Factory) *cli.Command {
-	params := &sync.ItemQuickAddParams{}
+	params := &rest.TaskQuickAddRequest{}
 	return &cli.Command{
 		Name:        "quick-add",
 		Aliases:     []string{"qa"},

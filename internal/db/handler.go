@@ -4,38 +4,39 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/CnTeng/todoist-api-go/rest"
 	"github.com/CnTeng/todoist-api-go/sync"
 )
 
-func (db *DB) ResourceTypes() (*sync.ResourceTypes, error) {
+func (db *DB) ResourceTypes(ctx context.Context) (*sync.ResourceTypes, error) {
 	return &sync.ResourceTypes{sync.All}, nil
 }
 
-func (db *DB) SyncToken() (*string, error) {
-	return db.getSyncToken()
+func (db *DB) SyncToken(ctx context.Context) (*string, error) {
+	return db.getSyncToken(ctx)
 }
 
-func (db *DB) HandleResponse(resp any) error {
+func (db *DB) HandleResponse(ctx context.Context, resp any) error {
 	switch r := resp.(type) {
 	case *sync.SyncResponse:
-		return db.handleSyncResponse(r)
-	case *sync.CompletedGetResponse:
-		return db.handleCompletedGetResponse(r)
+		return db.handleSyncResponse(ctx, r)
+	case *rest.TaskGetCompletedResponse:
+		return db.handleTaskGetCompletedResponse(ctx, r)
 	}
 
 	return nil
 }
 
-func (db *DB) handleSyncResponse(resp *sync.SyncResponse) error {
+func (db *DB) handleSyncResponse(ctx context.Context, resp *sync.SyncResponse) error {
 	if err := db.withTx(func(tx *sql.Tx) error {
 		if resp.FullSync {
-			if err := db.clean(context.Background(), tx); err != nil {
+			if err := db.clean(ctx, tx); err != nil {
 				return err
 			}
 		}
 
-		for _, item := range resp.Items {
-			if err := db.storeTask(tx, item); err != nil {
+		for _, task := range resp.Tasks {
+			if err := db.storeTask(ctx, tx, task); err != nil {
 				return err
 			}
 		}
@@ -69,18 +70,10 @@ func (db *DB) handleSyncResponse(resp *sync.SyncResponse) error {
 	return nil
 }
 
-func (db *DB) handleCompletedGetResponse(resp *sync.CompletedGetResponse) error {
+func (db *DB) handleTaskGetCompletedResponse(ctx context.Context, resp *rest.TaskGetCompletedResponse) error {
 	return db.withTx(func(tx *sql.Tx) error {
-		for _, item := range resp.Items {
-			if item.ItemObject != nil {
-				if err := db.storeTask(tx, item.ItemObject); err != nil {
-					return err
-				}
-			}
-		}
-
-		for _, project := range resp.Projects {
-			if err := db.storeProject(tx, project); err != nil {
+		for _, task := range resp.Tasks {
+			if err := db.storeTask(ctx, tx, task); err != nil {
 				return err
 			}
 		}

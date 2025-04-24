@@ -77,9 +77,9 @@ const (
 			data ->> 'child_order' ASC`
 )
 
-func (db *DB) storeTask(tx *sql.Tx, task *sync.Item) error {
+func (db *DB) storeTask(ctx context.Context, tx *sql.Tx, task *sync.Task) error {
 	if task.IsDeleted {
-		_, err := tx.Exec(taskDeleteQuery, task.ID)
+		_, err := tx.ExecContext(ctx, taskDeleteQuery, task.ID)
 		return err
 	}
 
@@ -88,7 +88,7 @@ func (db *DB) storeTask(tx *sql.Tx, task *sync.Item) error {
 		return err
 	}
 
-	if _, err := tx.Exec(taskStoreQuery, task.ID, data); err != nil {
+	if _, err := tx.ExecContext(ctx, taskStoreQuery, task.ID, data); err != nil {
 		return err
 	}
 
@@ -102,7 +102,7 @@ func (db *DB) getTask(ctx context.Context, tx *sql.Tx, id string) (*model.Task, 
 		return nil, err
 	}
 
-	t := &model.Task{Item: &sync.Item{}}
+	t := &model.Task{Task: &sync.Task{}}
 	if err := json.Unmarshal(tdata, t); err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (db *DB) getTask(ctx context.Context, tx *sql.Tx, id string) (*model.Task, 
 	}
 	t.Project = p
 
-	for _, ln := range t.Item.Labels {
+	for _, ln := range t.Task.Labels {
 		label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
 		if err != nil {
 			return nil, err
@@ -138,8 +138,8 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, query string, task *
 			return err
 		}
 
-		st := &model.Task{Item: &sync.Item{}, Project: task.Project}
-		if err := json.Unmarshal(data, st.Item); err != nil {
+		st := &model.Task{Task: &sync.Task{}, Project: task.Project}
+		if err := json.Unmarshal(data, st.Task); err != nil {
 			return err
 		}
 
@@ -147,7 +147,7 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, query string, task *
 			return err
 		}
 
-		for _, ln := range st.Item.Labels {
+		for _, ln := range st.Task.Labels {
 			label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
 			if err != nil {
 				return err
@@ -187,8 +187,8 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 			return nil, err
 		}
 
-		t := &model.Task{Item: &sync.Item{}, Project: project}
-		if err := json.Unmarshal(data, t.Item); err != nil {
+		t := &model.Task{Task: &sync.Task{}, Project: project}
+		if err := json.Unmarshal(data, t.Task); err != nil {
 			return nil, err
 		}
 
@@ -196,7 +196,7 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 			return nil, err
 		}
 
-		for _, ln := range t.Item.Labels {
+		for _, ln := range t.Task.Labels {
 			label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
 			if err != nil {
 				// TODO: shared labels

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-api-go/todoist"
 	"github.com/CnTeng/todoist-api-go/ws"
 	"github.com/CnTeng/todoist-cli/internal/db"
 	"github.com/creachadair/jrpc2"
@@ -34,7 +34,7 @@ var DefaultConfig = &Config{
 
 type Daemon struct {
 	address string
-	client  *sync.Client
+	client  *todoist.Client
 	ws      *ws.Client
 	db      *db.DB
 	log     *log.Logger
@@ -77,7 +77,7 @@ func (d *Daemon) LoadTokens() error {
 		wsToken = string(token)
 	}
 
-	d.client = sync.NewClient(http.DefaultClient, apiToken, d.db)
+	d.client = todoist.NewClient(http.DefaultClient, apiToken, d.db)
 	d.ws = ws.NewClient(wsToken, d)
 
 	return nil
@@ -93,17 +93,18 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	defer lst.Close()
 
 	svc := server.Static(handler.Map{
-		Sync:          handler.New(d.sync),
-		CompletedGet:  handler.New(d.client.GetCompletedInfo),
+		Sync: handler.New(d.sync),
+		// TODO: completed tasks
+		CompletedGet:  handler.New(d.client.GetTasksCompletedByDueDate),
 		TaskGet:       handler.New(d.db.GetTask),
 		TaskList:      handler.NewPos(d.db.ListTasks, "completed"),
-		TaskAdd:       handler.New(d.client.AddItem),
-		TaskQuickAdd:  handler.New(d.client.QuickAddItem),
-		TaskModify:    handler.New(d.client.UpdateItem),
-		TaskRemove:    handler.New(d.client.DeleteItems),
-		TaskClose:     handler.New(d.client.CloseItem),
-		TaskMove:      handler.New(d.client.MoveItem),
-		TaskReopen:    handler.New(d.client.UncompleteItem),
+		TaskAdd:       handler.New(d.client.AddTask),
+		TaskQuickAdd:  handler.New(d.client.AddTaskQuick),
+		TaskModify:    handler.New(d.client.UpdateTask),
+		TaskRemove:    handler.New(d.client.DeleteTasks),
+		TaskClose:     handler.New(d.client.CloseTask),
+		TaskMove:      handler.New(d.client.MoveTask),
+		TaskReopen:    handler.New(d.client.UncompleteTask),
 		ProjectGet:    handler.New(d.db.GetProject),
 		ProjectList:   handler.New(d.db.ListProjects),
 		ProjectAdd:    handler.New(d.client.AddProject),

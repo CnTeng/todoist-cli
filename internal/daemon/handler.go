@@ -3,7 +3,6 @@ package daemon
 import (
 	"context"
 
-	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-api-go/ws"
 )
 
@@ -13,7 +12,7 @@ func (d *Daemon) HandleMessage(ctx context.Context, msg ws.Message) error {
 		fallthrough
 	case ws.SyncNeeded:
 		d.log.Println("sync needed")
-		if _, err := d.client.Sync(ctx, false); err != nil {
+		if _, err := d.client.SyncWithAutoToken(ctx, false); err != nil {
 			return err
 		}
 	}
@@ -26,7 +25,7 @@ type SyncArgs struct {
 }
 
 func (d *Daemon) sync(ctx context.Context, args *SyncArgs) error {
-	if _, err := d.client.Sync(ctx, args.IsForce); err != nil {
+	if _, err := d.client.SyncWithAutoToken(ctx, args.IsForce); err != nil {
 		return err
 	}
 
@@ -34,22 +33,7 @@ func (d *Daemon) sync(ctx context.Context, args *SyncArgs) error {
 		return nil
 	}
 
-	ps, err := d.db.ListProjects(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, p := range ps {
-		AnnotateItems := true
-		params := &sync.CompletedGetParams{
-			ProjectID:     &p.ID,
-			AnnotateItems: &AnnotateItems,
-		}
-
-		if _, err := d.client.GetCompletedInfo(ctx, params); err != nil {
-			return err
-		}
-	}
+	// TODO: completed tasks
 
 	return nil
 }
