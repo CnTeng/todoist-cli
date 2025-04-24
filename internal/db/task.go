@@ -156,7 +156,7 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, query string, task *
 		}
 
 		task.SubTaskStatus.Total++
-		if st.CompletedAt != nil {
+		if st.Checked {
 			task.SubTaskStatus.Completed++
 		}
 

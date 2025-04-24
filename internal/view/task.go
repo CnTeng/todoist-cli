@@ -128,7 +128,7 @@ func (v *taskView) taskContent(t *model.Task, depth []bool) *table.Cell {
 	}
 
 	sIcon := v.icons.Undone
-	if t.CompletedAt != nil {
+	if t.Checked {
 		sIcon = v.icons.Done
 	}
 

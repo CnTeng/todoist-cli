@@ -3,6 +3,7 @@ package sync
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
@@ -21,7 +22,7 @@ func NewCmd(f *util.Factory) *cli.Command {
 				Usage:       "force sync",
 				OnlyOnce:    true,
 				Value:       false,
-				Destination: &params.IsForce,
+				Destination: &params.Force,
 			},
 			&cli.BoolFlag{
 				Name:        "all",
@@ -30,6 +31,19 @@ func NewCmd(f *util.Factory) *cli.Command {
 				OnlyOnce:    true,
 				Value:       false,
 				Destination: &params.All,
+			},
+
+			&cli.TimestampFlag{
+				Name:        "since",
+				Aliases:     []string{"s"},
+				Usage:       "completed task since",
+				OnlyOnce:    true,
+				Value:       time.Now().AddDate(0, -1, 0),
+				DefaultText: "1 month ago",
+				Destination: &params.Since,
+				Config: cli.TimestampConfig{
+					Layouts: []string{time.DateOnly},
+				},
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {

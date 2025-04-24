@@ -95,7 +95,6 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	svc := server.Static(handler.Map{
 		Sync: handler.New(d.sync),
 		// TODO: completed tasks
-		CompletedGet:  handler.New(d.client.GetTasksCompletedByDueDate),
 		TaskGet:       handler.New(d.db.GetTask),
 		TaskList:      handler.NewPos(d.db.ListTasks, "completed"),
 		TaskAdd:       handler.New(d.client.AddTask),
