@@ -1,42 +1,36 @@
 package project
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewModifyCmd(f *util.Factory) *cli.Command {
+func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &sync.ProjectUpdateArgs{}
-	return &cli.Command{
-		Name:        "modify",
-		Aliases:     []string{"m"},
-		Usage:       "Modify a task",
-		Description: "Modify a task in todoist",
-		Category:    "task",
-		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:        "ID",
-				Destination: &params.ID,
-				Config:      cli.StringConfig{TrimSpace: true},
-			},
-		},
-		Flags: []cli.Flag{
-			newNameFlag(&params.Name),
-			newColorFlag(&params.Color),
-			newFavoriteFlag(&params.IsFavorite),
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.Call(ctx, daemon.ProjectModify, params); err != nil {
-				return err
+	cmd := &cobra.Command{
+		Use:     "modify",
+		Aliases: []string{"m"},
+		Short:   "Modify a task",
+		Long:    "Modify a task in todoist",
+		Args:    cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			params.ID = args[0]
+
+			if _, err := f.Call(cmd.Context(), daemon.ProjectModify, params); err != nil {
+				cobra.CheckErr(err)
 			}
 
 			fmt.Printf("Project modified: %s\n", params.ID)
-			return nil
 		},
 	}
+
+	cmd.Flags().AddFlag(newNameFlag(&params.Name))
+	addColorFlag(cmd, &params.Color)
+	cmd.Flags().AddFlag(newFavoriteFlag(&params.IsFavorite))
+
+	return cmd
 }

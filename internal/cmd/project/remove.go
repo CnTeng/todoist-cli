@@ -1,43 +1,34 @@
 package project
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewRemoveCmd(f *util.Factory) *cli.Command {
+func NewRemoveCmd(f *util.Factory) *cobra.Command {
 	ids := []string{}
-	return &cli.Command{
-		Name:        "remove",
-		Aliases:     []string{"rm"},
-		Usage:       "Remove a project",
-		Description: "Remove a project in todoist",
-		Arguments: []cli.Argument{
-			&cli.StringArgs{
-				Name:        "id",
-				Min:         1,
-				Max:         -1,
-				Destination: &ids,
-			},
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
+	return &cobra.Command{
+		Use:     "remove",
+		Aliases: []string{"rm"},
+		Short:   "Remove a project",
+		Long:    "Remove a project in todoist",
+		Args:    cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
 			params := make([]*sync.ProjectDeleteArgs, 0, len(ids))
-			for _, id := range ids {
+			for _, id := range args {
 				params = append(params, &sync.ProjectDeleteArgs{ID: id})
 			}
 
-			if _, err := f.Call(ctx, daemon.ProjectRemove, params); err != nil {
-				return err
+			if _, err := f.Call(cmd.Context(), daemon.ProjectRemove, params); err != nil {
+				cobra.CheckErr(err)
 			}
 
 			fmt.Printf("Project deleted: %s\n", strings.Join(ids, ", "))
-			return nil
 		},
 	}
 }
