@@ -18,13 +18,14 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		Short:   "Add a task",
 		Long:    "Add a task to todoist",
 		Args:    cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			params.Content = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.TaskAdd, params); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			fmt.Printf("Task added: %s\n", params.Content)
+			return nil
 		},
 	}
 
@@ -48,13 +49,14 @@ func NewQuickAddCmd(f *util.Factory) *cobra.Command {
 		Short:   "Quick add a task",
 		Long:    "Quick Add a task to todoist",
 		Args:    cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			params.Text = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.TaskQuickAdd, params); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			fmt.Printf("Task added: %s\n", params.Text)
+			return nil
 		},
 	}
 }

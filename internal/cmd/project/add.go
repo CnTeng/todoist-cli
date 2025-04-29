@@ -17,13 +17,14 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		Short:   "Add a project",
 		Long:    "Add a project to todoist",
 		Args:    cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			params.Name = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.ProjectAdd, params); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			fmt.Printf("Project added: %s\n", params.Name)
+			return nil
 		},
 	}
 

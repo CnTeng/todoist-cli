@@ -16,13 +16,14 @@ func NewReopenCmd(f *util.Factory) *cobra.Command {
 		Short:   "Reopen a task",
 		Long:    "Reopen a task in todoist",
 		Args:    cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
 				if _, err := f.Call(cmd.Context(), daemon.TaskReopen, &sync.TaskUncompleteArgs{ID: arg}); err != nil {
-					cobra.CheckErr(err)
+					return err
 				}
 				fmt.Printf("Task reopen: %s\n", arg)
 			}
+			return nil
 		},
 	}
 }

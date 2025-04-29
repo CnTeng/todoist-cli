@@ -11,7 +11,8 @@ import (
 
 func NewCmd(f *util.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use: "daemon",
+		Use:          "daemon",
+		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			return f.ReadConfig()
 		},

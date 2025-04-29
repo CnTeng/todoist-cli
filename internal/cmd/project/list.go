@@ -14,14 +14,15 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 	return &cobra.Command{
 		Use:     "list",
 		Aliases: []string{"ls"},
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			result := []*sync.Project{}
 			if err := f.CallResult(cmd.Context(), daemon.ProjectList, nil, &result); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			v := view.NewProjectView(result, f.IconConfig.Icons)
 			fmt.Print(v.Render())
+			return nil
 		},
 	}
 }

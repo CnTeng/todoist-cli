@@ -18,17 +18,18 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 		Long:              "Remove a task in todoist",
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: taskCompletion(f),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			params := make([]*sync.TaskDeleteArgs, 0, len(args))
 			for _, arg := range args {
 				params = append(params, &sync.TaskDeleteArgs{ID: arg})
 			}
 
 			if _, err := f.Call(cmd.Context(), daemon.TaskRemove, params); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			fmt.Printf("Task deleted: %s\n", strings.Join(args, ", "))
+			return nil
 		},
 	}
 }

@@ -17,13 +17,14 @@ func NewMoveCmd(f *util.Factory) *cobra.Command {
 		Short:   "Move a task",
 		Long:    "Move a task in todoist",
 		Args:    cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			params.ID = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.TaskMove, params); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			fmt.Printf("Task moved: %s\n", params.ID)
+			return nil
 		},
 	}
 

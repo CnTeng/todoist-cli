@@ -17,14 +17,15 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		Short:   "Modify a task",
 		Long:    "Modify a task in todoist",
 		Args:    cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			params.ID = args[0]
 
 			if _, err := f.Call(cmd.Context(), daemon.ProjectModify, params); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			fmt.Printf("Project modified: %s\n", params.ID)
+			return nil
 		},
 	}
 

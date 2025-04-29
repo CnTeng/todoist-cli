@@ -17,14 +17,15 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		Aliases: []string{"ls"},
 		Short:   "List tasks",
 		Long:    "List tasks in todoist",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			result := []*model.Task{}
 			if err := f.CallResult(cmd.Context(), daemon.TaskList, params, &result); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			v := view.NewTaskView(result, f.IconConfig.Icons, params)
 			fmt.Print(v.Render())
+			return nil
 		},
 	}
 

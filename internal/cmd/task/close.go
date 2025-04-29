@@ -17,14 +17,14 @@ func NewCloseCmd(f *util.Factory) *cobra.Command {
 		Long:       "Close a task in todoist",
 		Args:       cobra.MinimumNArgs(1),
 		ArgAliases: []string{"id"},
-
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
 				if _, err := f.Call(cmd.Context(), daemon.TaskClose, &sync.TaskCloseArgs{ID: arg}); err != nil {
-					cobra.CheckErr(err)
+					return err
 				}
 				fmt.Printf("Task close: %s\n", arg)
 			}
+			return nil
 		},
 	}
 }

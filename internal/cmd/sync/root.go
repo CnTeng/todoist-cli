@@ -15,12 +15,13 @@ func NewCmd(f *util.Factory) *cobra.Command {
 	params := &daemon.SyncArgs{}
 	cmd := &cobra.Command{
 		Use: "sync",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if _, err := f.Call(cmd.Context(), daemon.Sync, params); err != nil {
-				cobra.CheckErr(err)
+				return err
 			}
 
 			fmt.Println("Sync success")
+			return nil
 		},
 	}
 

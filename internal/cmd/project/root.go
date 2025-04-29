@@ -7,9 +7,10 @@ import (
 
 func NewCmd(f *util.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "project",
-		Aliases: []string{"proj"},
-		Long:    "project commands",
+		Use:          "project",
+		Aliases:      []string{"proj"},
+		Long:         "project commands",
+		SilenceUsage: true,
 	}
 
 	cmd.AddCommand(NewListCmd(f))
