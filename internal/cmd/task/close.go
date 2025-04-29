@@ -1,41 +1,30 @@
 package task
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewCloseCmd(f *util.Factory) *cli.Command {
-	params := []string{}
-	return &cli.Command{
-		Name:        "close",
-		Aliases:     []string{"done"},
-		Usage:       "Close a task",
-		Description: "Close a task in todoist",
-		Category:    "task",
-		Arguments: []cli.Argument{
-			&cli.StringArgs{
-				Name:        "id",
-				Min:         1,
-				Max:         -1,
-				Destination: &params,
-				Config:      cli.StringConfig{TrimSpace: true},
-			},
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			for _, id := range params {
-				if _, err := f.Call(ctx, daemon.TaskClose, &sync.TaskCloseArgs{ID: id}); err != nil {
-					return err
-				}
-				fmt.Printf("Task close: %s\n", id)
-			}
+func NewCloseCmd(f *util.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:        "close",
+		Aliases:    []string{"done"},
+		Short:      "Close a task",
+		Long:       "Close a task in todoist",
+		Args:       cobra.MinimumNArgs(1),
+		ArgAliases: []string{"id"},
 
-			return nil
+		Run: func(cmd *cobra.Command, args []string) {
+			for _, arg := range args {
+				if _, err := f.Call(cmd.Context(), daemon.TaskClose, &sync.TaskCloseArgs{ID: arg}); err != nil {
+					cobra.CheckErr(err)
+				}
+				fmt.Printf("Task close: %s\n", arg)
+			}
 		},
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/project"
+	"github.com/CnTeng/todoist-cli/internal/cmd/task"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
@@ -49,7 +50,18 @@ func newCmd() (*cobra.Command, error) {
 	}
 
 	cmd.Flags().StringVar(&f.ConfigFilePath, "config", configFilePath, "config file")
-	cmd.AddCommand(project.NewCmd(f))
+
+	cmd.AddCommand(
+		task.NewListCmd(f),
+		task.NewAddCmd(f),
+		task.NewQuickAddCmd(f),
+		task.NewModifyCmd(f),
+		task.NewCloseCmd(f),
+		task.NewReopenCmd(f),
+		task.NewRemoveCmd(f),
+		task.NewMoveCmd(f),
+		project.NewCmd(f),
+	)
 
 	return cmd, nil
 }

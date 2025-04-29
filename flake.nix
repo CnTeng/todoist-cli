@@ -57,6 +57,7 @@
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               go
+              config.packages.todoist-cli
               config.treefmt.build.wrapper
             ];
             CGO_ENABLED = "0";

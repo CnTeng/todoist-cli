@@ -1,41 +1,35 @@
 package task
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewMoveCmd(f *util.Factory) *cli.Command {
+func NewMoveCmd(f *util.Factory) *cobra.Command {
 	params := &sync.TaskMoveArgs{}
-	return &cli.Command{
-		Name:        "move",
-		Aliases:     []string{"mv"},
-		Usage:       "Move a task",
-		Description: "Move a task in todoist",
-		Category:    "task",
-		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:        "id",
-				Destination: &params.ID,
-			},
-		},
-		Flags: []cli.Flag{
-			newSectionFlag(&params.SectionID),
-			newParentFlag(&params.ParentID),
-			newProjectFlag(&params.ProjectID),
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.Call(ctx, daemon.TaskMove, params); err != nil {
-				return err
+	cmd := &cobra.Command{
+		Use:     "move",
+		Aliases: []string{"mv"},
+		Short:   "Move a task",
+		Long:    "Move a task in todoist",
+		Args:    cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			params.ID = args[0]
+			if _, err := f.Call(cmd.Context(), daemon.TaskMove, params); err != nil {
+				cobra.CheckErr(err)
 			}
 
 			fmt.Printf("Task moved: %s\n", params.ID)
-			return nil
 		},
 	}
+
+	cmd.Flags().AddFlag(newSectionFlag(&params.SectionID))
+	cmd.Flags().AddFlag(newParentFlag(&params.ParentID))
+	cmd.Flags().AddFlag(newProjectFlag(&params.ProjectID))
+
+	return cmd
 }

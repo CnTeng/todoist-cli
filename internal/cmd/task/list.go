@@ -1,60 +1,36 @@
 package task
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/CnTeng/todoist-cli/internal/view"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewListCmd(f *util.Factory) *cli.Command {
+func NewListCmd(f *util.Factory) *cobra.Command {
 	params := &view.TaskViewConfig{}
-	return &cli.Command{
-		Name:                   "list",
-		Aliases:                []string{"ls"},
-		Usage:                  "List tasks",
-		Description:            "List tasks in todoist",
-		Category:               "task",
-		UseShortOptionHandling: true,
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:        "all",
-				Aliases:     []string{"a"},
-				Usage:       "list all tasks include completed",
-				HideDefault: true,
-				OnlyOnce:    true,
-				Destination: &params.Completed,
-			},
-			&cli.BoolFlag{
-				Name:        "description",
-				Aliases:     []string{"d"},
-				Usage:       "list tasks include description",
-				HideDefault: true,
-				OnlyOnce:    true,
-				Destination: &params.Description,
-			},
-			&cli.BoolFlag{
-				Name:        "tree",
-				Aliases:     []string{"t"},
-				Usage:       "list tasks in tree format",
-				HideDefault: true,
-				OnlyOnce:    true,
-				Destination: &params.Tree,
-			},
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
+	cmd := &cobra.Command{
+		Use:     "list",
+		Aliases: []string{"ls"},
+		Short:   "List tasks",
+		Long:    "List tasks in todoist",
+		Run: func(cmd *cobra.Command, args []string) {
 			result := []*model.Task{}
-			if err := f.CallResult(ctx, daemon.TaskList, params, &result); err != nil {
-				return err
+			if err := f.CallResult(cmd.Context(), daemon.TaskList, params, &result); err != nil {
+				cobra.CheckErr(err)
 			}
 
 			v := view.NewTaskView(result, f.IconConfig.Icons, params)
 			fmt.Print(v.Render())
-			return nil
 		},
 	}
+
+	cmd.Flags().BoolVarP(&params.Completed, "all", "a", true, "list all tasks include completed")
+	cmd.Flags().BoolVarP(&params.Description, "description", "d", true, "list tasks include description")
+	cmd.Flags().BoolVarP(&params.Tree, "tree", "t", true, "list tasks in tree format")
+
+	return cmd
 }

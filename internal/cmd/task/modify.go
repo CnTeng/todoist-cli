@@ -1,46 +1,39 @@
 package task
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewModifyCmd(f *util.Factory) *cli.Command {
+func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &sync.TaskUpdateArgs{}
-	return &cli.Command{
-		Name:        "modify",
-		Aliases:     []string{"m"},
-		Usage:       "Modify a task",
-		Description: "Modify a task in todoist",
-		Category:    "task",
-		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:        "ID",
-				Destination: &params.ID,
-				Config:      cli.StringConfig{TrimSpace: true},
-			},
-		},
-		Flags: []cli.Flag{
-			newContentFlag(&params.Content),
-			newDescriptionFlag(&params.Description),
-			newDueFlag(&params.Due),
-			newDeadlineFlag(&params.Deadline),
-			newPriorityFlag(&params.Priority),
-			newLabelsFlag(&params.Labels),
-			newDurationFlag(&params.Duration),
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.Call(ctx, daemon.TaskModify, params); err != nil {
-				return err
+	cmd := &cobra.Command{
+		Use:     "modify",
+		Aliases: []string{"m"},
+		Short:   "Modify a task",
+		Long:    "Modify a task in todoist",
+		Args:    cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			params.ID = args[0]
+			if _, err := f.Call(cmd.Context(), daemon.TaskModify, params); err != nil {
+				cobra.CheckErr(err)
 			}
 
 			fmt.Printf("Task modified: %s\n", params.ID)
-			return nil
 		},
 	}
+
+	cmd.Flags().AddFlag(newContentFlag(&params.Content))
+	cmd.Flags().AddFlag(newDescriptionFlag(&params.Description))
+	cmd.Flags().AddFlag(newDueFlag(&params.Due))
+	cmd.Flags().AddFlag(newDeadlineFlag(&params.Deadline))
+	cmd.Flags().AddFlag(newPriorityFlag(&params.Priority))
+	addLabelsFlag(cmd, &params.Labels)
+	cmd.Flags().AddFlag(newDurationFlag(&params.Duration))
+
+	return cmd
 }

@@ -1,40 +1,28 @@
 package task
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewReopenCmd(f *util.Factory) *cli.Command {
-	params := []string{}
-	return &cli.Command{
-		Name:        "reopen",
-		Aliases:     []string{"r"},
-		Usage:       "Reopen a task",
-		Description: "Reopen a task in todoist",
-		Category:    "task",
-		Arguments: []cli.Argument{
-			&cli.StringArgs{
-				Name:        "id",
-				Min:         1,
-				Max:         -1,
-				Destination: &params,
-			},
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			for _, id := range params {
-				if _, err := f.Call(ctx, daemon.TaskReopen, &sync.TaskUncompleteArgs{ID: id}); err != nil {
-					return err
+func NewReopenCmd(f *util.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:     "reopen",
+		Aliases: []string{"r"},
+		Short:   "Reopen a task",
+		Long:    "Reopen a task in todoist",
+		Args:    cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			for _, arg := range args {
+				if _, err := f.Call(cmd.Context(), daemon.TaskReopen, &sync.TaskUncompleteArgs{ID: arg}); err != nil {
+					cobra.CheckErr(err)
 				}
-				fmt.Printf("Task reopen: %s\n", id)
+				fmt.Printf("Task reopen: %s\n", arg)
 			}
-
-			return nil
 		},
 	}
 }
