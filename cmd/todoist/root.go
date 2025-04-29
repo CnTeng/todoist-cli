@@ -4,7 +4,9 @@ import (
 	"context"
 	"path/filepath"
 
+	"github.com/CnTeng/todoist-cli/internal/cmd/daemon"
 	"github.com/CnTeng/todoist-cli/internal/cmd/project"
+	"github.com/CnTeng/todoist-cli/internal/cmd/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/task"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/adrg/xdg"
@@ -49,7 +51,7 @@ func newCmd() (*cobra.Command, error) {
 		},
 	}
 
-	cmd.Flags().StringVar(&f.ConfigFilePath, "config", configFilePath, "config file")
+	cmd.PersistentFlags().StringVar(&f.ConfigFilePath, "config", configFilePath, "config file")
 
 	cmd.AddCommand(
 		task.NewListCmd(f),
@@ -61,6 +63,8 @@ func newCmd() (*cobra.Command, error) {
 		task.NewRemoveCmd(f),
 		task.NewMoveCmd(f),
 		project.NewCmd(f),
+		sync.NewCmd(f),
+		daemon.NewCmd(f),
 	)
 
 	return cmd, nil

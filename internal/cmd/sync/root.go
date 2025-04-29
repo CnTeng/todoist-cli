@@ -1,58 +1,46 @@
 package sync
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
+	"github.com/CnTeng/todoist-cli/internal/cmd/value"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
-func NewCmd(f *util.Factory) *cli.Command {
+func NewCmd(f *util.Factory) *cobra.Command {
 	params := &daemon.SyncArgs{}
-	return &cli.Command{
-		Name:                   "sync",
-		UseShortOptionHandling: true,
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:        "force",
-				Aliases:     []string{"f"},
-				Usage:       "force sync",
-				OnlyOnce:    true,
-				Value:       false,
-				Destination: &params.Force,
-			},
-			&cli.BoolFlag{
-				Name:        "all",
-				Aliases:     []string{"a"},
-				Usage:       "sync all items",
-				OnlyOnce:    true,
-				Value:       false,
-				Destination: &params.All,
-			},
-
-			&cli.TimestampFlag{
-				Name:        "since",
-				Aliases:     []string{"s"},
-				Usage:       "completed task since",
-				OnlyOnce:    true,
-				Value:       time.Now().AddDate(0, -1, 0),
-				DefaultText: "1 month ago",
-				Destination: &params.Since,
-				Config: cli.TimestampConfig{
-					Layouts: []string{time.DateOnly},
-				},
-			},
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.Call(ctx, daemon.Sync, params); err != nil {
-				return err
+	cmd := &cobra.Command{
+		Use: "sync",
+		Run: func(cmd *cobra.Command, args []string) {
+			if _, err := f.Call(cmd.Context(), daemon.Sync, params); err != nil {
+				cobra.CheckErr(err)
 			}
 
 			fmt.Println("Sync success")
-			return nil
 		},
+	}
+
+	cmd.Flags().BoolVarP(&params.Force, "force", "f", false, "force sync")
+	cmd.Flags().BoolVarP(&params.All, "all", "a", false, "sync all items")
+	cmd.Flags().AddFlag(newSinceFlag(&params.Since))
+
+	return cmd
+}
+
+func newSinceFlag(destination *time.Time) *pflag.Flag {
+	v := value.NewTimeValue(time.DateOnly, func(v time.Time) error {
+		*destination = v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "since",
+		Shorthand: "s",
+		Usage:     "completed task since",
+		Value:     v,
+		DefValue:  time.Now().AddDate(0, -1, 0).String(),
 	}
 }

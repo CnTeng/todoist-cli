@@ -12,7 +12,6 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.6.7
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
-	github.com/urfave/cli/v3 v3.2.0
 	modernc.org/sqlite v1.37.0
 )
 

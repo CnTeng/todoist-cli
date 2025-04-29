@@ -4,11 +4,11 @@
 }:
 buildGoModule {
   pname = "todoist-cli";
-  version = "unstable-2025-04-11";
+  version = "unstable-2025-04-30";
 
   src = ../.;
 
-  vendorHash = "sha256-ZrATT6BnXtmkhLr4s/ron2jtNgf0REYCyPgYTPngrEg=";
+  vendorHash = "sha256-Gsz9ijb7wW/qrsvuTBsz5j49WhxpWAP1eqHwvhvgBko=";
 
   postFixup = ''
     mv $out/bin/todoist-cli $out/bin/todoist
