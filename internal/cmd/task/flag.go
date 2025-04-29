@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
@@ -38,7 +39,10 @@ func taskCompletion(f *util.Factory) cobra.CompletionFunc {
 }
 
 func newContentFlag(destination **string) *pflag.Flag {
-	v := value.NewStringPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "content",
 		Shorthand: "c",
@@ -49,7 +53,10 @@ func newContentFlag(destination **string) *pflag.Flag {
 }
 
 func newDescriptionFlag(destination **string) *pflag.Flag {
-	v := value.NewStringPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "description",
 		Shorthand: "D",
@@ -60,7 +67,10 @@ func newDescriptionFlag(destination **string) *pflag.Flag {
 }
 
 func newProjectFlag(destination **string) *pflag.Flag {
-	v := value.NewStringPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "project",
 		Shorthand: "P",
@@ -71,7 +81,10 @@ func newProjectFlag(destination **string) *pflag.Flag {
 }
 
 func newDueFlag(destination **sync.Due) *pflag.Flag {
-	v := value.NewDuePtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &sync.Due{String: &v}
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "due",
 		Shorthand: "d",
@@ -82,7 +95,12 @@ func newDueFlag(destination **sync.Due) *pflag.Flag {
 }
 
 func newDeadlineFlag(destination **sync.Deadline) *pflag.Flag {
-	v := value.NewDeadlinePtr(destination)
+	v := value.NewTimeValue(
+		time.DateOnly,
+		func(v time.Time) error {
+			*destination = &sync.Deadline{Date: &v}
+			return nil
+		})
 	return &pflag.Flag{
 		Name:     "deadline",
 		Usage:    "Deadline date",
@@ -92,7 +110,10 @@ func newDeadlineFlag(destination **sync.Deadline) *pflag.Flag {
 }
 
 func newPriorityFlag(destination **int) *pflag.Flag {
-	v := value.NewIntPtr(destination)
+	v := value.NewIntValue(func(v int) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "priority",
 		Shorthand: "p",
@@ -103,7 +124,10 @@ func newPriorityFlag(destination **int) *pflag.Flag {
 }
 
 func newParentFlag(destination **string) *pflag.Flag {
-	v := value.NewStringPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:     "parent",
 		Usage:    "Parent task ID",
@@ -113,7 +137,10 @@ func newParentFlag(destination **string) *pflag.Flag {
 }
 
 func newSectionFlag(destination **string) *pflag.Flag {
-	v := value.NewStringPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "section",
 		Shorthand: "s",
@@ -128,7 +155,14 @@ func addLabelsFlag(cmd *cobra.Command, destination *[]string) {
 }
 
 func newDurationFlag(destination **sync.Duration) *pflag.Flag {
-	v := value.NewDurationPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		duration, err := sync.ParseDuration(v)
+		if err != nil {
+			return err
+		}
+		*destination = duration
+		return nil
+	})
 	return &pflag.Flag{
 		Name:     "duration",
 		Usage:    "Duration",

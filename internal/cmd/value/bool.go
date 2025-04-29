@@ -1,31 +1,33 @@
 package value
 
-import "strconv"
+import (
+	"strconv"
 
-type BoolPtr struct {
-	value **bool
+	"github.com/spf13/pflag"
+)
+
+type boolValue struct {
+	value  bool
+	action func(v bool) error
 }
 
-func NewBoolPtr(value **bool) *BoolPtr {
-	return &BoolPtr{value: value}
+func NewBoolPtr(action func(v bool) error) pflag.Value {
+	return &boolValue{action: action}
 }
 
-func (b *BoolPtr) Set(val string) error {
+func (b *boolValue) Set(val string) error {
 	v, err := strconv.ParseBool(val)
 	if err != nil {
 		return err
 	}
-	*b.value = &v
-	return nil
+	b.value = v
+	return b.action(b.value)
 }
 
-func (b *BoolPtr) Type() string {
+func (b *boolValue) Type() string {
 	return "bool"
 }
 
-func (b *BoolPtr) String() string {
-	if *b.value == nil {
-		return ""
-	}
-	return strconv.FormatBool(**b.value)
+func (b *boolValue) String() string {
+	return strconv.FormatBool(b.value)
 }

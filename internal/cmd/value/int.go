@@ -1,31 +1,33 @@
 package value
 
-import "strconv"
+import (
+	"strconv"
 
-type IntPtr struct {
-	value **int
+	"github.com/spf13/pflag"
+)
+
+type intValue struct {
+	value  int
+	action func(v int) error
 }
 
-func NewIntPtr(value **int) *IntPtr {
-	return &IntPtr{value: value}
+func NewIntValue(action func(v int) error) pflag.Value {
+	return &intValue{action: action}
 }
 
-func (i *IntPtr) Set(val string) error {
-	parsedValue, err := strconv.Atoi(val)
+func (i *intValue) Set(val string) error {
+	v, err := strconv.Atoi(val)
 	if err != nil {
 		return err
 	}
-	*i.value = &parsedValue
-	return nil
+	i.value = v
+	return i.action(i.value)
 }
 
-func (i *IntPtr) Type() string {
+func (i *intValue) Type() string {
 	return "int"
 }
 
-func (i *IntPtr) String() string {
-	if *i.value == nil {
-		return ""
-	}
-	return strconv.Itoa(**i.value)
+func (i *intValue) String() string {
+	return strconv.Itoa(i.value)
 }

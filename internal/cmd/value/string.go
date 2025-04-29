@@ -1,25 +1,25 @@
 package value
 
-type StringPtr struct {
-	value **string
+import "github.com/spf13/pflag"
+
+type stringValue struct {
+	value  string
+	action func(v string) error
 }
 
-func NewStringPtr(value **string) *StringPtr {
-	return &StringPtr{value: value}
+func NewStringPtr(action func(v string) error) pflag.Value {
+	return &stringValue{action: action}
 }
 
-func (s *StringPtr) Set(val string) error {
-	*s.value = &val
-	return nil
+func (s *stringValue) Set(val string) error {
+	s.value = val
+	return s.action(s.value)
 }
 
-func (s *StringPtr) Type() string {
+func (s *stringValue) Type() string {
 	return "string"
 }
 
-func (s *StringPtr) String() string {
-	if *s.value == nil {
-		return ""
-	}
-	return **s.value
+func (s *stringValue) String() string {
+	return s.value
 }

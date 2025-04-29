@@ -8,7 +8,10 @@ import (
 )
 
 func newNameFlag(destination **string) *pflag.Flag {
-	v := value.NewStringPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "name",
 		Shorthand: "n",
@@ -30,7 +33,14 @@ func colorCompletion(cmd *cobra.Command, args []string, toComplete string) ([]co
 }
 
 func addColorFlag(cmd *cobra.Command, destination **sync.Color) {
-	v := value.NewColorPtr(destination)
+	v := value.NewStringPtr(func(v string) error {
+		color, err := sync.ParseColor(v)
+		if err != nil {
+			return err
+		}
+		*destination = &color
+		return nil
+	})
 	flag := &pflag.Flag{
 		Name:      "color",
 		Shorthand: "c",
@@ -44,7 +54,10 @@ func addColorFlag(cmd *cobra.Command, destination **sync.Color) {
 }
 
 func newFavoriteFlag(destination **bool) *pflag.Flag {
-	v := value.NewBoolPtr(destination)
+	v := value.NewBoolPtr(func(v bool) error {
+		*destination = &v
+		return nil
+	})
 	return &pflag.Flag{
 		Name:      "favorite",
 		Shorthand: "f",
