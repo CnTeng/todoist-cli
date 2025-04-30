@@ -1,144 +1,172 @@
 package task
 
 import (
-	"context"
+	"fmt"
 	"time"
 
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/urfave/cli/v3"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
+	"github.com/CnTeng/todoist-cli/internal/cmd/value"
+	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
+	"github.com/CnTeng/todoist-cli/internal/view"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
-func newContentFlag(destination **string) cli.Flag {
-	return &cli.StringFlag{
-		Name:     "content",
-		Aliases:  []string{"c"},
-		Usage:    "Task content",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			*destination = &v
-			return nil
-		},
+func taskCompletion(f *util.Factory) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if err := f.ReadConfig(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.Dial(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		params := &view.TaskViewConfig{}
+		result := []*model.Task{}
+		if err := f.CallResult(cmd.Context(), daemon.TaskList, params, &result); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		cmps := make([]cobra.Completion, len(result))
+		for i, task := range result {
+			desc := fmt.Sprintf("%s: %s", task.Project.Name, task.Content)
+			cmps[i] = cobra.CompletionWithDesc(task.ID, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
 	}
 }
 
-func newDescriptionFlag(destination **string) cli.Flag {
-	return &cli.StringFlag{
-		Name:     "description",
-		Aliases:  []string{"D"},
-		Usage:    "Task description",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			*destination = &v
-			return nil
-		},
+func newContentFlag(destination **string) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "content",
+		Shorthand: "c",
+		Usage:     "Task content",
+		Value:     v,
+		DefValue:  v.String(),
 	}
 }
 
-func newProjectFlag(destination **string) cli.Flag {
-	return &cli.StringFlag{
-		Name:     "project",
-		Aliases:  []string{"P"},
-		Usage:    "Project ID",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			*destination = &v
-			return nil
-		},
+func newDescriptionFlag(destination **string) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "description",
+		Shorthand: "D",
+		Usage:     "Task description",
+		Value:     v,
+		DefValue:  v.String(),
 	}
 }
 
-func newDueFlag(destination **sync.Due) cli.Flag {
-	return &cli.StringFlag{
-		Name:     "due",
-		Aliases:  []string{"d"},
-		Usage:    "Due date",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			*destination = &sync.Due{String: &v}
-			return nil
-		},
+func newProjectFlag(destination **string) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "project",
+		Shorthand: "P",
+		Usage:     "Project ID",
+		Value:     v,
+		DefValue:  v.String(),
 	}
 }
 
-func newDeadlineFlag(destination **sync.Deadline) cli.Flag {
-	return &cli.TimestampFlag{
-		Name:     "deadline",
-		Usage:    "Deadline date",
-		OnlyOnce: true,
-		Config: cli.TimestampConfig{
-			Layouts: []string{time.DateOnly},
-		},
-		Action: func(ctx context.Context, cmd *cli.Command, v time.Time) error {
+func newDueFlag(destination **sync.Due) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &sync.Due{String: &v}
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "due",
+		Shorthand: "d",
+		Usage:     "Due date",
+		Value:     v,
+		DefValue:  v.String(),
+	}
+}
+
+func newDeadlineFlag(destination **sync.Deadline) *pflag.Flag {
+	v := value.NewTimeValue(
+		time.DateOnly,
+		func(v time.Time) error {
 			*destination = &sync.Deadline{Date: &v}
 			return nil
-		},
+		})
+	return &pflag.Flag{
+		Name:     "deadline",
+		Usage:    "Deadline date",
+		Value:    v,
+		DefValue: v.String(),
 	}
 }
 
-func newPriorityFlag(destination **int) cli.Flag {
-	return &cli.IntFlag{
-		Name:     "priority",
-		Aliases:  []string{"p"},
-		Usage:    "Task priority",
-		Value:    1,
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v int) error {
-			*destination = &v
-			return nil
-		},
+func newPriorityFlag(destination **int) *pflag.Flag {
+	v := value.NewIntValue(func(v int) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "priority",
+		Shorthand: "p",
+		Usage:     "Task priority",
+		Value:     v,
+		DefValue:  "1",
 	}
 }
 
-func newParentFlag(destination **string) cli.Flag {
-	return &cli.StringFlag{
+func newParentFlag(destination **string) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
 		Name:     "parent",
 		Usage:    "Parent task ID",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			*destination = &v
-			return nil
-		},
+		Value:    v,
+		DefValue: v.String(),
 	}
 }
 
-func newSectionFlag(destination **string) cli.Flag {
-	return &cli.StringFlag{
-		Name:     "section",
-		Aliases:  []string{"s"},
-		Usage:    "Section ID",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			*destination = &v
-			return nil
-		},
+func newSectionFlag(destination **string) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "section",
+		Shorthand: "s",
+		Usage:     "Section ID",
+		Value:     v,
+		DefValue:  v.String(),
 	}
 }
 
-func newLabelsFlag(destination *[]string) cli.Flag {
-	return &cli.StringSliceFlag{
-		Name:     "labels",
-		Aliases:  []string{"l"},
-		Usage:    "Labels",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v []string) error {
-			destination = &v
-			return nil
-		},
-	}
+func addLabelsFlag(cmd *cobra.Command, destination *[]string) {
+	cmd.Flags().StringArrayVarP(destination, "labels", "l", nil, "Labels")
 }
 
-func newDurationFlag(destination **sync.Duration) cli.Flag {
-	return &cli.StringFlag{
+func newDurationFlag(destination **sync.Duration) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		duration, err := sync.ParseDuration(v)
+		if err != nil {
+			return err
+		}
+		*destination = duration
+		return nil
+	})
+	return &pflag.Flag{
 		Name:     "duration",
 		Usage:    "Duration",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			duration, err := sync.ParseDuration(v)
-			if err != nil {
-				return err
-			}
-			*destination = duration
-			return nil
-		},
+		Value:    v,
+		DefValue: v.String(),
 	}
 }

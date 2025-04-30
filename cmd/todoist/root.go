@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"os"
 	"path/filepath"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/daemon"
@@ -11,7 +10,7 @@ import (
 	"github.com/CnTeng/todoist-cli/internal/cmd/task"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/adrg/xdg"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -20,7 +19,7 @@ const (
 	cacheFile  = "todoist.db"
 )
 
-func newCmd() (*cli.Command, error) {
+func newCmd() (*cobra.Command, error) {
 	configFilePath, err := xdg.ConfigFile(filepath.Join(appName, configFile))
 	if err != nil {
 		return nil, err
@@ -32,51 +31,43 @@ func newCmd() (*cli.Command, error) {
 
 	f := util.NewFactory(configFilePath, dataFilePath)
 
-	return &cli.Command{
-		Name:  appName,
-		Usage: "A CLI for Todoist",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "config",
-				Usage:       "config file",
-				Value:       f.ConfigFilePath,
-				Destination: &f.ConfigFilePath,
-			},
-		},
-		Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
+	cmd := &cobra.Command{
+		Use:   appName,
+		Short: "A CLI for Todoist",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.ReadConfig(); err != nil {
-				return nil, err
-			}
-
-			if cmd.Args().First() == "daemon" {
-				return ctx, nil
+				return err
 			}
 
 			if err := f.Dial(); err != nil {
-				return nil, err
+				return err
 			}
 
-			return ctx, nil
+			return nil
 		},
 
-		After: func(ctx context.Context, cmd *cli.Command) error {
+		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
 			return f.Close()
 		},
+	}
 
-		Commands: []*cli.Command{
-			task.NewListCmd(f),
-			task.NewAddCmd(f),
-			task.NewQuickAddCmd(f),
-			task.NewModifyCmd(f),
-			task.NewCloseCmd(f),
-			task.NewReopenCmd(f),
-			task.NewRemoveCmd(f),
-			task.NewMoveCmd(f),
-			project.NewCmd(f),
-			sync.NewCmd(f),
-			daemon.NewCmd(f),
-		},
-	}, nil
+	cmd.PersistentFlags().StringVar(&f.ConfigFilePath, "config", configFilePath, "config file")
+
+	cmd.AddCommand(
+		task.NewListCmd(f),
+		task.NewAddCmd(f),
+		task.NewQuickAddCmd(f),
+		task.NewModifyCmd(f),
+		task.NewCloseCmd(f),
+		task.NewReopenCmd(f),
+		task.NewRemoveCmd(f),
+		task.NewMoveCmd(f),
+		project.NewCmd(f),
+		sync.NewCmd(f),
+		daemon.NewCmd(f),
+	)
+
+	return cmd, nil
 }
 
 func Execute() error {
@@ -84,5 +75,5 @@ func Execute() error {
 	if err != nil {
 		return err
 	}
-	return cmd.Run(context.Background(), os.Args)
+	return cmd.ExecuteContext(context.Background())
 }

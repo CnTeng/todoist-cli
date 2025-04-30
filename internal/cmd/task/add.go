@@ -1,43 +1,26 @@
 package task
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/rest"
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewAddCmd(f *util.Factory) *cli.Command {
+func NewAddCmd(f *util.Factory) *cobra.Command {
 	params := &sync.TaskAddArgs{}
-	return &cli.Command{
-		Name:        "add",
-		Aliases:     []string{"a"},
-		Usage:       "Add a task",
-		Description: "Add a task to todoist",
-		Category:    "task",
-		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:        "content",
-				Destination: &params.Content,
-				Config:      cli.StringConfig{TrimSpace: true},
-			},
-		},
-		Flags: []cli.Flag{
-			newDescriptionFlag(&params.Description),
-			newProjectFlag(&params.ProjectID),
-			newDueFlag(&params.Due),
-			newDeadlineFlag(&params.Deadline),
-			newPriorityFlag(&params.Priority),
-			newParentFlag(&params.ParentID),
-			newSectionFlag(&params.SectionID),
-			newLabelsFlag(&params.Labels),
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.Call(ctx, daemon.TaskAdd, params); err != nil {
+	cmd := &cobra.Command{
+		Use:     "add",
+		Aliases: []string{"a"},
+		Short:   "Add a task",
+		Long:    "Add a task to todoist",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			params.Content = args[0]
+			if _, err := f.Call(cmd.Context(), daemon.TaskAdd, params); err != nil {
 				return err
 			}
 
@@ -45,25 +28,30 @@ func NewAddCmd(f *util.Factory) *cli.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().AddFlag(newDescriptionFlag(&params.Description))
+	cmd.Flags().AddFlag(newProjectFlag(&params.ProjectID))
+	cmd.Flags().AddFlag(newDueFlag(&params.Due))
+	cmd.Flags().AddFlag(newDeadlineFlag(&params.Deadline))
+	cmd.Flags().AddFlag(newPriorityFlag(&params.Priority))
+	cmd.Flags().AddFlag(newParentFlag(&params.ParentID))
+	cmd.Flags().AddFlag(newSectionFlag(&params.SectionID))
+	addLabelsFlag(cmd, &params.Labels)
+
+	return cmd
 }
 
-func NewQuickAddCmd(f *util.Factory) *cli.Command {
+func NewQuickAddCmd(f *util.Factory) *cobra.Command {
 	params := &rest.TaskQuickAddRequest{}
-	return &cli.Command{
-		Name:        "quick-add",
-		Aliases:     []string{"qa"},
-		Usage:       "Quick add a task",
-		Description: "Quick Add a task to todoist",
-		Category:    "task",
-		Arguments: []cli.Argument{
-			&cli.StringArg{
-				Name:        "text",
-				Destination: &params.Text,
-				Config:      cli.StringConfig{TrimSpace: true},
-			},
-		},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
-			if _, err := f.Call(ctx, daemon.TaskQuickAdd, params); err != nil {
+	return &cobra.Command{
+		Use:     "quick-add",
+		Aliases: []string{"qa"},
+		Short:   "Quick add a task",
+		Long:    "Quick Add a task to todoist",
+		Args:    cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			params.Text = args[0]
+			if _, err := f.Call(cmd.Context(), daemon.TaskQuickAdd, params); err != nil {
 				return err
 			}
 

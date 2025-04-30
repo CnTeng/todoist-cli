@@ -1,23 +1,22 @@
 package project
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/view"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewListCmd(f *util.Factory) *cli.Command {
-	return &cli.Command{
-		Name:    "list",
+func NewListCmd(f *util.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:     "list",
 		Aliases: []string{"ls"},
-		Action: func(ctx context.Context, cmd *cli.Command) error {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			result := []*sync.Project{}
-			if err := f.CallResult(ctx, daemon.ProjectList, nil, &result); err != nil {
+			if err := f.CallResult(cmd.Context(), daemon.ProjectList, nil, &result); err != nil {
 				return err
 			}
 

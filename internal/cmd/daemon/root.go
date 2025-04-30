@@ -6,13 +6,17 @@ import (
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/db"
-	"github.com/urfave/cli/v3"
+	"github.com/spf13/cobra"
 )
 
-func NewCmd(f *util.Factory) *cli.Command {
-	return &cli.Command{
-		Name: "daemon",
-		Action: func(ctx context.Context, cmd *cli.Command) error {
+func NewCmd(f *util.Factory) *cobra.Command {
+	return &cobra.Command{
+		Use:          "daemon",
+		SilenceUsage: true,
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return f.ReadConfig()
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
 			db, err := db.NewDB(f.DataFilePath)
 			if err != nil {
 				return err

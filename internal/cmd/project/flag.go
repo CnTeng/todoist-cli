@@ -1,51 +1,68 @@
 package project
 
 import (
-	"context"
-
 	"github.com/CnTeng/todoist-api-go/sync"
-	"github.com/urfave/cli/v3"
+	"github.com/CnTeng/todoist-cli/internal/cmd/value"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
-func newNameFlag(destination **string) cli.Flag {
-	return &cli.StringFlag{
-		Name:     "name",
-		Aliases:  []string{"n"},
-		Usage:    "Project name",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			*destination = &v
-			return nil
-		},
+func newNameFlag(destination **string) *pflag.Flag {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "name",
+		Shorthand: "n",
+		Usage:     "Project name",
+		Value:     v,
+		DefValue:  v.String(),
 	}
 }
 
-func newColorFlag(destination **sync.Color) cli.Flag {
-	return &cli.StringFlag{
-		Name:     "color",
-		Aliases:  []string{"c"},
-		Usage:    "Project color",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v string) error {
-			color, err := sync.ParseColor(v)
-			if err != nil {
-				return err
-			}
-			*destination = &color
-			return nil
-		},
+func colorCompletion(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+	colors := sync.ListColors()
+
+	cmps := make([]cobra.Completion, len(colors))
+
+	for i, c := range colors {
+		cmps[i] = cobra.CompletionWithDesc(string(c), c.Hex())
 	}
+	return cmps, cobra.ShellCompDirectiveNoFileComp
 }
 
-func newFavoriteFlag(destination **bool) cli.Flag {
-	return &cli.BoolFlag{
-		Name:     "favorite",
-		Aliases:  []string{"f"},
-		Usage:    "Add project to favorites",
-		OnlyOnce: true,
-		Action: func(ctx context.Context, cmd *cli.Command, v bool) error {
-			*destination = &v
-			return nil
-		},
+func addColorFlag(cmd *cobra.Command, destination **sync.Color) {
+	v := value.NewStringPtr(func(v string) error {
+		color, err := sync.ParseColor(v)
+		if err != nil {
+			return err
+		}
+		*destination = &color
+		return nil
+	})
+	flag := &pflag.Flag{
+		Name:      "color",
+		Shorthand: "c",
+		Usage:     "Project color",
+		Value:     v,
+		DefValue:  v.String(),
+	}
+
+	cmd.Flags().AddFlag(flag)
+	_ = cmd.RegisterFlagCompletionFunc("color", colorCompletion)
+}
+
+func newFavoriteFlag(destination **bool) *pflag.Flag {
+	v := value.NewBoolPtr(func(v bool) error {
+		*destination = &v
+		return nil
+	})
+	return &pflag.Flag{
+		Name:      "favorite",
+		Shorthand: "f",
+		Usage:     "Add project to favorites",
+		Value:     v,
+		DefValue:  v.String(),
 	}
 }
