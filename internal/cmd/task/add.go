@@ -17,6 +17,7 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		Aliases: []string{"a"},
 		Short:   "Add a task",
 		Long:    "Add a task to todoist",
+		GroupID: Group.ID,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
@@ -53,6 +54,7 @@ func NewQuickAddCmd(f *util.Factory) *cobra.Command {
 		Aliases: []string{"qa"},
 		Short:   "Quick add a task",
 		Long:    "Quick Add a task to todoist",
+		GroupID: Group.ID,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {

@@ -17,6 +17,7 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		Aliases: []string{"ls"},
 		Short:   "List tasks",
 		Long:    "List tasks in todoist",
+		GroupID: Group.ID,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
