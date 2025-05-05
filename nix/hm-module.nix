@@ -24,15 +24,6 @@ in
       '';
     };
 
-    wsTokenFile = lib.mkOption {
-      type = lib.types.path;
-      default = null;
-      example = "/path/to/ws_token";
-      description = ''
-        Path to the file containing the Todoist WebSocket token.
-      '';
-    };
-
     settings = lib.mkOption {
       type = format.type;
       default = { };
@@ -62,10 +53,7 @@ in
       Install.WantedBy = [ "default.target" ];
 
       Service = {
-        Environment = [
-          "API_TOKEN_FILE=${cfg.apiTokenFile}"
-          "WS_TOKEN_FILE=${cfg.wsTokenFile}"
-        ];
+        Environment = "API_TOKEN_FILE=${cfg.apiTokenFile}";
         ExecStart = "${lib.getExe cfg.package} daemon";
         Restart = "on-failure";
       };

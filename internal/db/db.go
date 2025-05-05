@@ -14,6 +14,7 @@ const (
 		DELETE FROM tasks;
 		DELETE FROM projects;
 		DELETE FROM labels;
+		DELETE FROM users;
 		PRAGMA foreign_keys = ON;
 	`
 )

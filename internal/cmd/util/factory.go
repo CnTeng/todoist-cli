@@ -33,7 +33,7 @@ func NewFactory(configFile, dataFile string) *Factory {
 	}
 }
 
-func (f *Factory) ReadConfig() error {
+func (f *Factory) LoadConfig() error {
 	data, err := os.ReadFile(f.ConfigFilePath)
 	if err != nil {
 		if !os.IsNotExist(err) {
