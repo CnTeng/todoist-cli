@@ -2,11 +2,9 @@ package daemon
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
-	"os"
 
 	"github.com/CnTeng/todoist-api-go/todoist"
 	"github.com/CnTeng/todoist-api-go/ws"
@@ -17,15 +15,9 @@ import (
 	"github.com/creachadair/jrpc2/server"
 )
 
-const (
-	apiTokenEnv     = "API_TOKEN"
-	apiTokenFileEnv = "API_TOKEN_FILE"
-	WsTokenEnv      = "WS_TOKEN"
-	WsTokenFileEnv  = "WS_TOKEN_FILE"
-)
-
 type Config struct {
-	Address string `toml:"address"`
+	Address  string `toml:"address"`
+	ApiToken string `toml:"-"`
 }
 
 var DefaultConfig = &Config{
@@ -35,56 +27,41 @@ var DefaultConfig = &Config{
 type Daemon struct {
 	address string
 	client  *todoist.Client
-	ws      *ws.Client
 	db      *db.DB
 	log     *log.Logger
 }
 
 func NewDaemon(db *db.DB, config *Config) *Daemon {
-	d := &Daemon{
+	return &Daemon{
 		address: config.Address,
+		client:  todoist.NewClient(http.DefaultClient, config.ApiToken, db),
 		db:      db,
 		log:     log.New(log.Writer(), "daemon: ", log.Flags()),
 	}
-
-	return d
 }
 
-func (d *Daemon) LoadTokens() error {
-	apiToken := os.Getenv(apiTokenEnv)
-	apiTokenFile := os.Getenv(apiTokenFileEnv)
-	if apiToken == "" && apiTokenFile == "" {
-		return fmt.Errorf("%s or %s is required", apiTokenEnv, apiTokenFileEnv)
-	}
-	if apiToken == "" && apiTokenFile != "" {
-		token, err := os.ReadFile(apiTokenFile)
-		if err != nil {
-			return err
-		}
-		apiToken = string(token)
+func (d *Daemon) loadWsToken(ctx context.Context) (string, error) {
+	user, err := d.db.GetUser(ctx)
+	if err == nil {
+		return user.WebsocketURL, nil
 	}
 
-	wsToken := os.Getenv(WsTokenEnv)
-	wsTokenFile := os.Getenv(WsTokenFileEnv)
-	if wsToken == "" && wsTokenFile == "" {
-		return fmt.Errorf("%s or %s is required,", WsTokenEnv, WsTokenFileEnv)
-	}
-	if wsToken == "" && wsTokenFile != "" {
-		token, err := os.ReadFile(wsTokenFile)
-		if err != nil {
-			return err
-		}
-		wsToken = string(token)
+	user, err = d.client.GetUser(ctx)
+	if err != nil {
+		return "", err
 	}
 
-	d.client = todoist.NewClient(http.DefaultClient, apiToken, d.db)
-	d.ws = ws.NewClient(wsToken, d)
-
-	return nil
+	return user.WebsocketURL, nil
 }
 
 func (d *Daemon) Serve(ctx context.Context) error {
-	d.ws.Listen(ctx)
+	url, err := d.loadWsToken(ctx)
+	if err != nil {
+		return err
+	}
+
+	ws := ws.NewClient(url, d)
+	ws.Listen(ctx)
 
 	lst, err := net.Listen(jrpc2.Network(d.address))
 	if err != nil {

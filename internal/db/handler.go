@@ -53,6 +53,12 @@ func (db *DB) handleSyncResponse(ctx context.Context, resp *sync.SyncResponse) e
 			}
 		}
 
+		if resp.User != nil {
+			if err := db.storeUser(tx, resp.User); err != nil {
+				return err
+			}
+		}
+
 		if err := db.storeSyncToken(tx, resp.SyncToken); err != nil {
 			return err
 		}

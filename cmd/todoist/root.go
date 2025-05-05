@@ -35,7 +35,7 @@ func newCmd() (*cobra.Command, error) {
 		Use:   appName,
 		Short: "A CLI for Todoist",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := f.ReadConfig(); err != nil {
+			if err := f.LoadConfig(); err != nil {
 				return err
 			}
 

@@ -16,7 +16,7 @@ import (
 
 func taskCompletion(f *util.Factory) cobra.CompletionFunc {
 	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
-		if err := f.ReadConfig(); err != nil {
+		if err := f.LoadConfig(); err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
 
