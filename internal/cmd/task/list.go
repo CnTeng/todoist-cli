@@ -18,6 +18,11 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		Short:   "List tasks",
 		Long:    "List tasks in todoist",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			result := []*model.Task{}
 			if err := f.CallResult(cmd.Context(), daemon.TaskList, params, &result); err != nil {
 				return err

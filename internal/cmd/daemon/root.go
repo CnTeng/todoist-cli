@@ -11,9 +11,6 @@ func NewCmd(f *util.Factory) *cobra.Command {
 	return &cobra.Command{
 		Use:          "daemon",
 		SilenceUsage: true,
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			return f.LoadConfig()
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			db, err := db.NewDB(f.DataPath)
 			if err != nil {

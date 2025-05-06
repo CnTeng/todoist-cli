@@ -18,6 +18,11 @@ func NewCloseCmd(f *util.Factory) *cobra.Command {
 		Args:       cobra.MinimumNArgs(1),
 		ArgAliases: []string{"id"},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			for _, arg := range args {
 				if _, err := f.Call(cmd.Context(), daemon.TaskClose, &sync.TaskCloseArgs{ID: arg}); err != nil {
 					return err

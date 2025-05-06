@@ -19,6 +19,11 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: taskCompletion(f),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			params := make([]*sync.TaskDeleteArgs, 0, len(args))
 			for _, arg := range args {
 				params = append(params, &sync.TaskDeleteArgs{ID: arg})

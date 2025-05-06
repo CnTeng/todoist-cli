@@ -16,6 +16,11 @@ func NewCmd(f *util.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "sync",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			if _, err := f.Call(cmd.Context(), daemon.Sync, params); err != nil {
 				return err
 			}

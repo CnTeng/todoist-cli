@@ -21,19 +21,7 @@ func newCmd() (*cobra.Command, error) {
 		Use:   "todoist <command> [subcommand] [flags]",
 		Short: "A CLI for Todoist",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := f.LoadConfig(); err != nil {
-				return err
-			}
-
-			if err := f.Dial(); err != nil {
-				return err
-			}
-
-			return nil
-		},
-
-		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
-			return f.Close()
+			return f.LoadConfig()
 		},
 	}
 
