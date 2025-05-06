@@ -15,6 +15,7 @@ func NewCloseCmd(f *util.Factory) *cobra.Command {
 		Aliases:    []string{"done"},
 		Short:      "Close a task",
 		Long:       "Close a task in todoist",
+		GroupID:    Group.ID,
 		Args:       cobra.MinimumNArgs(1),
 		ArgAliases: []string{"id"},
 		RunE: func(cmd *cobra.Command, args []string) error {

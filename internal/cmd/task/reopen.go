@@ -15,6 +15,7 @@ func NewReopenCmd(f *util.Factory) *cobra.Command {
 		Aliases: []string{"r"},
 		Short:   "Reopen a task",
 		Long:    "Reopen a task in todoist",
+		GroupID: Group.ID,
 		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {

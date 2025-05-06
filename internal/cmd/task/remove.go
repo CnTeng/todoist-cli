@@ -16,6 +16,7 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 		Aliases:           []string{"rm"},
 		Short:             "Remove a task",
 		Long:              "Remove a task in todoist",
+		GroupID:           Group.ID,
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: taskCompletion(f),
 		RunE: func(cmd *cobra.Command, args []string) error {

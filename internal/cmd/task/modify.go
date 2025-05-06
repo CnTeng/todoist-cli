@@ -16,6 +16,7 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		Aliases: []string{"m"},
 		Short:   "Modify a task",
 		Long:    "Modify a task in todoist",
+		GroupID: Group.ID,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {

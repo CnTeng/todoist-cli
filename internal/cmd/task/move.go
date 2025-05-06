@@ -16,6 +16,7 @@ func NewMoveCmd(f *util.Factory) *cobra.Command {
 		Aliases: []string{"mv"},
 		Short:   "Move a task",
 		Long:    "Move a task in todoist",
+		GroupID: Group.ID,
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
