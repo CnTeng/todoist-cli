@@ -18,6 +18,11 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		Long:    "Add a project to todoist",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			params.Name = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.ProjectAdd, params); err != nil {
 				return err

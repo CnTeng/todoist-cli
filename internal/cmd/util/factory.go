@@ -1,56 +1,50 @@
 package util
 
 import (
-	"bytes"
 	"net"
-	"os"
+	"path/filepath"
 
-	"github.com/BurntSushi/toml"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/view"
+	"github.com/adrg/xdg"
 	"github.com/creachadair/jrpc2"
 	"github.com/creachadair/jrpc2/channel"
+)
+
+const (
+	appName    = "todoist"
+	configFile = "config.toml"
+	dataFile   = "todoist.db"
 )
 
 type Factory struct {
 	DeamonConfig *daemon.Config   `toml:"daemon"`
 	IconConfig   *view.IconConfig `toml:"icon"`
 
-	ConfigFilePath string `toml:"-"`
-	DataFilePath   string `toml:"-"`
+	ConfigPath string `toml:"-"`
+	DataPath   string `toml:"-"`
 
 	conn net.Conn
 	*jrpc2.Client
 }
 
-func NewFactory(configFile, dataFile string) *Factory {
+func NewFactory() (*Factory, error) {
+	configPath, err := xdg.ConfigFile(filepath.Join(appName, configFile))
+	if err != nil {
+		return nil, err
+	}
+	dataPath, err := xdg.DataFile(filepath.Join(appName, dataFile))
+	if err != nil {
+		return nil, err
+	}
+
 	return &Factory{
 		DeamonConfig: daemon.DefaultConfig,
 		IconConfig:   view.DefaultIconConfig,
 
-		ConfigFilePath: configFile,
-		DataFilePath:   dataFile,
-	}
-}
-
-func (f *Factory) LoadConfig() error {
-	data, err := os.ReadFile(f.ConfigFilePath)
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return err
-		}
-
-		buf := new(bytes.Buffer)
-		encoder := toml.NewEncoder(buf)
-		encoder.Indent = ""
-		if err := encoder.Encode(f); err != nil {
-			return err
-		}
-
-		return os.WriteFile(f.ConfigFilePath, buf.Bytes(), 0o644)
-	}
-
-	return toml.Unmarshal(data, f)
+		ConfigPath: configPath,
+		DataPath:   dataPath,
+	}, nil
 }
 
 func (f *Factory) Dial() error {

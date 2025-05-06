@@ -18,6 +18,11 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		Long:    "Modify a task in todoist",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			params.ID = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.TaskModify, params); err != nil {
 				return err

@@ -2,56 +2,30 @@ package cmd
 
 import (
 	"context"
-	"path/filepath"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/daemon"
 	"github.com/CnTeng/todoist-cli/internal/cmd/project"
 	"github.com/CnTeng/todoist-cli/internal/cmd/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/task"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
-	"github.com/adrg/xdg"
 	"github.com/spf13/cobra"
 )
 
-const (
-	appName    = "todoist"
-	configFile = "config.toml"
-	cacheFile  = "todoist.db"
-)
-
 func newCmd() (*cobra.Command, error) {
-	configFilePath, err := xdg.ConfigFile(filepath.Join(appName, configFile))
+	f, err := util.NewFactory()
 	if err != nil {
 		return nil, err
 	}
-	dataFilePath, err := xdg.DataFile(filepath.Join(appName, cacheFile))
-	if err != nil {
-		return nil, err
-	}
-
-	f := util.NewFactory(configFilePath, dataFilePath)
 
 	cmd := &cobra.Command{
-		Use:   appName,
+		Use:   "todoist <command> [subcommand] [flags]",
 		Short: "A CLI for Todoist",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := f.LoadConfig(); err != nil {
-				return err
-			}
-
-			if err := f.Dial(); err != nil {
-				return err
-			}
-
-			return nil
-		},
-
-		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
-			return f.Close()
+			return f.LoadConfig()
 		},
 	}
 
-	cmd.PersistentFlags().StringVar(&f.ConfigFilePath, "config", configFilePath, "config file")
+	cmd.PersistentFlags().StringVar(&f.ConfigPath, "config", f.ConfigPath, "config file")
 
 	cmd.AddCommand(
 		task.NewListCmd(f),

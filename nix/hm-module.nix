@@ -15,21 +15,13 @@ in
 
     package = lib.mkPackageOption self.packages.${pkgs.system} "todoist-cli" { };
 
-    apiTokenFile = lib.mkOption {
-      type = lib.types.path;
-      default = null;
-      example = "/path/to/api_token";
-      description = ''
-        Path to the file containing the Todoist API token.
-      '';
-    };
-
     settings = lib.mkOption {
       type = format.type;
       default = { };
       example = {
         daemon = {
           address = "@todo.sock";
+          api_token_file = "/path/to/api_token";
         };
       };
       description = ''
@@ -53,7 +45,6 @@ in
       Install.WantedBy = [ "default.target" ];
 
       Service = {
-        Environment = "API_TOKEN_FILE=${cfg.apiTokenFile}";
         ExecStart = "${lib.getExe cfg.package} daemon";
         Restart = "on-failure";
       };

@@ -19,6 +19,11 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 		Long:    "Remove a project in todoist",
 		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			params := make([]*sync.ProjectDeleteArgs, 0, len(ids))
 			for _, id := range args {
 				params = append(params, &sync.ProjectDeleteArgs{ID: id})

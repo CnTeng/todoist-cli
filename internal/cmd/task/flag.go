@@ -23,6 +23,8 @@ func taskCompletion(f *util.Factory) cobra.CompletionFunc {
 		if err := f.Dial(); err != nil {
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		}
+		defer f.Close()
+
 		params := &view.TaskViewConfig{}
 		result := []*model.Task{}
 		if err := f.CallResult(cmd.Context(), daemon.TaskList, params, &result); err != nil {

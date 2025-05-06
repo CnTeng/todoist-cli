@@ -19,6 +19,11 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		Long:    "Add a task to todoist",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			params.Content = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.TaskAdd, params); err != nil {
 				return err
@@ -50,6 +55,11 @@ func NewQuickAddCmd(f *util.Factory) *cobra.Command {
 		Long:    "Quick Add a task to todoist",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := f.Dial(); err != nil {
+				return err
+			}
+			defer f.Close()
+
 			params.Text = args[0]
 			if _, err := f.Call(cmd.Context(), daemon.TaskQuickAdd, params); err != nil {
 				return err
