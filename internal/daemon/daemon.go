@@ -16,8 +16,9 @@ import (
 )
 
 type Config struct {
-	Address  string `toml:"address"`
-	ApiToken string `toml:"-"`
+	Address      string `toml:"address"`
+	ApiToken     string `toml:"api_token"`
+	ApiTokenFile string `toml:"api_token_file"`
 }
 
 var DefaultConfig = &Config{
