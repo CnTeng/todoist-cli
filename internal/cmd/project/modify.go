@@ -12,11 +12,12 @@ import (
 func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &sync.ProjectUpdateArgs{}
 	cmd := &cobra.Command{
-		Use:     "modify",
-		Aliases: []string{"m"},
-		Short:   "Modify a task",
-		Long:    "Modify a task in todoist",
-		Args:    cobra.ExactArgs(1),
+		Use:               "modify",
+		Aliases:           []string{"m"},
+		Short:             "Modify a task",
+		Long:              "Modify a task in todoist",
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: f.NewProjectCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
@@ -33,9 +34,9 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlag(newNameFlag(&params.Name))
-	addColorFlag(cmd, &params.Color)
-	cmd.Flags().AddFlag(newFavoriteFlag(&params.IsFavorite))
+	addColorFlag(f, cmd, &params.Color)
+	addFavoriteFlag(f, cmd, &params.IsFavorite)
+	addNameFlag(f, cmd, &params.Name)
 
 	return cmd
 }

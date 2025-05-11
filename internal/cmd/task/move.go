@@ -12,11 +12,13 @@ import (
 func NewMoveCmd(f *util.Factory) *cobra.Command {
 	params := &sync.TaskMoveArgs{}
 	cmd := &cobra.Command{
-		Use:     "move",
-		Aliases: []string{"mv"},
-		Short:   "Move a task",
-		Long:    "Move a task in todoist",
-		Args:    cobra.ExactArgs(1),
+		Use:               "move",
+		Aliases:           []string{"mv"},
+		Short:             "Move a task",
+		Long:              "Move a task in todoist",
+		GroupID:           Group.ID,
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: f.NewTaskCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
@@ -33,9 +35,9 @@ func NewMoveCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlag(newSectionFlag(&params.SectionID))
-	cmd.Flags().AddFlag(newParentFlag(&params.ParentID))
-	cmd.Flags().AddFlag(newProjectFlag(&params.ProjectID))
+	addSectionFlag(f, cmd, &params.SectionID)
+	addParentFlag(f, cmd, &params.ParentID)
+	addProjectFlag(f, cmd, &params.ProjectID)
 
 	return cmd
 }

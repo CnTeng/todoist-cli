@@ -2,37 +2,13 @@ package project
 
 import (
 	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/cmd/value"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
-func newNameFlag(destination **string) *pflag.Flag {
-	v := value.NewStringPtr(func(v string) error {
-		*destination = &v
-		return nil
-	})
-	return &pflag.Flag{
-		Name:      "name",
-		Shorthand: "n",
-		Usage:     "Project name",
-		Value:     v,
-		DefValue:  v.String(),
-	}
-}
-
-func colorCompletion(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
-	colors := sync.ListColors()
-
-	cmps := make([]cobra.Completion, len(colors))
-
-	for i, c := range colors {
-		cmps[i] = cobra.CompletionWithDesc(string(c), c.Hex())
-	}
-	return cmps, cobra.ShellCompDirectiveNoFileComp
-}
-
-func addColorFlag(cmd *cobra.Command, destination **sync.Color) {
+func addColorFlag(f *util.Factory, cmd *cobra.Command, destination **sync.Color) {
 	v := value.NewStringPtr(func(v string) error {
 		color, err := sync.ParseColor(v)
 		if err != nil {
@@ -50,19 +26,40 @@ func addColorFlag(cmd *cobra.Command, destination **sync.Color) {
 	}
 
 	cmd.Flags().AddFlag(flag)
-	_ = cmd.RegisterFlagCompletionFunc("color", colorCompletion)
+	_ = cmd.RegisterFlagCompletionFunc(flag.Name, f.NewColorCompletionFunc(-1))
 }
 
-func newFavoriteFlag(destination **bool) *pflag.Flag {
+func addFavoriteFlag(f *util.Factory, cmd *cobra.Command, destination **bool) {
 	v := value.NewBoolPtr(func(v bool) error {
 		*destination = &v
 		return nil
 	})
-	return &pflag.Flag{
-		Name:      "favorite",
-		Shorthand: "f",
-		Usage:     "Add project to favorites",
+	flag := &pflag.Flag{
+		Name:        "favorite",
+		Shorthand:   "f",
+		Usage:       "Add project to favorites",
+		Value:       v,
+		NoOptDefVal: "true",
+		DefValue:    v.String(),
+	}
+
+	cmd.Flags().AddFlag(flag)
+	_ = cmd.RegisterFlagCompletionFunc(flag.Name, f.NewFavoriteCompletionFunc(-1))
+}
+
+func addNameFlag(f *util.Factory, cmd *cobra.Command, destination **string) {
+	v := value.NewStringPtr(func(v string) error {
+		*destination = &v
+		return nil
+	})
+	flag := &pflag.Flag{
+		Name:      "name",
+		Shorthand: "n",
+		Usage:     "Project name",
 		Value:     v,
 		DefValue:  v.String(),
 	}
+
+	cmd.Flags().AddFlag(flag)
+	_ = cmd.RegisterFlagCompletionFunc(flag.Name, f.NewProjectCompletionFunc(-1))
 }

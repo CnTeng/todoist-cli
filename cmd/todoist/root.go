@@ -27,15 +27,17 @@ func newCmd() (*cobra.Command, error) {
 
 	cmd.PersistentFlags().StringVar(&f.ConfigPath, "config", f.ConfigPath, "config file")
 
+	cmd.AddGroup(task.Group)
+
 	cmd.AddCommand(
-		task.NewListCmd(f),
 		task.NewAddCmd(f),
 		task.NewQuickAddCmd(f),
-		task.NewModifyCmd(f),
 		task.NewCloseCmd(f),
-		task.NewReopenCmd(f),
-		task.NewRemoveCmd(f),
+		task.NewListCmd(f),
+		task.NewModifyCmd(f),
 		task.NewMoveCmd(f),
+		task.NewRemoveCmd(f),
+		task.NewReopenCmd(f),
 		project.NewCmd(f),
 		sync.NewCmd(f),
 		daemon.NewCmd(f),

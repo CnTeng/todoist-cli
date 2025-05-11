@@ -13,10 +13,13 @@ import (
 func NewListCmd(f *util.Factory) *cobra.Command {
 	params := &view.TaskViewConfig{}
 	cmd := &cobra.Command{
-		Use:     "list",
-		Aliases: []string{"ls"},
-		Short:   "List tasks",
-		Long:    "List tasks in todoist",
+		Use:               "list",
+		Aliases:           []string{"ls"},
+		Short:             "List tasks",
+		Long:              "List tasks in todoist",
+		GroupID:           Group.ID,
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

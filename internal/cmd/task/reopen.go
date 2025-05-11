@@ -11,11 +11,13 @@ import (
 
 func NewReopenCmd(f *util.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:     "reopen",
-		Aliases: []string{"r"},
-		Short:   "Reopen a task",
-		Long:    "Reopen a task in todoist",
-		Args:    cobra.MinimumNArgs(1),
+		Use:               "reopen",
+		Aliases:           []string{"r"},
+		Short:             "Reopen a task",
+		Long:              "Reopen a task in todoist",
+		GroupID:           Group.ID,
+		Args:              cobra.MinimumNArgs(1),
+		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
