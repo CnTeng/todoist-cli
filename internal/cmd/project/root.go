@@ -7,14 +7,15 @@ import (
 
 func NewCmd(f *util.Factory) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:          "project",
-		Aliases:      []string{"proj"},
-		Long:         "project commands",
-		SilenceUsage: true,
+		Use:               "project",
+		Aliases:           []string{"proj"},
+		Long:              "project commands",
+		SilenceUsage:      true,
+		ValidArgsFunction: cobra.NoFileCompletions,
 	}
 
-	cmd.AddCommand(NewListCmd(f))
 	cmd.AddCommand(NewAddCmd(f))
+	cmd.AddCommand(NewListCmd(f))
 	cmd.AddCommand(NewModifyCmd(f))
 	cmd.AddCommand(NewRemoveCmd(f))
 	return cmd

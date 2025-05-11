@@ -11,13 +11,14 @@ import (
 
 func NewCloseCmd(f *util.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:        "close",
-		Aliases:    []string{"done"},
-		Short:      "Close a task",
-		Long:       "Close a task in todoist",
-		GroupID:    Group.ID,
-		Args:       cobra.MinimumNArgs(1),
-		ArgAliases: []string{"id"},
+		Use:               "close",
+		Aliases:           []string{"done"},
+		Short:             "Close a task",
+		Long:              "Close a task in todoist",
+		GroupID:           Group.ID,
+		Args:              cobra.MinimumNArgs(1),
+		ArgAliases:        []string{"id"},
+		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

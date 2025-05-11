@@ -9,8 +9,10 @@ import (
 
 func NewCmd(f *util.Factory) *cobra.Command {
 	return &cobra.Command{
-		Use:          "daemon",
-		SilenceUsage: true,
+		Use:               "daemon",
+		SilenceUsage:      true,
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			db, err := db.NewDB(f.DataPath)
 			if err != nil {

@@ -12,12 +12,13 @@ import (
 func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &sync.TaskUpdateArgs{}
 	cmd := &cobra.Command{
-		Use:     "modify",
-		Aliases: []string{"m"},
-		Short:   "Modify a task",
-		Long:    "Modify a task in todoist",
-		GroupID: Group.ID,
-		Args:    cobra.ExactArgs(1),
+		Use:               "modify",
+		Aliases:           []string{"m"},
+		Short:             "Modify a task",
+		Long:              "Modify a task in todoist",
+		GroupID:           Group.ID,
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: f.NewTaskCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
@@ -34,13 +35,13 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().AddFlag(newContentFlag(&params.Content))
-	cmd.Flags().AddFlag(newDescriptionFlag(&params.Description))
-	cmd.Flags().AddFlag(newDueFlag(&params.Due))
-	cmd.Flags().AddFlag(newDeadlineFlag(&params.Deadline))
-	cmd.Flags().AddFlag(newPriorityFlag(&params.Priority))
-	addLabelsFlag(cmd, &params.Labels)
-	cmd.Flags().AddFlag(newDurationFlag(&params.Duration))
+	addContentFlag(f, cmd, &params.Content)
+	addDeadlineFlag(f, cmd, &params.Deadline)
+	addDescriptionFlag(f, cmd, &params.Description)
+	addDueFlag(f, cmd, &params.Due)
+	addDurationFlag(f, cmd, &params.Duration)
+	addLabelsFlag(f, cmd, &params.Labels)
+	addPriorityFlag(f, cmd, &params.Priority)
 
 	return cmd
 }

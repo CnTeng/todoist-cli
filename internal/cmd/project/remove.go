@@ -13,11 +13,12 @@ import (
 func NewRemoveCmd(f *util.Factory) *cobra.Command {
 	ids := []string{}
 	return &cobra.Command{
-		Use:     "remove",
-		Aliases: []string{"rm"},
-		Short:   "Remove a project",
-		Long:    "Remove a project in todoist",
-		Args:    cobra.MinimumNArgs(1),
+		Use:               "remove",
+		Aliases:           []string{"rm"},
+		Short:             "Remove a project",
+		Long:              "Remove a project in todoist",
+		Args:              cobra.MinimumNArgs(1),
+		ValidArgsFunction: f.NewProjectCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

@@ -14,7 +14,9 @@ import (
 func NewCmd(f *util.Factory) *cobra.Command {
 	params := &daemon.SyncArgs{}
 	cmd := &cobra.Command{
-		Use: "sync",
+		Use:               "sync",
+		Args:              cobra.NoArgs,
+		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

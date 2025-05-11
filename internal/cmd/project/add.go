@@ -12,11 +12,12 @@ import (
 func NewAddCmd(f *util.Factory) *cobra.Command {
 	params := &sync.ProjectAddArgs{}
 	cmd := &cobra.Command{
-		Use:     "add",
-		Aliases: []string{"a"},
-		Short:   "Add a project",
-		Long:    "Add a project to todoist",
-		Args:    cobra.ExactArgs(1),
+		Use:               "add",
+		Aliases:           []string{"a"},
+		Short:             "Add a project",
+		Long:              "Add a project to todoist",
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
@@ -33,8 +34,8 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	addColorFlag(cmd, &params.Color)
-	cmd.Flags().AddFlag(newFavoriteFlag(&params.IsFavorite))
+	addColorFlag(f, cmd, &params.Color)
+	addFavoriteFlag(f, cmd, &params.IsFavorite)
 
 	return cmd
 }
