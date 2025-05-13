@@ -179,3 +179,41 @@ func (f *Factory) NewLabelCompletionFunc(n int) cobra.CompletionFunc {
 		return cmps, cobra.ShellCompDirectiveNoFileComp
 	}
 }
+
+func (f *Factory) NewFilterCompletionFunc(n int) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if n > 0 && len(args) >= n {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.LoadConfig(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.Dial(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		defer f.Close()
+
+		filters := []*sync.Filter{}
+		if err := f.CallResult(cmd.Context(), daemon.FilterList, nil, &filters); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		seen := make(map[string]struct{})
+		for _, arg := range args {
+			seen[arg] = struct{}{}
+		}
+
+		cmps := make([]cobra.Completion, len(filters))
+		for i, filter := range filters {
+			if _, ok := seen[filter.ID]; ok {
+				continue
+			}
+
+			desc := fmt.Sprintf("%s: %s", filter.Name, filter.Query)
+			cmps[i] = cobra.CompletionWithDesc(filter.ID, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
+	}
+}

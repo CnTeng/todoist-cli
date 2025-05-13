@@ -71,6 +71,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	defer lst.Close()
 
 	labelSvc := todoist.NewLabelService(d.client)
+	filterSvc := todoist.NewFilterService(d.client)
 
 	svc := server.Static(handler.Map{
 		Sync: handler.New(d.sync),
@@ -96,6 +97,13 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		LabelModify:  handler.New(d.updateLabel),
 		LabelRemove:  handler.New(d.deleteLabels),
 		LabelReorder: handler.New(labelSvc.ReorderLabels),
+
+		// Filter services
+		FilterAdd:     handler.New(filterSvc.AddFilter),
+		FilterList:    handler.New(d.db.ListFilters),
+		FilterModify:  handler.New(filterSvc.UpdateFilter),
+		FilterRemove:  handler.New(filterSvc.DeleteFilters),
+		FilterReorder: handler.New(filterSvc.ReorderFilters),
 	})
 
 	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{

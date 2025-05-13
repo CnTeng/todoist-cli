@@ -41,14 +41,20 @@ func (db *DB) handleSyncResponse(ctx context.Context, resp *sync.SyncResponse) e
 			}
 		}
 
+		for _, project := range resp.Projects {
+			if err := db.storeProject(tx, project); err != nil {
+				return err
+			}
+		}
+
 		for _, label := range resp.Labels {
 			if err := db.storeLabel(ctx, tx, label); err != nil {
 				return err
 			}
 		}
 
-		for _, project := range resp.Projects {
-			if err := db.storeProject(tx, project); err != nil {
+		for _, filter := range resp.Filters {
+			if err := db.storeFilter(ctx, tx, filter); err != nil {
 				return err
 			}
 		}

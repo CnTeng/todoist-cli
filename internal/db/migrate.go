@@ -7,6 +7,8 @@ const createTableQuery = `
 
 	CREATE TABLE IF NOT EXISTS projects (id text PRIMARY KEY, data jsonb NOT NULL);
 
+	CREATE TABLE IF NOT EXISTS filters (id text PRIMARY KEY, data jsonb NOT NULL);
+
 	CREATE TABLE IF NOT EXISTS labels (id text PRIMARY KEY, data jsonb NOT NULL);
 
 	CREATE TABLE IF NOT EXISTS users (id text PRIMARY KEY, data jsonb NOT NULL);

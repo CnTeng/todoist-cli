@@ -24,4 +24,11 @@ const (
 	LabelModify  string = "Label.Modify"
 	LabelRemove  string = "Label.Remove"
 	LabelReorder string = "Label.Reorder"
+
+	// Filter services
+	FilterAdd     string = "Filter.Add"
+	FilterList    string = "Filter.List"
+	FilterModify  string = "Filter.Modify"
+	FilterRemove  string = "Filter.Remove"
+	FilterReorder string = "Filter.Reorder"
 )
