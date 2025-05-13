@@ -86,7 +86,11 @@ func (v *taskView) taskProject(t *model.Task) string {
 func (v *taskView) taskLabels(t *model.Task) string {
 	labels := []string{}
 	for _, l := range t.Labels {
-		labels = append(labels, color.BgRGB(l.Color.RGB()).Sprint(l.Name))
+		label := l.Name
+		if !l.IsShared {
+			label = color.BgRGB(l.Color.RGB()).Sprint(l.Name)
+		}
+		labels = append(labels, label)
 	}
 	return strings.Join(labels, " ")
 }

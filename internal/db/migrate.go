@@ -23,8 +23,54 @@ const createTableQuery = `
 		(1, "*")
 	ON CONFLICT (id) DO NOTHING;`
 
+const createViewQuery = `
+	CREATE VIEW IF NOT EXISTS labels_view AS
+	WITH
+		label_count AS (
+			SELECT
+				je.value AS id,
+				count(tasks.id) AS count
+			FROM
+				tasks,
+				json_each(tasks.data -> 'labels') AS je
+			GROUP BY
+				je.value
+		)
+	SELECT
+		l.id,
+		json_patch(
+			l.data,
+			json_object('count', coalesce(lc.count, 0))
+		) AS data
+	FROM
+		labels l
+		LEFT JOIN label_count lc ON l.id = lc.id
+	UNION ALL
+	SELECT
+		lc.id AS id,
+		json_object(
+			'name',
+			lc.id,
+			'is_shared',
+			json('true'),
+			'count',
+			lc.count
+		) AS data
+	FROM
+		label_count lc
+	WHERE
+		NOT EXISTS (
+			SELECT
+				1
+			FROM
+				labels l
+			WHERE
+				l.id = lc.id
+		);`
+
 var migrations = []string{
 	createTableQuery,
+	createViewQuery,
 }
 
 func (db *DB) Migrate() error {

@@ -17,6 +17,11 @@ const (
 	ProjectAdd    string = "Project.Add"
 	ProjectModify string = "Project.Modify"
 	ProjectRemove string = "Project.Remove"
-	LabelGet      string = "Label.Get"
-	LabelList     string = "Label.List"
+
+	// Label services
+	LabelAdd     string = "Label.Add"
+	LabelList    string = "Label.List"
+	LabelModify  string = "Label.Modify"
+	LabelRemove  string = "Label.Remove"
+	LabelReorder string = "Label.Reorder"
 )

@@ -70,6 +70,8 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	}
 	defer lst.Close()
 
+	labelSvc := todoist.NewLabelService(d.client)
+
 	svc := server.Static(handler.Map{
 		Sync: handler.New(d.sync),
 		// TODO: completed tasks
@@ -87,8 +89,13 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		ProjectAdd:    handler.New(d.client.AddProject),
 		ProjectModify: handler.New(d.client.UpdateProject),
 		ProjectRemove: handler.New(d.client.DeleteProjects),
-		LabelGet:      handler.New(d.db.GetLabel),
-		LabelList:     handler.New(d.db.ListLabels),
+
+		// Label services
+		LabelAdd:     handler.New(labelSvc.AddLabel),
+		LabelList:    handler.New(d.db.ListLabels),
+		LabelModify:  handler.New(d.updateLabel),
+		LabelRemove:  handler.New(d.deleteLabels),
+		LabelReorder: handler.New(labelSvc.ReorderLabels),
 	})
 
 	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{

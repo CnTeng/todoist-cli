@@ -12,5 +12,5 @@ type Task struct {
 	Project       *sync.Project `json:"project"`
 	SubTasks      []*Task       `json:"sub_tasks"`
 	SubTaskStatus SubTaskStatus `json:"sub_task_status"`
-	Labels        []*sync.Label `json:"labels"`
+	Labels        []*Label      `json:"labels"`
 }

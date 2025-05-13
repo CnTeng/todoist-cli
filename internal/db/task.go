@@ -114,7 +114,7 @@ func (db *DB) getTask(ctx context.Context, tx *sql.Tx, id string) (*model.Task, 
 	t.Project = p
 
 	for _, ln := range t.Task.Labels {
-		label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
+		label, err := getItem[model.Label](ctx, tx, labelGetQuery, ln)
 		if err != nil {
 			return nil, err
 		}
@@ -148,7 +148,7 @@ func (db *DB) listSubTasks(ctx context.Context, tx *sql.Tx, query string, task *
 		}
 
 		for _, ln := range st.Task.Labels {
-			label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
+			label, err := getItem[model.Label](ctx, tx, labelGetQuery, ln)
 			if err != nil {
 				return err
 			}
@@ -197,10 +197,9 @@ func (db *DB) listTasksByProject(ctx context.Context, tx *sql.Tx, project *sync.
 		}
 
 		for _, ln := range t.Task.Labels {
-			label, err := getItem[sync.Label](ctx, tx, labelGetQuery, ln)
+			label, err := getItem[model.Label](ctx, tx, labelGetQuery, ln)
 			if err != nil {
-				// TODO: shared labels
-				label = &sync.Label{Name: ln, Color: sync.Grey}
+				return nil, err
 			}
 			t.Labels = append(t.Labels, label)
 		}

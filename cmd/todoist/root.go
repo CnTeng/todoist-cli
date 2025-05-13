@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/daemon"
+	"github.com/CnTeng/todoist-cli/internal/cmd/label"
 	"github.com/CnTeng/todoist-cli/internal/cmd/project"
 	"github.com/CnTeng/todoist-cli/internal/cmd/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/task"
@@ -38,6 +39,7 @@ func newCmd() (*cobra.Command, error) {
 		task.NewMoveCmd(f),
 		task.NewRemoveCmd(f),
 		task.NewReopenCmd(f),
+		label.NewCmd(f),
 		project.NewCmd(f),
 		sync.NewCmd(f),
 		daemon.NewCmd(f),
