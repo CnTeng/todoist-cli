@@ -18,6 +18,16 @@ const (
 	ProjectModify string = "Project.Modify"
 	ProjectRemove string = "Project.Remove"
 
+	// Section services
+	SectionAdd       string = "Section.Add"
+	SectionList      string = "Section.List"
+	SectionModify    string = "Section.Modify"
+	SectionMove      string = "Section.Move"
+	SectionArchive   string = "Section.Archive"
+	SectionUnarchive string = "Section.Unarchive"
+	SectionRemove    string = "Section.Remove"
+	SectionReorder   string = "Section.Reorder"
+
 	// Label services
 	LabelAdd     string = "Label.Add"
 	LabelList    string = "Label.List"

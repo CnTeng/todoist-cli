@@ -217,3 +217,41 @@ func (f *Factory) NewFilterCompletionFunc(n int) cobra.CompletionFunc {
 		return cmps, cobra.ShellCompDirectiveNoFileComp
 	}
 }
+
+func (f *Factory) NewSectionCompletionFunc(n int) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if n > 0 && len(args) >= n {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.LoadConfig(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.Dial(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		defer f.Close()
+
+		sections := []*model.Section{}
+		if err := f.CallResult(cmd.Context(), daemon.SectionList, nil, &sections); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		seen := make(map[string]struct{})
+		for _, arg := range args {
+			seen[arg] = struct{}{}
+		}
+
+		cmps := make([]cobra.Completion, len(sections))
+		for i, section := range sections {
+			if _, ok := seen[section.ID]; ok {
+				continue
+			}
+
+			desc := fmt.Sprintf("%s: %s", section.ProjectName, section.Name)
+			cmps[i] = cobra.CompletionWithDesc(section.ID, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
+	}
+}

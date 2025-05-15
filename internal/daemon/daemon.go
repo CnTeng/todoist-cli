@@ -91,6 +91,16 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		ProjectModify: handler.New(d.client.UpdateProject),
 		ProjectRemove: handler.New(d.client.DeleteProjects),
 
+		// Section services
+		SectionAdd:       handler.New(d.client.AddSection),
+		SectionList:      handler.New(d.db.ListSections),
+		SectionModify:    handler.New(d.client.UpdateSection),
+		SectionMove:      handler.New(d.client.MoveSection),
+		SectionArchive:   handler.New(d.client.ArchiveSections),
+		SectionUnarchive: handler.New(d.client.UnarchiveSections),
+		SectionRemove:    handler.New(d.client.DeleteSections),
+		SectionReorder:   handler.New(d.client.ReorderSections),
+
 		// Label services
 		LabelAdd:     handler.New(labelSvc.AddLabel),
 		LabelList:    handler.New(d.db.ListLabels),

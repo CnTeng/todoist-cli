@@ -7,6 +7,8 @@ const createTableQuery = `
 
 	CREATE TABLE IF NOT EXISTS projects (id text PRIMARY KEY, data jsonb NOT NULL);
 
+	CREATE TABLE IF NOT EXISTS sections (id text PRIMARY KEY, data jsonb NOT NULL);
+
 	CREATE TABLE IF NOT EXISTS filters (id text PRIMARY KEY, data jsonb NOT NULL);
 
 	CREATE TABLE IF NOT EXISTS labels (id text PRIMARY KEY, data jsonb NOT NULL);
@@ -68,7 +70,23 @@ const createViewQuery = `
 				labels l
 			WHERE
 				l.id = lc.id
-		);`
+		);
+
+	CREATE VIEW IF NOT EXISTS sections_view AS
+	SELECT
+		s.id,
+		json_patch(
+			s.data,
+			json_object(
+				'project_name',
+				p.data ->> 'name',
+				'project_order',
+				p.data ->> 'child_order'
+			)
+		) AS data
+	FROM
+		sections s
+		LEFT JOIN projects p ON s.data ->> 'project_id' = p.id;`
 
 var migrations = []string{
 	createTableQuery,

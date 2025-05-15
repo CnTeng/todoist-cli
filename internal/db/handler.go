@@ -47,6 +47,12 @@ func (db *DB) handleSyncResponse(ctx context.Context, resp *sync.SyncResponse) e
 			}
 		}
 
+		for _, section := range resp.Sections {
+			if err := db.storeSection(ctx, tx, section); err != nil {
+				return err
+			}
+		}
+
 		for _, label := range resp.Labels {
 			if err := db.storeLabel(ctx, tx, label); err != nil {
 				return err
