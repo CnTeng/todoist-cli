@@ -20,8 +20,8 @@ func getItem[T any](ctx context.Context, tx *sql.Tx, query string, args ...any) 
 	return &item, nil
 }
 
-func listItems[T any](ctx context.Context, tx *sql.Tx, query string) ([]*T, error) {
-	rows, err := tx.QueryContext(ctx, query)
+func listItems[T any](ctx context.Context, tx *sql.Tx, query string, args ...any) ([]*T, error) {
+	rows, err := tx.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

@@ -86,7 +86,54 @@ const createViewQuery = `
 		) AS data
 	FROM
 		sections s
-		LEFT JOIN projects p ON s.data ->> 'project_id' = p.id;`
+		LEFT JOIN projects p ON s.data ->> 'project_id' = p.id;
+
+	CREATE VIEW IF NOT EXISTS tasks_view AS
+	SELECT
+		t.id,
+		json_patch(
+			t.data,
+			json_object(
+				-- project
+				'project',
+				json(p.data),
+				-- section
+				'section',
+				json(s.data),
+				-- labels
+				'labels',
+				coalesce(
+					(
+						SELECT
+							json_group_array(json(lv.data))
+						FROM
+							json_each(t.data -> 'labels') AS je
+							LEFT JOIN labels_view lv ON je.value = lv.id
+					),
+					json_array()
+				),
+				-- task
+				'sub_task_status',
+				json_object(
+					'total',
+					count(child.id),
+					'completed',
+					sum(
+						CASE
+							WHEN child.data -> 'checked' = 'true' THEN 1
+							ELSE 0
+						END
+					)
+				)
+			)
+		) AS data
+	FROM
+		tasks t
+		LEFT JOIN projects p ON t.data ->> 'project_id' = p.id
+		LEFT JOIN sections s ON t.data ->> 'section_id' = s.id
+		LEFT JOIN tasks child ON t.id = child.data ->> 'parent_id'
+	GROUP BY
+		t.id;`
 
 var migrations = []string{
 	createTableQuery,
