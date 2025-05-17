@@ -8,9 +8,11 @@ import (
 )
 
 func NewCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "daemon",
-		SilenceUsage:      true,
+		Short:             "Start daemon",
+		Long:              "Start daemon to sync data with Todoist.",
+		Example:           "  todoist daemon",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -27,4 +29,8 @@ func NewCmd(f *util.Factory) *cobra.Command {
 			return daemon.Serve(cmd.Context())
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

@@ -16,7 +16,7 @@ func NewCmd(f *util.Factory) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "sync",
 		Short:             "Sync data",
-		Long:              "Sync data with Todoist server.",
+		Long:              "Sync data with Todoist.",
 		Example:           "  todoist sync --all",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
