@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCmd(f *util.Factory) *cobra.Command {
+func NewCmd(f *util.Factory, group string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "section",
 		Short: "Section commands",
@@ -14,6 +14,7 @@ func NewCmd(f *util.Factory) *cobra.Command {
   todoist section list
 	todoist section modify 6Xm5HVVRcX00MCjv --name dailytodoist section modify 6Xm5HVVRcX00MCjv --name stage1
 	todoist section remove 6Xm5HVVRcX00MCjv`,
+		GroupID:           group,
 		SilenceUsage:      true,
 		ValidArgsFunction: cobra.NoFileCompletions,
 	}

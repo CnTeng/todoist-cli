@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewListCmd(f *util.Factory) *cobra.Command {
+func NewListCmd(f *util.Factory, group string) *cobra.Command {
 	params := &view.TaskViewConfig{}
 	cmd := &cobra.Command{
 		Use:               "list [flags]",
@@ -18,7 +18,7 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		Short:             "List tasks",
 		Long:              "List tasks in Todoist, similar to the 'ls' command in shell.",
 		Example:           "  todoist list --all",
-		GroupID:           Group.ID,
+		GroupID:           group,
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {

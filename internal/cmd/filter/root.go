@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCmd(f *util.Factory) *cobra.Command {
+func NewCmd(f *util.Factory, group string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "filter",
 		Short: "Filter commands",
@@ -14,6 +14,7 @@ func NewCmd(f *util.Factory) *cobra.Command {
   todoist filter list
   todoist filter modify daily1 --name daily
   todoist filter remove work daily`,
+		GroupID:           group,
 		SilenceUsage:      true,
 		ValidArgsFunction: cobra.NoFileCompletions,
 	}

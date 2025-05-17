@@ -5,11 +5,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCmd(f *util.Factory) *cobra.Command {
+func NewCmd(f *util.Factory, group string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "project",
 		Aliases:           []string{"proj"},
 		Long:              "project commands",
+		GroupID:           group,
 		SilenceUsage:      true,
 		ValidArgsFunction: cobra.NoFileCompletions,
 	}

@@ -10,14 +10,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewRemoveCmd(f *util.Factory) *cobra.Command {
+func NewRemoveCmd(f *util.Factory, group string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "remove [flags] <task-id>...",
 		Aliases:           []string{"rm"},
 		Short:             "Remove task",
 		Long:              "Remove a task in Todoist, similar to the 'rm' command in shell.",
 		Example:           "  todoist remove 6X7rfFVPjhvv84XG",
-		GroupID:           Group.ID,
+		GroupID:           group,
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {

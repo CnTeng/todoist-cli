@@ -10,13 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewReopenCmd(f *util.Factory) *cobra.Command {
+func NewReopenCmd(f *util.Factory, group string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "reopen [flags] <task-id>...",
 		Short:             "Reopen task",
 		Long:              "Reopen a task in Todoist.",
 		Example:           "  todoist reopen 6X7rfFVPjhvv84XG",
-		GroupID:           Group.ID,
+		GroupID:           group,
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {

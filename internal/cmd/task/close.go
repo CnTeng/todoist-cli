@@ -10,13 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewCloseCmd(f *util.Factory) *cobra.Command {
+func NewCloseCmd(f *util.Factory, group string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "close [flags] <task-id>...",
 		Short:             "Close task",
 		Long:              "Close a task in Todoist.",
 		Example:           "  todoist close 6X7rfFVPjhvv84XG",
-		GroupID:           Group.ID,
+		GroupID:           group,
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewAddCmd(f *util.Factory) *cobra.Command {
+func NewAddCmd(f *util.Factory, group string) *cobra.Command {
 	params := &sync.TaskAddArgs{}
 	cmd := &cobra.Command{
 		Use:               "add [flags] <task-name>",
@@ -18,7 +18,7 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		Short:             "Add task",
 		Long:              "Add a task to Todoist.",
 		Example:           "  todoist add 'Buy Milk' --project 6Jf8VQXxpwv56VQ7 --labels 'Food,Shopping'",
-		GroupID:           Group.ID,
+		GroupID:           group,
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -73,7 +73,7 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 	return cmd
 }
 
-func NewQuickAddCmd(f *util.Factory) *cobra.Command {
+func NewQuickAddCmd(f *util.Factory, group string) *cobra.Command {
 	params := &rest.TaskQuickAddRequest{}
 	cmd := &cobra.Command{
 		Use:               "quick-add <text>",
@@ -81,7 +81,7 @@ func NewQuickAddCmd(f *util.Factory) *cobra.Command {
 		Short:             "Quick add task",
 		Long:              "Quick add a task to Todoist.",
 		Example:           `  todoist quick-add 'Buy Milk P2 @Food @Shopping'`,
-		GroupID:           Group.ID,
+		GroupID:           group,
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {

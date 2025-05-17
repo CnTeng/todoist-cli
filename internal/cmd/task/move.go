@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func NewMoveCmd(f *util.Factory) *cobra.Command {
+func NewMoveCmd(f *util.Factory, group string) *cobra.Command {
 	params := &sync.TaskMoveArgs{}
 	cmd := &cobra.Command{
 		Use:               "move [flags] <task-id>",
@@ -17,7 +17,7 @@ func NewMoveCmd(f *util.Factory) *cobra.Command {
 		Short:             "Move task",
 		Long:              "Move a task in Todoist.",
 		Example:           "  todoist move 6X7rM8997g3RQmvh --parent 6X7rf9x6pv2FGghW",
-		GroupID:           Group.ID,
+		GroupID:           group,
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: f.NewTaskCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
