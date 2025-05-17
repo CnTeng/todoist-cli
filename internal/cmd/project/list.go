@@ -11,9 +11,12 @@ import (
 )
 
 func NewListCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "list",
 		Aliases:           []string{"ls"},
+		Short:             "List projects",
+		Long:              "List projects in Todoist, similar to the 'ls' command in shell.",
+		Example:           "  todoist project list",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -22,14 +25,18 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 			}
 			defer f.Close()
 
-			result := []*sync.Project{}
-			if err := f.CallResult(cmd.Context(), daemon.ProjectList, nil, &result); err != nil {
+			projects := []*sync.Project{}
+			if err := f.CallResult(cmd.Context(), daemon.ProjectList, nil, &projects); err != nil {
 				return err
 			}
 
-			v := view.NewProjectView(result, f.IconConfig.Icons)
+			v := view.NewProjectView(projects, f.IconConfig.Icons)
 			fmt.Print(v.Render())
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

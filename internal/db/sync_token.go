@@ -18,8 +18,8 @@ const (
 	syncTokenGetQuery = `SELECT token FROM sync_token WHERE id = 1`
 )
 
-func (db *DB) storeSyncToken(tx *sql.Tx, token string) error {
-	_, err := tx.Exec(syncTokenStoreQuery, token)
+func (db *DB) storeSyncToken(ctx context.Context, tx *sql.Tx, token string) error {
+	_, err := tx.ExecContext(ctx, syncTokenStoreQuery, token)
 	return err
 }
 

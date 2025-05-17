@@ -27,12 +27,14 @@ const (
 			projects
 		ORDER BY
 			data ->> 'inbox_project' DESC,
+			data ->> 'is_favorite' DESC,
+			data ->> 'is_archived' ASC,
 			data ->> 'child_order' ASC`
 )
 
-func (db *DB) storeProject(tx *sql.Tx, project *sync.Project) error {
+func (db *DB) storeProject(ctx context.Context, tx *sql.Tx, project *sync.Project) error {
 	if project.IsDeleted {
-		_, err := tx.Exec(projectDeleteQuery, project.ID)
+		_, err := tx.ExecContext(ctx, projectDeleteQuery, project.ID)
 		return err
 	}
 
@@ -41,7 +43,7 @@ func (db *DB) storeProject(tx *sql.Tx, project *sync.Project) error {
 		return err
 	}
 
-	if _, err := tx.Exec(projectStoreQuery, project.ID, data); err != nil {
+	if _, err := tx.ExecContext(ctx, projectStoreQuery, project.ID, data); err != nil {
 		return err
 	}
 

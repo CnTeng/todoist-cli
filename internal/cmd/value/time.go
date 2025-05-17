@@ -36,5 +36,5 @@ func (t *timeValue) String() string {
 	if t.value.IsZero() {
 		return ""
 	}
-	return t.value.Format(time.DateOnly)
+	return t.value.Format(t.layout)
 }

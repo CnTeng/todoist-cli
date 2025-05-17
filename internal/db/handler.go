@@ -22,6 +22,8 @@ func (db *DB) HandleResponse(ctx context.Context, resp any) error {
 		return db.handleSyncResponse(ctx, r)
 	case *rest.TaskGetCompletedResponse:
 		return db.handleTaskGetCompletedResponse(ctx, r)
+	case *rest.ProjectGetArchivedResponse:
+		return db.handleProjectGetArchivedResponse(ctx, r)
 	}
 
 	return nil
@@ -41,25 +43,37 @@ func (db *DB) handleSyncResponse(ctx context.Context, resp *sync.SyncResponse) e
 			}
 		}
 
-		for _, label := range resp.Labels {
-			if err := db.storeLabel(tx, label); err != nil {
+		for _, project := range resp.Projects {
+			if err := db.storeProject(ctx, tx, project); err != nil {
 				return err
 			}
 		}
 
-		for _, project := range resp.Projects {
-			if err := db.storeProject(tx, project); err != nil {
+		for _, section := range resp.Sections {
+			if err := db.storeSection(ctx, tx, section); err != nil {
+				return err
+			}
+		}
+
+		for _, label := range resp.Labels {
+			if err := db.storeLabel(ctx, tx, label); err != nil {
+				return err
+			}
+		}
+
+		for _, filter := range resp.Filters {
+			if err := db.storeFilter(ctx, tx, filter); err != nil {
 				return err
 			}
 		}
 
 		if resp.User != nil {
-			if err := db.storeUser(tx, resp.User); err != nil {
+			if err := db.storeUser(ctx, tx, resp.User); err != nil {
 				return err
 			}
 		}
 
-		if err := db.storeSyncToken(tx, resp.SyncToken); err != nil {
+		if err := db.storeSyncToken(ctx, tx, resp.SyncToken); err != nil {
 			return err
 		}
 
@@ -80,6 +94,18 @@ func (db *DB) handleTaskGetCompletedResponse(ctx context.Context, resp *rest.Tas
 	return db.withTx(func(tx *sql.Tx) error {
 		for _, task := range resp.Tasks {
 			if err := db.storeTask(ctx, tx, task); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (db *DB) handleProjectGetArchivedResponse(ctx context.Context, resp *rest.ProjectGetArchivedResponse) error {
+	return db.withTx(func(tx *sql.Tx) error {
+		for _, project := range resp.Projects {
+			if err := db.storeProject(ctx, tx, project); err != nil {
 				return err
 			}
 		}

@@ -51,8 +51,8 @@ func (f *Factory) NewFavoriteCompletionFunc(n int) cobra.CompletionFunc {
 		}
 
 		cmps := []cobra.Completion{
-			cobra.CompletionWithDesc("true", "Add project to favorites"),
-			cobra.CompletionWithDesc("false", "Remove project from favorites"),
+			cobra.CompletionWithDesc("true", "Add to favorites"),
+			cobra.CompletionWithDesc("false", "Remove from favorites"),
 		}
 		return cmps, cobra.ShellCompDirectiveNoFileComp
 	}
@@ -133,6 +133,140 @@ func (f *Factory) NewProjectCompletionFunc(n int) cobra.CompletionFunc {
 				desc = fmt.Sprintf("%s: %s", project.Name, project.Description)
 			}
 			cmps[i] = cobra.CompletionWithDesc(project.ID, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func (f *Factory) NewLabelCompletionFunc(n int) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if n > 0 && len(args) >= n {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.LoadConfig(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.Dial(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		defer f.Close()
+
+		labels := []*model.Label{}
+		if err := f.CallResult(cmd.Context(), daemon.LabelList, nil, &labels); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		seen := make(map[string]struct{})
+		for _, arg := range args {
+			seen[arg] = struct{}{}
+		}
+
+		cmps := make([]cobra.Completion, len(labels))
+		for i, label := range labels {
+			if _, ok := seen[label.Name]; ok {
+				continue
+			}
+
+			desc := "personal"
+			if label.IsShared {
+				desc = "shared"
+			}
+
+			cmps[i] = cobra.CompletionWithDesc(label.Name, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func (f *Factory) NewFilterCompletionFunc(n int) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if n > 0 && len(args) >= n {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.LoadConfig(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.Dial(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		defer f.Close()
+
+		filters := []*sync.Filter{}
+		if err := f.CallResult(cmd.Context(), daemon.FilterList, nil, &filters); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		seen := make(map[string]struct{})
+		for _, arg := range args {
+			seen[arg] = struct{}{}
+		}
+
+		cmps := make([]cobra.Completion, len(filters))
+		for i, filter := range filters {
+			if _, ok := seen[filter.ID]; ok {
+				continue
+			}
+
+			desc := fmt.Sprintf("%s: %s", filter.Name, filter.Query)
+			cmps[i] = cobra.CompletionWithDesc(filter.ID, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func (f *Factory) NewSectionCompletionFunc(n int) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if n > 0 && len(args) >= n {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.LoadConfig(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		if err := f.Dial(); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		defer f.Close()
+
+		sections := []*model.Section{}
+		if err := f.CallResult(cmd.Context(), daemon.SectionList, nil, &sections); err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		seen := make(map[string]struct{})
+		for _, arg := range args {
+			seen[arg] = struct{}{}
+		}
+
+		cmps := make([]cobra.Completion, len(sections))
+		for i, section := range sections {
+			if _, ok := seen[section.ID]; ok {
+				continue
+			}
+
+			desc := fmt.Sprintf("%s: %s", section.ProjectName, section.Name)
+			cmps[i] = cobra.CompletionWithDesc(section.ID, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func (f *Factory) NewPriorityCompletionFunc(n int) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if n > 0 && len(args) >= n {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		cmps := []cobra.Completion{
+			cobra.CompletionWithDesc("1", "P1 Natural"),
+			cobra.CompletionWithDesc("2", "P2 Medium"),
+			cobra.CompletionWithDesc("3", "P3 High"),
+			cobra.CompletionWithDesc("4", "P4 Urgent"),
 		}
 		return cmps, cobra.ShellCompDirectiveNoFileComp
 	}

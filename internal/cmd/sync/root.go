@@ -5,16 +5,19 @@ import (
 	"time"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
-	"github.com/CnTeng/todoist-cli/internal/cmd/value"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 func NewCmd(f *util.Factory) *cobra.Command {
-	params := &daemon.SyncArgs{}
+	params := &daemon.SyncArgs{
+		Since: time.Now().AddDate(0, -1, 0),
+	}
 	cmd := &cobra.Command{
 		Use:               "sync",
+		Short:             "Sync data",
+		Long:              "Sync data with Todoist.",
+		Example:           "  todoist sync --all",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -32,23 +35,10 @@ func NewCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&params.Force, "force", "f", false, "force sync")
-	cmd.Flags().BoolVarP(&params.All, "all", "a", false, "sync all items")
+	cmd.Flags().BoolVarP(&params.All, "all", "a", false, "Sync including completed tasks and archived projects")
+	cmd.Flags().BoolVarP(&params.Force, "force", "f", false, "Force sync by removing local data")
 	cmd.Flags().AddFlag(newSinceFlag(&params.Since))
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	return cmd
-}
-
-func newSinceFlag(destination *time.Time) *pflag.Flag {
-	v := value.NewTimeValue(time.DateOnly, func(v time.Time) error {
-		*destination = v
-		return nil
-	})
-	return &pflag.Flag{
-		Name:      "since",
-		Shorthand: "s",
-		Usage:     "completed task since",
-		Value:     v,
-		DefValue:  time.Now().AddDate(0, -1, 0).String(),
-	}
 }

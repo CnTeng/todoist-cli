@@ -57,6 +57,8 @@
           devShells.default = pkgs.mkShell {
             packages = with pkgs; [
               go
+              gotools
+
               config.treefmt.build.wrapper
             ];
             CGO_ENABLED = "0";

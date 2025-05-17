@@ -47,7 +47,7 @@ func (d *Daemon) loadWsToken(ctx context.Context) (string, error) {
 		return user.WebsocketURL, nil
 	}
 
-	user, err = d.client.GetUser(ctx)
+	user, err = todoist.NewUserService(d.client).GetUser(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -70,25 +70,58 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	}
 	defer lst.Close()
 
+	taskSvc := todoist.NewTaskService(d.client)
+	projectSvc := todoist.NewProjectService(d.client)
+	sectionSvc := todoist.NewSectionService(d.client)
+	labelSvc := todoist.NewLabelService(d.client)
+	filterSvc := todoist.NewFilterService(d.client)
+
 	svc := server.Static(handler.Map{
 		Sync: handler.New(d.sync),
-		// TODO: completed tasks
-		TaskGet:       handler.New(d.db.GetTask),
-		TaskList:      handler.NewPos(d.db.ListTasks, "completed"),
-		TaskAdd:       handler.New(d.client.AddTask),
-		TaskQuickAdd:  handler.New(d.client.AddTaskQuick),
-		TaskModify:    handler.New(d.client.UpdateTask),
-		TaskRemove:    handler.New(d.client.DeleteTasks),
-		TaskClose:     handler.New(d.client.CloseTask),
-		TaskMove:      handler.New(d.client.MoveTask),
-		TaskReopen:    handler.New(d.client.UncompleteTask),
-		ProjectGet:    handler.New(d.db.GetProject),
-		ProjectList:   handler.New(d.db.ListProjects),
-		ProjectAdd:    handler.New(d.client.AddProject),
-		ProjectModify: handler.New(d.client.UpdateProject),
-		ProjectRemove: handler.New(d.client.DeleteProjects),
-		LabelGet:      handler.New(d.db.GetLabel),
-		LabelList:     handler.New(d.db.ListLabels),
+
+		// Task services
+		TaskList:     handler.NewPos(d.db.ListTasks, "completed"),
+		TaskAdd:      handler.New(taskSvc.AddTask),
+		TaskQuickAdd: handler.New(taskSvc.QuickAddTask),
+		TaskModify:   handler.New(taskSvc.UpdateTask),
+		TaskMove:     handler.New(taskSvc.MoveTask),
+		TaskReorder:  handler.New(taskSvc.ReorderTasks),
+		TaskClose:    handler.New(taskSvc.CloseTasks),
+		TaskReopen:   handler.New(taskSvc.UncompleteTasks),
+		TaskRemove:   handler.New(taskSvc.DeleteTasks),
+
+		// Project services
+		ProjectList:      handler.New(d.db.ListProjects),
+		ProjectAdd:       handler.New(projectSvc.AddProject),
+		ProjectModify:    handler.New(projectSvc.UpdateProject),
+		ProjectReorder:   handler.New(projectSvc.ReorderProjects),
+		ProjectArchive:   handler.New(projectSvc.ArchiveProjects),
+		ProjectUnarchive: handler.New(projectSvc.UnarchiveProjects),
+		ProjectRemove:    handler.New(projectSvc.DeleteProjects),
+
+		// Section services
+		SectionList:      handler.New(d.db.ListSections),
+		SectionAdd:       handler.New(sectionSvc.AddSection),
+		SectionModify:    handler.New(sectionSvc.UpdateSection),
+		SectionMove:      handler.New(sectionSvc.MoveSection),
+		SectionReorder:   handler.New(sectionSvc.ReorderSections),
+		SectionArchive:   handler.New(sectionSvc.ArchiveSections),
+		SectionUnarchive: handler.New(sectionSvc.UnarchiveSections),
+		SectionRemove:    handler.New(sectionSvc.DeleteSections),
+
+		// Label services
+		LabelList:    handler.New(d.db.ListLabels),
+		LabelAdd:     handler.New(labelSvc.AddLabel),
+		LabelModify:  handler.New(d.updateLabel),
+		LabelReorder: handler.New(labelSvc.ReorderLabels),
+		LabelRemove:  handler.New(d.deleteLabels),
+
+		// Filter services
+		FilterList:    handler.New(d.db.ListFilters),
+		FilterAdd:     handler.New(filterSvc.AddFilter),
+		FilterModify:  handler.New(filterSvc.UpdateFilter),
+		FilterReorder: handler.New(filterSvc.ReorderFilters),
+		FilterRemove:  handler.New(filterSvc.DeleteFilters),
 	})
 
 	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{

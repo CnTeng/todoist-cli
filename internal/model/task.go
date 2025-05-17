@@ -10,7 +10,8 @@ type SubTaskStatus struct {
 type Task struct {
 	*sync.Task
 	Project       *sync.Project `json:"project"`
+	Section       *sync.Section `json:"section"`
 	SubTasks      []*Task       `json:"sub_tasks"`
 	SubTaskStatus SubTaskStatus `json:"sub_task_status"`
-	Labels        []*sync.Label `json:"labels"`
+	Labels        []*Label      `json:"labels"`
 }

@@ -22,9 +22,9 @@ const (
 	userGetQuery = `SELECT data FROM users LIMIT 1`
 )
 
-func (db *DB) storeUser(tx *sql.Tx, user *sync.User) error {
+func (db *DB) storeUser(ctx context.Context, tx *sql.Tx, user *sync.User) error {
 	if user.IsDeleted {
-		_, err := tx.Exec(userDeleteQuery, user.ID)
+		_, err := tx.ExecContext(ctx, userDeleteQuery, user.ID)
 		return err
 	}
 
@@ -33,7 +33,7 @@ func (db *DB) storeUser(tx *sql.Tx, user *sync.User) error {
 		return err
 	}
 
-	if _, err := tx.Exec(userStoreQuery, user.ID, data); err != nil {
+	if _, err := tx.ExecContext(ctx, userStoreQuery, user.ID, data); err != nil {
 		return err
 	}
 

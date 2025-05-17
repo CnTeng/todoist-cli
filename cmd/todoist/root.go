@@ -4,7 +4,10 @@ import (
 	"context"
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/daemon"
+	"github.com/CnTeng/todoist-cli/internal/cmd/filter"
+	"github.com/CnTeng/todoist-cli/internal/cmd/label"
 	"github.com/CnTeng/todoist-cli/internal/cmd/project"
+	"github.com/CnTeng/todoist-cli/internal/cmd/section"
 	"github.com/CnTeng/todoist-cli/internal/cmd/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/task"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
@@ -27,18 +30,35 @@ func newCmd() (*cobra.Command, error) {
 
 	cmd.PersistentFlags().StringVar(&f.ConfigPath, "config", f.ConfigPath, "config file")
 
-	cmd.AddGroup(task.Group)
+	taskGroup := &cobra.Group{
+		ID:    "task",
+		Title: "Task commands:",
+	}
+	otherGroup := &cobra.Group{
+		ID:    "other",
+		Title: "Resources commands:",
+	}
+
+	cmd.AddGroup(taskGroup, otherGroup)
 
 	cmd.AddCommand(
-		task.NewAddCmd(f),
-		task.NewQuickAddCmd(f),
-		task.NewCloseCmd(f),
-		task.NewListCmd(f),
-		task.NewModifyCmd(f),
-		task.NewMoveCmd(f),
-		task.NewRemoveCmd(f),
-		task.NewReopenCmd(f),
-		project.NewCmd(f),
+		// Task commands
+		task.NewAddCmd(f, taskGroup.ID),
+		task.NewQuickAddCmd(f, taskGroup.ID),
+		task.NewCloseCmd(f, taskGroup.ID),
+		task.NewListCmd(f, taskGroup.ID),
+		task.NewModifyCmd(f, taskGroup.ID),
+		task.NewMoveCmd(f, taskGroup.ID),
+		task.NewRemoveCmd(f, taskGroup.ID),
+		task.NewReopenCmd(f, taskGroup.ID),
+
+		// Other resources commands
+		project.NewCmd(f, otherGroup.ID),
+		section.NewCmd(f, otherGroup.ID),
+		label.NewCmd(f, otherGroup.ID),
+		filter.NewCmd(f, otherGroup.ID),
+
+		// Advanced commands
 		sync.NewCmd(f),
 		daemon.NewCmd(f),
 	)

@@ -33,6 +33,10 @@ func NewTaskView(tasks []*model.Task, icons *Icons, config *TaskViewConfig) View
 }
 
 func (v *taskView) Render() string {
+	if len(v.tasks) == 0 {
+		return "No tasks found."
+	}
+
 	tbl := table.NewTable()
 	if v.config.Description {
 		tbl.AddHeader("ID", "Project", "Name", "Description", "Labels", "Due", "Deadline", "Duration")
@@ -86,7 +90,11 @@ func (v *taskView) taskProject(t *model.Task) string {
 func (v *taskView) taskLabels(t *model.Task) string {
 	labels := []string{}
 	for _, l := range t.Labels {
-		labels = append(labels, color.BgRGB(l.Color.RGB()).Sprint(l.Name))
+		label := l.Name
+		if !l.IsShared {
+			label = color.BgRGB(l.Color.RGB()).Sprint(l.Name)
+		}
+		labels = append(labels, label)
 	}
 	return strings.Join(labels, " ")
 }
