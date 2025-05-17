@@ -11,13 +11,12 @@ import (
 func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &daemon.LabelUpdateArgs{}
 	cmd := &cobra.Command{
-		Use:     "modify [flags] <label>",
+		Use:     "modify [flags] <label-name>",
 		Aliases: []string{"m"},
 		Short:   "Modify label",
 		Long:    "Modify a label in Todoist. For shared labels, only the name can be modified.",
-		Example: `  todoist label modify works --name work
-  todoist label modify daily -c blue --favorite
-  todoist label m daily --favorite=false`,
+		Example: `  todoist label modify Food --color berry_red
+  todoist label modify Food --favorite=false`,
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: f.NewLabelCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -43,6 +42,7 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 	cmd.Flags().AddFlag(colorFlag)
 	cmd.Flags().AddFlag(favoriteFlag)
 	cmd.Flags().AddFlag(nameFlag)
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	_ = cmd.RegisterFlagCompletionFunc(colorFlag.Name, f.NewColorCompletionFunc(-1))
 	_ = cmd.RegisterFlagCompletionFunc(favoriteFlag.Name, f.NewFavoriteCompletionFunc(-1))

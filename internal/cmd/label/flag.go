@@ -18,7 +18,7 @@ func newColorFlag(destination **sync.Color) *pflag.Flag {
 	return &pflag.Flag{
 		Name:      "color",
 		Shorthand: "c",
-		Usage:     "label color",
+		Usage:     "Set the label color",
 		Value:     v,
 		DefValue:  v.String(),
 	}
@@ -32,7 +32,7 @@ func newFavoriteFlag(destination **bool) *pflag.Flag {
 	return &pflag.Flag{
 		Name:        "favorite",
 		Shorthand:   "f",
-		Usage:       "mark label as favorite",
+		Usage:       "Mark label as favorite",
 		Value:       v,
 		DefValue:    v.String(),
 		NoOptDefVal: "true",
@@ -47,7 +47,7 @@ func newNameFlag(destination **string) *pflag.Flag {
 	return &pflag.Flag{
 		Name:      "name",
 		Shorthand: "n",
-		Usage:     "label name",
+		Usage:     "Set the label name",
 		Value:     v,
 		DefValue:  v.String(),
 	}

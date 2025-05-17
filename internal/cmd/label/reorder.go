@@ -16,7 +16,7 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 		Use:               "reorder",
 		Short:             "Reorder labels",
 		Long:              "Reorder labels in Todoist, similar to the 'git rebase -i' command in shell.",
-		Example:           `  todoist label reorder`,
+		Example:           "  todoist label reorder",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -46,6 +46,8 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	return cmd
 }

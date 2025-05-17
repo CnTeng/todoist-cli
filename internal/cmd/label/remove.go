@@ -10,13 +10,12 @@ import (
 )
 
 func NewRemoveCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use:     "remove [flags] <label>...",
-		Aliases: []string{"rm"},
-		Short:   "Remove labels",
-		Long:    "Remove labels in Todoist, similar to the 'rm' command in shell.",
-		Example: `  todoist label remove work
-  todoist label rm work daily`,
+	cmd := &cobra.Command{
+		Use:               "remove [flags] <label-name>...",
+		Aliases:           []string{"rm"},
+		Short:             "Remove labels",
+		Long:              "Remove labels in Todoist, similar to the 'rm' command in shell.",
+		Example:           "  todoist label remove Food",
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewLabelCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -37,4 +36,8 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

@@ -10,10 +10,11 @@ func NewCmd(f *util.Factory, group string) *cobra.Command {
 		Use:   "label",
 		Short: "Label commands",
 		Long:  "A set of commands to manage labels in Todoist.",
-		Example: `  todoist label add daily --favorite
+		Example: `  todoist label add Food --favorite
   todoist label list
-  todoist label modify works --name work
-  todoist label remove work daily`,
+  todoist label modify Food --color berry_red
+  todoist label remove Food
+  todoist label reorder`,
 		GroupID:           group,
 		SilenceUsage:      true,
 		ValidArgsFunction: cobra.NoFileCompletions,
@@ -24,6 +25,8 @@ func NewCmd(f *util.Factory, group string) *cobra.Command {
 	cmd.AddCommand(NewModifyCmd(f))
 	cmd.AddCommand(NewRemoveCmd(f))
 	cmd.AddCommand(NewReorderCmd(f))
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	return cmd
 }
