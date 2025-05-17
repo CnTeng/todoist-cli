@@ -4,6 +4,7 @@ import (
 	"github.com/CnTeng/table"
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/fatih/color"
+	"github.com/jedib0t/go-pretty/v6/text"
 )
 
 type projectView struct {
@@ -19,10 +20,14 @@ func NewProjectView(projects []*sync.Project, icons *Icons) View {
 }
 
 func (v *projectView) Render() string {
+	if len(v.projects) == 0 {
+		return "No projects found."
+	}
+
 	tbl := table.NewTable()
-	tbl.AddHeader("ID", "Name", "Color")
+	tbl.AddHeader("ID", " ", "Name", "Color")
 	tbl.SetHeaderStyle(headerStyle)
-	tbl.SetColStyle(1, &table.CellStyle{
+	tbl.SetColStyle(2, &table.CellStyle{
 		WrapText: boolPtr(true),
 		Markdown: boolPtr(true),
 	})
@@ -31,8 +36,9 @@ func (v *projectView) Render() string {
 		row := table.Row{}
 
 		row = append(row, p.ID)
+		row = append(row, v.projectIcon(p))
 		row = append(row, v.projectName(p))
-		row = append(row, color.BgRGB(p.Color.RGB()).Sprint(p.Color))
+		row = append(row, v.projectColor(p))
 
 		tbl.AddRow(row)
 	}
@@ -40,20 +46,22 @@ func (v *projectView) Render() string {
 	return tbl.Render()
 }
 
-func (v *projectView) projectName(p *sync.Project) *table.Cell {
-	icon := v.icons.None
+func (v *projectView) projectIcon(p *sync.Project) string {
 	if p.InboxProject {
-		icon = v.icons.Inbox
+		return v.icons.Inbox
 	} else if p.IsFavorite {
-		icon = v.icons.Favorite
+		return v.icons.Favorite
 	}
-	return &table.Cell{
-		Content: p.Name,
-		PrefixFunc: func(isFirst, isLast bool) string {
-			if isFirst {
-				return icon
-			}
-			return v.icons.None
-		},
+	return v.icons.None
+}
+
+func (v *projectView) projectName(p *sync.Project) string {
+	if p.IsArchived {
+		return text.CrossedOut.Sprint(p.Name)
 	}
+	return p.Name
+}
+
+func (v *projectView) projectColor(p *sync.Project) string {
+	return color.BgRGB(p.Color.RGB()).Sprint(p.Color)
 }
