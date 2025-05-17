@@ -33,6 +33,10 @@ func NewTaskView(tasks []*model.Task, icons *Icons, config *TaskViewConfig) View
 }
 
 func (v *taskView) Render() string {
+	if len(v.tasks) == 0 {
+		return "No tasks found."
+	}
+
 	tbl := table.NewTable()
 	if v.config.Description {
 		tbl.AddHeader("ID", "Project", "Name", "Description", "Labels", "Due", "Deadline", "Duration")
