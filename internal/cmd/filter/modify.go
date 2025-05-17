@@ -12,13 +12,12 @@ import (
 func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &sync.FilterUpdateArgs{}
 	cmd := &cobra.Command{
-		Use:     "modify [flags] <filter>",
+		Use:     "modify [flags] <filter-id>",
 		Aliases: []string{"m"},
 		Short:   "Modify filter",
 		Long:    "Modify a filter in Todoist.",
-		Example: `  todoist filter modify daily1 --name daily
-  todoist filter modify daily -c blue --favorite
-  todoist filter m daily --favorite=false`,
+		Example: `  todoist filter modify 4638879 --name 'Not Important' --query 'priority 4'
+  todoist filter modify 4638879 --favorite=false`,
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: f.NewFilterCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -46,6 +45,7 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 	cmd.Flags().AddFlag(favoriteFlag)
 	cmd.Flags().AddFlag(nameFlag)
 	cmd.Flags().AddFlag(queryFlag)
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	_ = cmd.RegisterFlagCompletionFunc(colorFlag.Name, f.NewColorCompletionFunc(-1))
 	_ = cmd.RegisterFlagCompletionFunc(favoriteFlag.Name, f.NewFavoriteCompletionFunc(-1))

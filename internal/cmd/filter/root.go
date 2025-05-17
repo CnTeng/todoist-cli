@@ -10,10 +10,11 @@ func NewCmd(f *util.Factory, group string) *cobra.Command {
 		Use:   "filter",
 		Short: "Filter commands",
 		Long:  "A set of commands to manage filter in Todoist.",
-		Example: `  todoist filter add daily --query 'today | overdue'
+		Example: `  todoist filter add Important --query 'priority 1'
   todoist filter list
-  todoist filter modify daily1 --name daily
-  todoist filter remove work daily`,
+  todoist filter modify 4638879 --name 'Not Important' --query 'priority 4'
+  todoist filter remove 4638879
+  todoist filter reorder`,
 		GroupID:           group,
 		SilenceUsage:      true,
 		ValidArgsFunction: cobra.NoFileCompletions,
@@ -24,6 +25,8 @@ func NewCmd(f *util.Factory, group string) *cobra.Command {
 	cmd.AddCommand(NewModifyCmd(f))
 	cmd.AddCommand(NewRemoveCmd(f))
 	cmd.AddCommand(NewReorderCmd(f))
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	return cmd
 }

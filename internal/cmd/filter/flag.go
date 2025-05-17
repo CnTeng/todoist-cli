@@ -18,7 +18,7 @@ func newColorFlag(destination **sync.Color) *pflag.Flag {
 	return &pflag.Flag{
 		Name:      "color",
 		Shorthand: "c",
-		Usage:     "filter color",
+		Usage:     "Set the filter color",
 		Value:     v,
 		DefValue:  v.String(),
 	}
@@ -32,7 +32,7 @@ func newFavoriteFlag(destination **bool) *pflag.Flag {
 	return &pflag.Flag{
 		Name:        "favorite",
 		Shorthand:   "f",
-		Usage:       "mark filter as favorite",
+		Usage:       "Mark the filter as favorite",
 		Value:       v,
 		DefValue:    v.String(),
 		NoOptDefVal: "true",
@@ -47,7 +47,7 @@ func newNameFlag(destination **string) *pflag.Flag {
 	return &pflag.Flag{
 		Name:      "name",
 		Shorthand: "n",
-		Usage:     "filter name",
+		Usage:     "Set the filter name",
 		Value:     v,
 		DefValue:  v.String(),
 	}
@@ -61,7 +61,7 @@ func newQueryFlag(destination **string) *pflag.Flag {
 	return &pflag.Flag{
 		Name:      "query",
 		Shorthand: "q",
-		Usage:     "filter query",
+		Usage:     "Set the filter query",
 		Value:     v,
 		DefValue:  v.String(),
 	}
