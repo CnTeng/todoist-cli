@@ -11,12 +11,11 @@ import (
 )
 
 func NewArchiveCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use:   "archive [flags] <section>...",
-		Short: "Archive sections",
-		Long:  "Archive sections in Todoist.",
-		Example: `  todoist archive 6Xm5HVVRcX00MCjv
-  todoist section archive 6Xm5HVVRcX00MCjv 6XxxpwJ00459cJWg`,
+	cmd := &cobra.Command{
+		Use:               "archive [flags] <section-id>...",
+		Short:             "Archive sections",
+		Long:              "Archive sections in Todoist.",
+		Example:           "  todoist section archive 6X7FxXvX84jHphx2",
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewSectionCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -37,15 +36,18 @@ func NewArchiveCmd(f *util.Factory) *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }
 
 func NewUnarchiveCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use:   "unarchive [flags] <section>...",
-		Short: "Unarchive sections",
-		Long:  "Unarchive sections in Todoist.",
-		Example: `  todoist unarchive 6Xm5HVVRcX00MCjv
-  todoist section unarchive 6Xm5HVVRcX00MCjv 6XxxpwJ00459cJWg`,
+	cmd := &cobra.Command{
+		Use:               "unarchive [flags] <section-id>...",
+		Short:             "Unarchive sections",
+		Long:              "Unarchive sections in Todoist.",
+		Example:           "  todoist section unarchive 6X7FxXvX84jHphx2",
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewSectionCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -66,4 +68,8 @@ func NewUnarchiveCmd(f *util.Factory) *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

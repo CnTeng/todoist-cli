@@ -11,13 +11,12 @@ import (
 )
 
 func NewRemoveCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use:     "remove [flags] <section>...",
-		Aliases: []string{"rm"},
-		Short:   "Remove sections",
-		Long:    "Remove sections in Todoist, similar to the 'rm' command in shell.",
-		Example: `  todoist section remove 6Xm5HVVRcX00MCjv
-  todoist section rm 6Xm5HVVRcX00MCjv 6XxxpwJ00459cJWg`,
+	cmd := &cobra.Command{
+		Use:               "remove [flags] <section-id>...",
+		Aliases:           []string{"rm"},
+		Short:             "Remove sections",
+		Long:              "Remove sections in Todoist, similar to the 'rm' command in shell.",
+		Example:           "  todoist section remove 6X7FxXvX84jHphx2",
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewSectionCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -38,4 +37,8 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

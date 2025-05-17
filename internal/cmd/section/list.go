@@ -11,13 +11,12 @@ import (
 )
 
 func NewListCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use:     "list",
-		Aliases: []string{"ls"},
-		Short:   "List sections",
-		Long:    "List sections in todoist, similar to the 'ls' command in shell.",
-		Example: `  todoist section list
-  todoist section ls`,
+	cmd := &cobra.Command{
+		Use:               "list",
+		Aliases:           []string{"ls"},
+		Short:             "List sections",
+		Long:              "List sections in todoist, similar to the 'ls' command in shell.",
+		Example:           "  todoist section list",
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -36,4 +35,8 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

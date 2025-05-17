@@ -12,12 +12,11 @@ import (
 func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &sync.SectionUpdateArgs{}
 	cmd := &cobra.Command{
-		Use:     "modify [flags] <section>",
-		Aliases: []string{"m"},
-		Short:   "Modify section",
-		Long:    "Modify a section in Todoist.",
-		Example: `  todoist section modify 6Xm5HVVRcX00MCjv --name stage1
-  todoist section m 6Xm5HVVRcX00MCjv -n stage1`,
+		Use:               "modify [flags] <section-id>",
+		Aliases:           []string{"m"},
+		Short:             "Modify section",
+		Long:              "Modify a section in Todoist.",
+		Example:           "  todoist section modify 6X7FxXvX84jHphx2 --name Supermarket",
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: f.NewSectionCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -39,6 +38,7 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 	nameFlag := newNameFlag(&params.Name)
 
 	cmd.Flags().AddFlag(nameFlag)
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	_ = cmd.RegisterFlagCompletionFunc(nameFlag.Name, cobra.NoFileCompletions)
 

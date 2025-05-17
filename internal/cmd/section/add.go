@@ -12,11 +12,11 @@ import (
 func NewAddCmd(f *util.Factory) *cobra.Command {
 	params := &sync.SectionAddArgs{}
 	cmd := &cobra.Command{
-		Use:               "add [flags] --project <project-id> <section>",
+		Use:               "add [flags] --project <project-id> <section-name>",
 		Aliases:           []string{"a"},
 		Short:             "Add section",
 		Long:              "Add a section to Todoist.",
-		Example:           "  todoist section add stage1 --project 6Mjq009rjRw9jXH6",
+		Example:           "  todoist section add Groceries --project 6X7FxXvX84jHphx2",
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -35,7 +35,8 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&params.ProjectID, "project", "P", "", "section project")
+	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Assign the section to a specific project by <project-id>")
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
 
