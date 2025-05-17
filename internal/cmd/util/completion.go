@@ -51,8 +51,8 @@ func (f *Factory) NewFavoriteCompletionFunc(n int) cobra.CompletionFunc {
 		}
 
 		cmps := []cobra.Completion{
-			cobra.CompletionWithDesc("true", "Add project to favorites"),
-			cobra.CompletionWithDesc("false", "Remove project from favorites"),
+			cobra.CompletionWithDesc("true", "Add to favorites"),
+			cobra.CompletionWithDesc("false", "Remove from favorites"),
 		}
 		return cmps, cobra.ShellCompDirectiveNoFileComp
 	}
@@ -251,6 +251,22 @@ func (f *Factory) NewSectionCompletionFunc(n int) cobra.CompletionFunc {
 
 			desc := fmt.Sprintf("%s: %s", section.ProjectName, section.Name)
 			cmps[i] = cobra.CompletionWithDesc(section.ID, desc)
+		}
+		return cmps, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func (f *Factory) NewPriorityCompletionFunc(n int) cobra.CompletionFunc {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]cobra.Completion, cobra.ShellCompDirective) {
+		if n > 0 && len(args) >= n {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+
+		cmps := []cobra.Completion{
+			cobra.CompletionWithDesc("1", "P1 Natural"),
+			cobra.CompletionWithDesc("2", "P2 Medium"),
+			cobra.CompletionWithDesc("3", "P3 High"),
+			cobra.CompletionWithDesc("4", "P4 Urgent"),
 		}
 		return cmps, cobra.ShellCompDirectiveNoFileComp
 	}

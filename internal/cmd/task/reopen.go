@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
@@ -10,11 +11,11 @@ import (
 )
 
 func NewReopenCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use:               "reopen",
-		Aliases:           []string{"r"},
-		Short:             "Reopen a task",
-		Long:              "Reopen a task in todoist",
+	cmd := &cobra.Command{
+		Use:               "reopen [flags] <task-id>...",
+		Short:             "Reopen task",
+		Long:              "Reopen a task in Todoist.",
+		Example:           "  todoist reopen 6X7rfFVPjhvv84XG",
 		GroupID:           Group.ID,
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
@@ -24,13 +25,20 @@ func NewReopenCmd(f *util.Factory) *cobra.Command {
 			}
 			defer f.Close()
 
+			params := []*sync.TaskUncompleteArgs{}
 			for _, arg := range args {
-				if _, err := f.Call(cmd.Context(), daemon.TaskReopen, &sync.TaskUncompleteArgs{ID: arg}); err != nil {
-					return err
-				}
-				fmt.Printf("Task reopen: %s\n", arg)
+				params = append(params, &sync.TaskUncompleteArgs{ID: arg})
 			}
+			if _, err := f.Call(cmd.Context(), daemon.TaskReopen, params); err != nil {
+				return err
+			}
+
+			fmt.Printf("Task reopen: %s\n", strings.Join(args, ", "))
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

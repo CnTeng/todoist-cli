@@ -1,17 +1,21 @@
 package daemon
 
 const (
-	Sync          string = "sync"
-	CompletedGet  string = "Completed.Get"
-	TaskGet       string = "Task.Get"
-	TaskList      string = "Task.List"
-	TaskAdd       string = "Task.Add"
-	TaskQuickAdd  string = "Task.QuickAdd"
-	TaskModify    string = "Task.Modify"
-	TaskRemove    string = "Task.Remove"
-	TaskClose     string = "Task.Close"
-	TaskMove      string = "Task.Move"
-	TaskReopen    string = "Task.Reopen"
+	Sync         string = "sync"
+	CompletedGet string = "Completed.Get"
+
+	// Task services
+	TaskList     string = "Task.List"
+	TaskAdd      string = "Task.Add"
+	TaskQuickAdd string = "Task.QuickAdd"
+	TaskModify   string = "Task.Modify"
+	TaskMove     string = "Task.Move"
+	TaskReorder  string = "Task.Reorder"
+	TaskClose    string = "Task.Close"
+	TaskReopen   string = "Task.Reopen"
+	TaskRemove   string = "Task.Remove"
+
+	// Project services
 	ProjectGet    string = "Project.Get"
 	ProjectList   string = "Project.List"
 	ProjectAdd    string = "Project.Add"

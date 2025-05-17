@@ -12,7 +12,9 @@ import (
 )
 
 func NewCmd(f *util.Factory) *cobra.Command {
-	params := &daemon.SyncArgs{}
+	params := &daemon.SyncArgs{
+		Since: time.Now().AddDate(0, -1, 0),
+	}
 	cmd := &cobra.Command{
 		Use:               "sync",
 		Args:              cobra.NoArgs,
@@ -49,6 +51,6 @@ func newSinceFlag(destination *time.Time) *pflag.Flag {
 		Shorthand: "s",
 		Usage:     "completed task since",
 		Value:     v,
-		DefValue:  time.Now().AddDate(0, -1, 0).String(),
+		DefValue:  destination.String(),
 	}
 }

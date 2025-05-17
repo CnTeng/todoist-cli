@@ -13,10 +13,11 @@ import (
 func NewListCmd(f *util.Factory) *cobra.Command {
 	params := &view.TaskViewConfig{}
 	cmd := &cobra.Command{
-		Use:               "list",
+		Use:               "list [flags]",
 		Aliases:           []string{"ls"},
 		Short:             "List tasks",
-		Long:              "List tasks in todoist",
+		Long:              "List tasks in Todoist, similar to the 'ls' command in shell.",
+		Example:           "  todoist list --all",
 		GroupID:           Group.ID,
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
@@ -37,9 +38,10 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&params.Completed, "all", "a", true, "list all tasks include completed")
-	cmd.Flags().BoolVarP(&params.Description, "description", "d", true, "list tasks include description")
-	cmd.Flags().BoolVarP(&params.Tree, "tree", "t", true, "list tasks in tree format")
+	cmd.Flags().BoolVarP(&params.Completed, "all", "a", false, "List all tasks include completed")
+	cmd.Flags().BoolVarP(&params.Description, "description", "d", false, "List tasks with description")
+	cmd.Flags().BoolVarP(&params.Tree, "tree", "t", false, "List tasks in tree format")
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	return cmd
 }

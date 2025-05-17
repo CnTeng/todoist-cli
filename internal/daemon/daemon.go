@@ -70,21 +70,25 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	}
 	defer lst.Close()
 
+	taskSvc := todoist.NewTaskService(d.client)
 	labelSvc := todoist.NewLabelService(d.client)
 	filterSvc := todoist.NewFilterService(d.client)
 
 	svc := server.Static(handler.Map{
 		Sync: handler.New(d.sync),
-		// TODO: completed tasks
-		TaskGet:       handler.New(d.db.GetTask),
-		TaskList:      handler.NewPos(d.db.ListTasks, "completed"),
-		TaskAdd:       handler.New(d.client.AddTask),
-		TaskQuickAdd:  handler.New(d.client.AddTaskQuick),
-		TaskModify:    handler.New(d.client.UpdateTask),
-		TaskRemove:    handler.New(d.client.DeleteTasks),
-		TaskClose:     handler.New(d.client.CloseTask),
-		TaskMove:      handler.New(d.client.MoveTask),
-		TaskReopen:    handler.New(d.client.UncompleteTask),
+
+		// Task services
+		TaskList:     handler.NewPos(d.db.ListTasks, "completed"),
+		TaskAdd:      handler.New(taskSvc.AddTask),
+		TaskQuickAdd: handler.New(taskSvc.QuickAddTask),
+		TaskModify:   handler.New(taskSvc.UpdateTask),
+		TaskMove:     handler.New(taskSvc.MoveTask),
+		TaskReorder:  handler.New(taskSvc.ReorderTasks),
+		TaskClose:    handler.New(taskSvc.CloseTasks),
+		TaskReopen:   handler.New(taskSvc.UncompleteTasks),
+		TaskRemove:   handler.New(taskSvc.DeleteTasks),
+
+		// Project services
 		ProjectGet:    handler.New(d.db.GetProject),
 		ProjectList:   handler.New(d.db.ListProjects),
 		ProjectAdd:    handler.New(d.client.AddProject),

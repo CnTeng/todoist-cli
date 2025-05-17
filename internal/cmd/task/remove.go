@@ -11,11 +11,12 @@ import (
 )
 
 func NewRemoveCmd(f *util.Factory) *cobra.Command {
-	return &cobra.Command{
-		Use:               "remove",
+	cmd := &cobra.Command{
+		Use:               "remove [flags] <task-id>...",
 		Aliases:           []string{"rm"},
-		Short:             "Remove a task",
-		Long:              "Remove a task in todoist",
+		Short:             "Remove task",
+		Long:              "Remove a task in Todoist, similar to the 'rm' command in shell.",
+		Example:           "  todoist remove 6X7rfFVPjhvv84XG",
 		GroupID:           Group.ID,
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
@@ -25,17 +26,20 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 			}
 			defer f.Close()
 
-			params := make([]*sync.TaskDeleteArgs, 0, len(args))
+			params := []*sync.TaskDeleteArgs{}
 			for _, arg := range args {
 				params = append(params, &sync.TaskDeleteArgs{ID: arg})
 			}
-
 			if _, err := f.Call(cmd.Context(), daemon.TaskRemove, params); err != nil {
 				return err
 			}
 
-			fmt.Printf("Task deleted: %s\n", strings.Join(args, ", "))
+			fmt.Printf("Tasks deleted: %s\n", strings.Join(args, ", "))
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }
