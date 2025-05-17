@@ -22,6 +22,8 @@ func (db *DB) HandleResponse(ctx context.Context, resp any) error {
 		return db.handleSyncResponse(ctx, r)
 	case *rest.TaskGetCompletedResponse:
 		return db.handleTaskGetCompletedResponse(ctx, r)
+	case *rest.ProjectGetArchivedResponse:
+		return db.handleProjectGetArchivedResponse(ctx, r)
 	}
 
 	return nil
@@ -92,6 +94,18 @@ func (db *DB) handleTaskGetCompletedResponse(ctx context.Context, resp *rest.Tas
 	return db.withTx(func(tx *sql.Tx) error {
 		for _, task := range resp.Tasks {
 			if err := db.storeTask(ctx, tx, task); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (db *DB) handleProjectGetArchivedResponse(ctx context.Context, resp *rest.ProjectGetArchivedResponse) error {
+	return db.withTx(func(tx *sql.Tx) error {
+		for _, project := range resp.Projects {
+			if err := db.storeProject(ctx, tx, project); err != nil {
 				return err
 			}
 		}
