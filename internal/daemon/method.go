@@ -1,8 +1,7 @@
 package daemon
 
 const (
-	Sync         string = "sync"
-	CompletedGet string = "Completed.Get"
+	Sync string = "sync"
 
 	// Task services
 	TaskList     string = "Task.List"
@@ -16,8 +15,8 @@ const (
 	TaskRemove   string = "Task.Remove"
 
 	// Project services
-	ProjectAdd       string = "Project.Add"
 	ProjectList      string = "Project.List"
+	ProjectAdd       string = "Project.Add"
 	ProjectModify    string = "Project.Modify"
 	ProjectReorder   string = "Project.Reorder"
 	ProjectArchive   string = "Project.Archive"
@@ -25,26 +24,26 @@ const (
 	ProjectRemove    string = "Project.Remove"
 
 	// Section services
-	SectionAdd       string = "Section.Add"
 	SectionList      string = "Section.List"
+	SectionAdd       string = "Section.Add"
 	SectionModify    string = "Section.Modify"
 	SectionMove      string = "Section.Move"
+	SectionReorder   string = "Section.Reorder"
 	SectionArchive   string = "Section.Archive"
 	SectionUnarchive string = "Section.Unarchive"
 	SectionRemove    string = "Section.Remove"
-	SectionReorder   string = "Section.Reorder"
 
 	// Label services
-	LabelAdd     string = "Label.Add"
 	LabelList    string = "Label.List"
+	LabelAdd     string = "Label.Add"
 	LabelModify  string = "Label.Modify"
-	LabelRemove  string = "Label.Remove"
 	LabelReorder string = "Label.Reorder"
+	LabelRemove  string = "Label.Remove"
 
 	// Filter services
-	FilterAdd     string = "Filter.Add"
 	FilterList    string = "Filter.List"
+	FilterAdd     string = "Filter.Add"
 	FilterModify  string = "Filter.Modify"
-	FilterRemove  string = "Filter.Remove"
 	FilterReorder string = "Filter.Reorder"
+	FilterRemove  string = "Filter.Remove"
 )

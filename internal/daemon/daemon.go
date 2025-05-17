@@ -47,7 +47,7 @@ func (d *Daemon) loadWsToken(ctx context.Context) (string, error) {
 		return user.WebsocketURL, nil
 	}
 
-	user, err = d.client.GetUser(ctx)
+	user, err = todoist.NewUserService(d.client).GetUser(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -91,8 +91,8 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		TaskRemove:   handler.New(taskSvc.DeleteTasks),
 
 		// Project services
-		ProjectAdd:       handler.New(projectSvc.AddProject),
 		ProjectList:      handler.New(d.db.ListProjects),
+		ProjectAdd:       handler.New(projectSvc.AddProject),
 		ProjectModify:    handler.New(projectSvc.UpdateProject),
 		ProjectReorder:   handler.New(projectSvc.ReorderProjects),
 		ProjectArchive:   handler.New(projectSvc.ArchiveProjects),
@@ -100,28 +100,28 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		ProjectRemove:    handler.New(projectSvc.DeleteProjects),
 
 		// Section services
-		SectionAdd:       handler.New(sectionSvc.AddSection),
 		SectionList:      handler.New(d.db.ListSections),
+		SectionAdd:       handler.New(sectionSvc.AddSection),
 		SectionModify:    handler.New(sectionSvc.UpdateSection),
 		SectionMove:      handler.New(sectionSvc.MoveSection),
+		SectionReorder:   handler.New(sectionSvc.ReorderSections),
 		SectionArchive:   handler.New(sectionSvc.ArchiveSections),
 		SectionUnarchive: handler.New(sectionSvc.UnarchiveSections),
 		SectionRemove:    handler.New(sectionSvc.DeleteSections),
-		SectionReorder:   handler.New(sectionSvc.ReorderSections),
 
 		// Label services
-		LabelAdd:     handler.New(labelSvc.AddLabel),
 		LabelList:    handler.New(d.db.ListLabels),
+		LabelAdd:     handler.New(labelSvc.AddLabel),
 		LabelModify:  handler.New(d.updateLabel),
-		LabelRemove:  handler.New(d.deleteLabels),
 		LabelReorder: handler.New(labelSvc.ReorderLabels),
+		LabelRemove:  handler.New(d.deleteLabels),
 
 		// Filter services
-		FilterAdd:     handler.New(filterSvc.AddFilter),
 		FilterList:    handler.New(d.db.ListFilters),
+		FilterAdd:     handler.New(filterSvc.AddFilter),
 		FilterModify:  handler.New(filterSvc.UpdateFilter),
-		FilterRemove:  handler.New(filterSvc.DeleteFilters),
 		FilterReorder: handler.New(filterSvc.ReorderFilters),
+		FilterRemove:  handler.New(filterSvc.DeleteFilters),
 	})
 
 	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{
