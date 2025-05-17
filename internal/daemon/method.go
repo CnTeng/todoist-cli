@@ -16,11 +16,13 @@ const (
 	TaskRemove   string = "Task.Remove"
 
 	// Project services
-	ProjectGet    string = "Project.Get"
-	ProjectList   string = "Project.List"
-	ProjectAdd    string = "Project.Add"
-	ProjectModify string = "Project.Modify"
-	ProjectRemove string = "Project.Remove"
+	ProjectAdd       string = "Project.Add"
+	ProjectList      string = "Project.List"
+	ProjectModify    string = "Project.Modify"
+	ProjectReorder   string = "Project.Reorder"
+	ProjectArchive   string = "Project.Archive"
+	ProjectUnarchive string = "Project.Unarchive"
+	ProjectRemove    string = "Project.Remove"
 
 	// Section services
 	SectionAdd       string = "Section.Add"

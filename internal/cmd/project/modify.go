@@ -12,10 +12,12 @@ import (
 func NewModifyCmd(f *util.Factory) *cobra.Command {
 	params := &sync.ProjectUpdateArgs{}
 	cmd := &cobra.Command{
-		Use:               "modify",
-		Aliases:           []string{"m"},
-		Short:             "Modify a task",
-		Long:              "Modify a task in todoist",
+		Use:     "modify [flags] <project-id>",
+		Aliases: []string{"m"},
+		Short:   "Modify project",
+		Long:    "Modify project in Todoist.",
+		Example: `  todoist project modify 6Jf8VQXxpwv56VQ7 --name Shopping
+  todoist project modify 6Jf8VQXxpwv56VQ7 --favorite=false`,
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: f.NewProjectCompletionFunc(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -34,9 +36,20 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	addColorFlag(f, cmd, &params.Color)
-	addFavoriteFlag(f, cmd, &params.IsFavorite)
-	addNameFlag(f, cmd, &params.Name)
+	colorFlag := newColorFlag(&params.Color)
+	favoriteFlag := newFavoriteFlag(&params.IsFavorite)
+	nameFlag := newNameFlag(&params.Name)
+
+	cmd.Flags().AddFlag(colorFlag)
+	cmd.Flags().AddFlag(favoriteFlag)
+	cmd.Flags().AddFlag(nameFlag)
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	_ = cmd.RegisterFlagCompletionFunc(colorFlag.Name, f.NewColorCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc(favoriteFlag.Name, f.NewFavoriteCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc(nameFlag.Name, cobra.NoFileCompletions)
+
+	cmd.MarkFlagsOneRequired(colorFlag.Name, favoriteFlag.Name, nameFlag.Name)
 
 	return cmd
 }

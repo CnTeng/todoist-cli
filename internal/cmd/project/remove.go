@@ -11,12 +11,12 @@ import (
 )
 
 func NewRemoveCmd(f *util.Factory) *cobra.Command {
-	ids := []string{}
-	return &cobra.Command{
-		Use:               "remove",
+	cmd := &cobra.Command{
+		Use:               "remove [flags] <project-id>...",
 		Aliases:           []string{"rm"},
-		Short:             "Remove a project",
-		Long:              "Remove a project in todoist",
+		Short:             "Remove projects",
+		Long:              "Remove projects in Todoist, similar to the 'rm' command in shell.",
+		Example:           "  todoist project remove 6X7fphhgwcXVGccJ",
 		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: f.NewProjectCompletionFunc(-1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -25,7 +25,7 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 			}
 			defer f.Close()
 
-			params := make([]*sync.ProjectDeleteArgs, 0, len(ids))
+			params := []*sync.ProjectDeleteArgs{}
 			for _, id := range args {
 				params = append(params, &sync.ProjectDeleteArgs{ID: id})
 			}
@@ -34,8 +34,12 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 				return err
 			}
 
-			fmt.Printf("Project deleted: %s\n", strings.Join(ids, ", "))
+			fmt.Printf("Projects deleted: %s\n", strings.Join(args, ", "))
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	return cmd
 }

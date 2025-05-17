@@ -71,6 +71,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 	defer lst.Close()
 
 	taskSvc := todoist.NewTaskService(d.client)
+	projectSvc := todoist.NewProjectService(d.client)
 	sectionSvc := todoist.NewSectionService(d.client)
 	labelSvc := todoist.NewLabelService(d.client)
 	filterSvc := todoist.NewFilterService(d.client)
@@ -90,11 +91,13 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		TaskRemove:   handler.New(taskSvc.DeleteTasks),
 
 		// Project services
-		ProjectGet:    handler.New(d.db.GetProject),
-		ProjectList:   handler.New(d.db.ListProjects),
-		ProjectAdd:    handler.New(d.client.AddProject),
-		ProjectModify: handler.New(d.client.UpdateProject),
-		ProjectRemove: handler.New(d.client.DeleteProjects),
+		ProjectAdd:       handler.New(projectSvc.AddProject),
+		ProjectList:      handler.New(d.db.ListProjects),
+		ProjectModify:    handler.New(projectSvc.UpdateProject),
+		ProjectReorder:   handler.New(projectSvc.ReorderProjects),
+		ProjectArchive:   handler.New(projectSvc.ArchiveProjects),
+		ProjectUnarchive: handler.New(projectSvc.UnarchiveProjects),
+		ProjectRemove:    handler.New(projectSvc.DeleteProjects),
 
 		// Section services
 		SectionAdd:       handler.New(sectionSvc.AddSection),
