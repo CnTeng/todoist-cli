@@ -27,6 +27,8 @@ const (
 			projects
 		ORDER BY
 			data ->> 'inbox_project' DESC,
+			data ->> 'is_favorite' DESC,
+			data ->> 'is_archived' ASC,
 			data ->> 'child_order' ASC`
 )
 

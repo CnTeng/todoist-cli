@@ -29,6 +29,7 @@ const (
 		FROM
 			tasks_view
 		WHERE
+			data ->> '$.project.is_archived' = false
 			{{ . }}
 		ORDER BY
 			data ->> '$.project.inbox_project' DESC,
@@ -77,10 +78,7 @@ func (db *DB) buildTaskListQuery(conds map[string]*taskListCondition) (string, e
 
 	var cond string
 	for _, c := range conds {
-		if cond != "" {
-			cond += " AND "
-		}
-		cond += c.Query
+		cond += " AND " + c.Query
 	}
 
 	b := &strings.Builder{}
@@ -126,7 +124,7 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds map[string]*taskL
 func (db *DB) ListTasks(ctx context.Context, all bool) ([]*model.Task, error) {
 	ts := []*model.Task{}
 	conds := map[string]*taskListCondition{
-		"checked":   {Query: "data ->> 'checked' = 'false'"},
+		"checked":   {Query: "data ->> 'checked' = false"},
 		"parent_id": {Query: "data ->> 'parent_id' IS NULL"},
 	}
 

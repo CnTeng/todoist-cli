@@ -27,6 +27,7 @@ const (
 		FROM
 			labels_view
 		ORDER BY
+			data ->> 'is_favorite' DESC,
 			data ->> 'is_shared' ASC,
 			data ->> 'item_order' ASC`
 )

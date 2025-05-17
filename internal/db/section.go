@@ -28,7 +28,7 @@ const (
 			sections_view
 		ORDER BY
 			data ->> 'is_archived' ASC,
-			data ->> 'project_name' ASC,
+			data ->> 'project_order' ASC,
 			data ->> 'section_order' ASC`
 )
 

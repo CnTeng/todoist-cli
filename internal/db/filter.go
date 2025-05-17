@@ -26,6 +26,7 @@ const (
 		FROM
 			filters
 		ORDER BY
+			data ->> 'is_favorite' DESC,
 			data ->> 'item_order' ASC`
 )
 
