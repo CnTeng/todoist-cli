@@ -29,12 +29,22 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 				return err
 			}
 
-			params := &sync.FilterReorderArgs{
-				IDOrderMapping: make(map[string]int),
+			rItems := make([]*view.ReorderItem, 0, len(filters))
+			for _, filter := range filters {
+				rItems = append(rItems, &view.ReorderItem{
+					ID:          filter.ID,
+					Description: fmt.Sprintf("%s: %s", filter.Name, filter.Query),
+				})
 			}
-			v := view.NewFilterReorderView(filters, f.IconConfig.Icons, params)
-			if err := v.Interact(); err != nil {
+
+			rResult, err := view.NewReorderView(rItems).Reorder()
+			if err != nil {
 				return err
+			}
+
+			params := &sync.FilterReorderArgs{IDOrderMapping: make(map[string]int)}
+			for i, id := range rResult {
+				params.IDOrderMapping[id] = i
 			}
 
 			if _, err := f.Call(cmd.Context(), daemon.FilterReorder, params); err != nil {

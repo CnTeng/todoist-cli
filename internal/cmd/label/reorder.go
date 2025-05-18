@@ -30,12 +30,25 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 				return err
 			}
 
-			params := &sync.LabelReorderArgs{
-				IDOrderMapping: make(map[string]int),
+			rItems := make([]*view.ReorderItem, 0, len(labels))
+			for _, l := range labels {
+				if l.IsShared {
+					continue
+				}
+				rItems = append(rItems, &view.ReorderItem{
+					ID:          l.ID,
+					Description: l.Name,
+				})
 			}
-			v := view.NewReorderLabelView(labels, f.IconConfig.Icons, params)
-			if err := v.Interact(); err != nil {
+
+			rResult, err := view.NewReorderView(rItems).Reorder()
+			if err != nil {
 				return err
+			}
+
+			params := &sync.LabelReorderArgs{IDOrderMapping: make(map[string]int)}
+			for i, id := range rResult {
+				params.IDOrderMapping[id] = i
 			}
 
 			if _, err := f.Call(cmd.Context(), daemon.LabelReorder, params); err != nil {
