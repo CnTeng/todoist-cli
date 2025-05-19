@@ -9,9 +9,14 @@ type SubTaskStatus struct {
 
 type Task struct {
 	*sync.Task
-	Project       *sync.Project `json:"project"`
-	Section       *sync.Section `json:"section"`
+	ProjectName   string        `json:"project_name"`
+	ProjectColor  sync.Color    `json:"project_color"`
+	SectionName   string        `json:"section_name"`
 	SubTasks      []*Task       `json:"sub_tasks"`
 	SubTaskStatus SubTaskStatus `json:"sub_task_status"`
 	Labels        []*Label      `json:"labels"`
+}
+
+type TaskListArgs struct {
+	Completed bool `json:"completed"`
 }

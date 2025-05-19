@@ -80,7 +80,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		Sync: handler.New(d.sync),
 
 		// Task services
-		TaskList:     handler.NewPos(d.db.ListTasks, "completed"),
+		TaskList:     handler.New(d.db.ListTasks),
 		TaskAdd:      handler.New(taskSvc.AddTask),
 		TaskQuickAdd: handler.New(taskSvc.QuickAddTask),
 		TaskModify:   handler.New(taskSvc.UpdateTask),

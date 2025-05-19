@@ -11,6 +11,7 @@ import (
 )
 
 func NewListCmd(f *util.Factory) *cobra.Command {
+	params := &model.SectionListArgs{}
 	cmd := &cobra.Command{
 		Use:               "list",
 		Aliases:           []string{"ls"},
@@ -26,7 +27,7 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 			defer f.Close()
 
 			sections := []*model.Section{}
-			if err := f.CallResult(cmd.Context(), daemon.SectionList, nil, &sections); err != nil {
+			if err := f.CallResult(cmd.Context(), daemon.SectionList, params, &sections); err != nil {
 				return err
 			}
 
@@ -36,7 +37,10 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Assign the section to a specific project by <project-id>")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
+
+	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
 
 	return cmd
 }

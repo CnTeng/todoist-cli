@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"strings"
-	"text/template"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/model"
@@ -22,20 +20,28 @@ const (
 			data = excluded.data`
 	taskDeleteQuery = `DELETE FROM tasks WHERE id = ?`
 
-	taskGetQuery          = `SELECT data FROM tasks_view WHERE id = ?`
 	taskListQueryTemplate = `
 		SELECT
-			data
+			json_patch(
+				task,
+				json_object(
+					'project_name',
+					project ->> 'name',
+					'project_color',
+					project ->> 'color',
+					'section_name',
+					section ->> 'name'
+				)
+			) AS data
 		FROM
 			tasks_view
 		WHERE
-			data ->> '$.project.is_archived' = false
-			{{ . }}
+			TRUE {{ . }}
 		ORDER BY
-			data ->> '$.project.inbox_project' DESC,
-			data ->> '$.project.child_order' ASC,
-			data ->> 'checked' ASC,
-			data ->> 'child_order' ASC`
+			project ->> 'inbox_project' DESC,
+			project ->> 'child_order' ASC,
+			task ->> 'checked' ASC,
+			task ->> 'child_order' ASC`
 )
 
 func (db *DB) storeTask(ctx context.Context, tx *sql.Tx, task *sync.Task) error {
@@ -57,58 +63,37 @@ func (db *DB) storeTask(ctx context.Context, tx *sql.Tx, task *sync.Task) error 
 }
 
 func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
-	t := &model.Task{}
-	return t, db.withTx(func(tx *sql.Tx) error {
-		var err error
-		t, err = getItem[model.Task](ctx, tx, taskGetQuery, id)
-		return err
-	})
-}
-
-type taskListCondition struct {
-	Query string
-	Args  []any
-}
-
-func (db *DB) buildTaskListQuery(conds map[string]*taskListCondition) (string, error) {
-	t, err := template.New("taskListQuery").Parse(taskListQueryTemplate)
-	if err != nil {
-		return "", err
-	}
-
-	var cond string
-	for _, c := range conds {
-		cond += " AND " + c.Query
-	}
-
-	b := &strings.Builder{}
-	if err := t.Execute(b, cond); err != nil {
-		return "", err
-	}
-
-	return b.String(), nil
-}
-
-func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds map[string]*taskListCondition) ([]*model.Task, error) {
-	taskListQuery, err := db.buildTaskListQuery(conds)
+	taskGetQuery, args, err := db.buildListQuery(
+		taskListQueryTemplate,
+		listConditions{"id": {Query: "id = ?", Arg: id}},
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	args := []any{}
-	for _, cond := range conds {
-		args = append(args, cond.Args...)
+	t := &model.Task{}
+	return t, db.withTx(func(tx *sql.Tx) error {
+		var err error
+		t, err = getItem[model.Task](ctx, tx, taskGetQuery, args...)
+		return err
+	})
+}
+
+func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds listConditions) ([]*model.Task, error) {
+	query, args, err := db.buildListQuery(taskListQueryTemplate, conds)
+	if err != nil {
+		return nil, err
 	}
 
-	ts, err := listItems[model.Task](ctx, tx, taskListQuery, args...)
+	ts, err := listItems[model.Task](ctx, tx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, t := range ts {
-		conds["parent_id"] = &taskListCondition{
-			Query: "data ->> 'parent_id' = ?",
-			Args:  []any{t.ID},
+		conds["task.parent_id"] = &listCondition{
+			Query: "task ->> 'parent_id' = ?",
+			Arg:   t.ID,
 		}
 
 		subTasks, err := db.listTasks(ctx, tx, conds)
@@ -121,16 +106,17 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds map[string]*taskL
 	return ts, nil
 }
 
-func (db *DB) ListTasks(ctx context.Context, all bool) ([]*model.Task, error) {
+func (db *DB) ListTasks(ctx context.Context, args *model.TaskListArgs) ([]*model.Task, error) {
 	ts := []*model.Task{}
-	conds := map[string]*taskListCondition{
-		"checked":   {Query: "data ->> 'checked' = false"},
-		"parent_id": {Query: "data ->> 'parent_id' IS NULL"},
+	conds := listConditions{
+		"project.is_archived": {Query: "project ->> 'is_archived' = false"},
+		"task.checked":        {Query: "task ->> 'checked' = false"},
+		"task.parent_id":      {Query: "task ->> 'parent_id' IS NULL"},
+	}
+	if args != nil && args.Completed {
+		delete(conds, "task.checked")
 	}
 
-	if all {
-		delete(conds, "checked")
-	}
 	return ts, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		ts, err = db.listTasks(ctx, tx, conds)

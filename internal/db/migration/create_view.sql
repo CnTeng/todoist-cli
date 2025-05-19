@@ -45,62 +45,65 @@ WHERE
 CREATE VIEW IF NOT EXISTS sections_view AS
 SELECT
   s.id,
-  json_patch(
-    s.data,
-    json_object(
-      'project_name',
-      p.data ->> 'name',
-      'project_order',
-      p.data ->> 'child_order'
-    )
-  ) AS data
+  s.data AS section,
+  p.data AS project
 FROM
   sections s
   LEFT JOIN projects p ON s.data ->> 'project_id' = p.id;
 
 CREATE VIEW IF NOT EXISTS tasks_view AS
+WITH
+  sub_task_status AS (
+    SELECT
+      child.data ->> 'parent_id' AS parent_id,
+      count(child.id) AS total,
+      sum(
+        CASE
+          WHEN child.data -> 'checked' = 'true' THEN 1
+          ELSE 0
+        END
+      ) AS completed
+    FROM
+      tasks child
+    WHERE
+      child.data ->> 'parent_id' IS NOT NULL
+    GROUP BY
+      child.data ->> 'parent_id'
+  ),
+  task_labels AS (
+    SELECT
+      t.id AS task_id,
+      (
+        SELECT
+          json_group_array(json(lv.data))
+        FROM
+          json_each(t.data -> 'labels') AS je
+          LEFT JOIN labels_view lv ON je.value = lv.id
+      ) AS labels
+    FROM
+      tasks t
+  )
 SELECT
   t.id,
   json_patch(
     t.data,
     json_object(
-      -- project
-      'project',
-      json(p.data),
-      -- section
-      'section',
-      json(s.data),
-      -- labels
-      'labels',
-      coalesce(
-        (
-          SELECT
-            json_group_array(json(lv.data))
-          FROM
-            json_each(t.data -> 'labels') AS je
-            LEFT JOIN labels_view lv ON je.value = lv.id
-        ),
-        json_array()
-      ),
-      -- task
       'sub_task_status',
       json_object(
         'total',
-        count(child.id),
+        coalesce(sts.total, 0),
         'completed',
-        sum(
-          CASE
-            WHEN child.data -> 'checked' = 'true' THEN 1
-            ELSE 0
-          END
-        )
-      )
+        coalesce(sts.completed, 0)
+      ),
+      'labels',
+      json(tl.labels)
     )
-  ) AS data
+  ) AS task,
+  p.data AS project,
+  s.data AS section
 FROM
   tasks t
+  LEFT JOIN sub_task_status sts ON t.id = sts.parent_id
+  LEFT JOIN task_labels tl ON t.id = tl.task_id
   LEFT JOIN projects p ON t.data ->> 'project_id' = p.id
   LEFT JOIN sections s ON t.data ->> 'section_id' = s.id
-  LEFT JOIN tasks child ON t.id = child.data ->> 'parent_id'
-GROUP BY
-  t.id;

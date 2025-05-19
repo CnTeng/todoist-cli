@@ -11,7 +11,8 @@ import (
 )
 
 func NewListCmd(f *util.Factory, group string) *cobra.Command {
-	params := &view.TaskViewConfig{}
+	params := &model.TaskListArgs{}
+	viewConfig := &view.TaskViewConfig{}
 	cmd := &cobra.Command{
 		Use:               "list [flags]",
 		Aliases:           []string{"ls"},
@@ -32,15 +33,15 @@ func NewListCmd(f *util.Factory, group string) *cobra.Command {
 				return err
 			}
 
-			v := view.NewTaskView(result, f.IconConfig.Icons, params)
+			v := view.NewTaskView(result, f.IconConfig.Icons, viewConfig)
 			fmt.Print(v.Render())
 			return nil
 		},
 	}
 
 	cmd.Flags().BoolVarP(&params.Completed, "all", "a", false, "List all tasks include completed")
-	cmd.Flags().BoolVarP(&params.Description, "description", "d", false, "List tasks with description")
-	cmd.Flags().BoolVarP(&params.Tree, "tree", "t", false, "List tasks in tree format")
+	cmd.Flags().BoolVarP(&viewConfig.Description, "description", "d", false, "List tasks with description")
+	cmd.Flags().BoolVarP(&viewConfig.Tree, "tree", "t", false, "List tasks in tree format")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	return cmd
