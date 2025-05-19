@@ -45,15 +45,8 @@ WHERE
 CREATE VIEW IF NOT EXISTS sections_view AS
 SELECT
   s.id,
-  json_patch(
-    s.data,
-    json_object(
-      'project_name',
-      p.data ->> 'name',
-      'project_order',
-      p.data ->> 'child_order'
-    )
-  ) AS data
+  s.data,
+  p.data AS project
 FROM
   sections s
   LEFT JOIN projects p ON s.data ->> 'project_id' = p.id;

@@ -13,7 +13,6 @@ import (
 )
 
 type TaskViewConfig struct {
-	Completed   bool `json:"completed"`
 	Tree        bool `json:"-"`
 	Description bool `json:"-"`
 }

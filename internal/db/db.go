@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
+	"text/template"
 
 	_ "modernc.org/sqlite"
 )
@@ -67,4 +69,36 @@ func (db *DB) withTx(fn func(tx *sql.Tx) error) error {
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
+}
+
+type listCondition struct {
+	Query string
+	Arg   any
+}
+
+type listConditions map[string]*listCondition
+
+func (db *DB) buildListQuery(query string, conds listConditions) (string, []any, error) {
+	t, err := template.New("listQuery").Parse(query)
+	if err != nil {
+		return "", nil, err
+	}
+
+	cb := &strings.Builder{}
+	args := []any{}
+	for _, c := range conds {
+		cb.WriteString(" AND ")
+		cb.WriteString(c.Query)
+
+		if c.Arg != nil {
+			args = append(args, c.Arg)
+		}
+	}
+
+	b := &strings.Builder{}
+	if err := t.Execute(b, cb.String()); err != nil {
+		return "", nil, err
+	}
+
+	return b.String(), args, nil
 }

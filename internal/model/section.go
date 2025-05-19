@@ -6,3 +6,7 @@ type Section struct {
 	*sync.Section
 	ProjectName string `json:"project_name"`
 }
+
+type SectionListArgs struct {
+	ProjectID string
+}

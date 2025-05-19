@@ -15,3 +15,7 @@ type Task struct {
 	SubTaskStatus SubTaskStatus `json:"sub_task_status"`
 	Labels        []*Label      `json:"labels"`
 }
+
+type TaskListArgs struct {
+	Completed bool `json:"completed"`
+}

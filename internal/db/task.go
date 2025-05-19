@@ -4,8 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"strings"
-	"text/template"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/model"
@@ -29,8 +27,7 @@ const (
 		FROM
 			tasks_view
 		WHERE
-			data ->> '$.project.is_archived' = false
-			{{ . }}
+			TRUE {{ . }}
 		ORDER BY
 			data ->> '$.project.inbox_project' DESC,
 			data ->> '$.project.child_order' ASC,
@@ -65,50 +62,21 @@ func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 	})
 }
 
-type taskListCondition struct {
-	Query string
-	Args  []any
-}
-
-func (db *DB) buildTaskListQuery(conds map[string]*taskListCondition) (string, error) {
-	t, err := template.New("taskListQuery").Parse(taskListQueryTemplate)
-	if err != nil {
-		return "", err
-	}
-
-	var cond string
-	for _, c := range conds {
-		cond += " AND " + c.Query
-	}
-
-	b := &strings.Builder{}
-	if err := t.Execute(b, cond); err != nil {
-		return "", err
-	}
-
-	return b.String(), nil
-}
-
-func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds map[string]*taskListCondition) ([]*model.Task, error) {
-	taskListQuery, err := db.buildTaskListQuery(conds)
+func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds listConditions) ([]*model.Task, error) {
+	query, args, err := db.buildListQuery(taskListQueryTemplate, conds)
 	if err != nil {
 		return nil, err
 	}
 
-	args := []any{}
-	for _, cond := range conds {
-		args = append(args, cond.Args...)
-	}
-
-	ts, err := listItems[model.Task](ctx, tx, taskListQuery, args...)
+	ts, err := listItems[model.Task](ctx, tx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, t := range ts {
-		conds["parent_id"] = &taskListCondition{
+		conds["parent_id"] = &listCondition{
 			Query: "data ->> 'parent_id' = ?",
-			Args:  []any{t.ID},
+			Arg:   t.ID,
 		}
 
 		subTasks, err := db.listTasks(ctx, tx, conds)
@@ -121,16 +89,17 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds map[string]*taskL
 	return ts, nil
 }
 
-func (db *DB) ListTasks(ctx context.Context, all bool) ([]*model.Task, error) {
+func (db *DB) ListTasks(ctx context.Context, args *model.TaskListArgs) ([]*model.Task, error) {
 	ts := []*model.Task{}
-	conds := map[string]*taskListCondition{
-		"checked":   {Query: "data ->> 'checked' = false"},
-		"parent_id": {Query: "data ->> 'parent_id' IS NULL"},
+	conds := listConditions{
+		"project.is_archived": {Query: "data ->> '$.project.is_archived' = false"},
+		"checked":             {Query: "data ->> 'checked' = false"},
+		"parent_id":           {Query: "data ->> 'parent_id' IS NULL"},
 	}
-
-	if all {
+	if args != nil && args.Completed {
 		delete(conds, "checked")
 	}
+
 	return ts, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		ts, err = db.listTasks(ctx, tx, conds)
