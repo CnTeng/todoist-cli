@@ -89,7 +89,7 @@ func (f *Factory) NewTaskCompletionFunc(n int) cobra.CompletionFunc {
 			if _, ok := seen[task.ID]; ok {
 				continue
 			}
-			desc := fmt.Sprintf("%s: %s", task.Project.Name, task.Content)
+			desc := fmt.Sprintf("%s: %s", task.ProjectName, task.Content)
 			cmps[i] = cobra.CompletionWithDesc(task.ID, desc)
 		}
 

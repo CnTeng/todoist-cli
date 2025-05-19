@@ -83,7 +83,7 @@ func (v *taskView) renderTask(t *model.Task, depth []bool) []table.Row {
 }
 
 func (v *taskView) taskProject(t *model.Task) string {
-	return color.RGB(t.Project.Color.RGB()).Sprint(t.Project.Name)
+	return color.RGB(t.ProjectColor.RGB()).Sprint(t.ProjectName)
 }
 
 func (v *taskView) taskLabels(t *model.Task) string {

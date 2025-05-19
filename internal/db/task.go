@@ -20,19 +20,28 @@ const (
 			data = excluded.data`
 	taskDeleteQuery = `DELETE FROM tasks WHERE id = ?`
 
-	taskGetQuery          = `SELECT data FROM tasks_view WHERE id = ?`
 	taskListQueryTemplate = `
 		SELECT
-			data
+			json_patch(
+				task,
+				json_object(
+					'project_name',
+					project ->> 'name',
+					'project_color',
+					project ->> 'color',
+					'section_name',
+					section ->> 'name'
+				)
+			) AS data
 		FROM
 			tasks_view
 		WHERE
 			TRUE {{ . }}
 		ORDER BY
-			data ->> '$.project.inbox_project' DESC,
-			data ->> '$.project.child_order' ASC,
-			data ->> 'checked' ASC,
-			data ->> 'child_order' ASC`
+			project ->> 'inbox_project' DESC,
+			project ->> 'child_order' ASC,
+			task ->> 'checked' ASC,
+			task ->> 'child_order' ASC`
 )
 
 func (db *DB) storeTask(ctx context.Context, tx *sql.Tx, task *sync.Task) error {
@@ -54,10 +63,18 @@ func (db *DB) storeTask(ctx context.Context, tx *sql.Tx, task *sync.Task) error 
 }
 
 func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
+	taskGetQuery, args, err := db.buildListQuery(
+		taskListQueryTemplate,
+		listConditions{"id": {Query: "id = ?", Arg: id}},
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	t := &model.Task{}
 	return t, db.withTx(func(tx *sql.Tx) error {
 		var err error
-		t, err = getItem[model.Task](ctx, tx, taskGetQuery, id)
+		t, err = getItem[model.Task](ctx, tx, taskGetQuery, args...)
 		return err
 	})
 }
@@ -74,8 +91,8 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds listConditions) (
 	}
 
 	for _, t := range ts {
-		conds["parent_id"] = &listCondition{
-			Query: "data ->> 'parent_id' = ?",
+		conds["task.parent_id"] = &listCondition{
+			Query: "task ->> 'parent_id' = ?",
 			Arg:   t.ID,
 		}
 
@@ -92,12 +109,12 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds listConditions) (
 func (db *DB) ListTasks(ctx context.Context, args *model.TaskListArgs) ([]*model.Task, error) {
 	ts := []*model.Task{}
 	conds := listConditions{
-		"project.is_archived": {Query: "data ->> '$.project.is_archived' = false"},
-		"checked":             {Query: "data ->> 'checked' = false"},
-		"parent_id":           {Query: "data ->> 'parent_id' IS NULL"},
+		"project.is_archived": {Query: "project ->> 'is_archived' = false"},
+		"task.checked":        {Query: "task ->> 'checked' = false"},
+		"task.parent_id":      {Query: "task ->> 'parent_id' IS NULL"},
 	}
 	if args != nil && args.Completed {
-		delete(conds, "checked")
+		delete(conds, "task.checked")
 	}
 
 	return ts, db.withTx(func(tx *sql.Tx) error {
