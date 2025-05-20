@@ -113,8 +113,17 @@ func (db *DB) ListTasks(ctx context.Context, args *model.TaskListArgs) ([]*model
 		"task.checked":        {Query: "task ->> 'checked' = false"},
 		"task.parent_id":      {Query: "task ->> 'parent_id' IS NULL"},
 	}
-	if args != nil && args.Completed {
-		delete(conds, "task.checked")
+	if args != nil {
+		if args.Completed {
+			delete(conds, "task.checked")
+		}
+
+		if args.ProjectID != "" {
+			conds["project.id"] = &listCondition{
+				Query: "project ->> 'id' = ?",
+				Arg:   args.ProjectID,
+			}
+		}
 	}
 
 	return ts, db.withTx(func(tx *sql.Tx) error {
