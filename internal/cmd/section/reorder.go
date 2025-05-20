@@ -12,7 +12,7 @@ import (
 )
 
 func NewReorderCmd(f *util.Factory) *cobra.Command {
-	params := &model.SectionListArgs{}
+	lParams := &model.SectionListArgs{}
 	cmd := &cobra.Command{
 		Use:               "reorder",
 		Short:             "Reorder sections",
@@ -27,17 +27,12 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 			defer f.Close()
 
 			sections := []*sync.Section{}
-			if err := f.CallResult(cmd.Context(), daemon.SectionList, params, &sections); err != nil {
+			if err := f.CallResult(cmd.Context(), daemon.SectionList, lParams, &sections); err != nil {
 				return err
 			}
 
 			rItems := make([]*view.ReorderItem, 0, len(sections))
 			for _, section := range sections {
-				// Skip archived sections
-				if section.IsArchived {
-					continue
-				}
-
 				rItems = append(rItems, &view.ReorderItem{
 					ID:          section.ID,
 					Description: section.Name,
@@ -49,15 +44,15 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 				return err
 			}
 
-			params := &sync.SectionReorderArgs{}
+			rParams := &sync.SectionReorderArgs{}
 			for i, id := range rResult {
-				params.Items = append(params.Items, sync.SectionReorderItem{
+				rParams.Items = append(rParams.Items, sync.SectionReorderItem{
 					ID:           id,
 					SectionOrder: i,
 				})
 			}
 
-			if _, err := f.Call(cmd.Context(), daemon.SectionReorder, params); err != nil {
+			if _, err := f.Call(cmd.Context(), daemon.SectionReorder, rParams); err != nil {
 				return err
 			}
 
@@ -66,7 +61,7 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Filter sections by <project-id>")
+	cmd.Flags().StringVarP(&lParams.ProjectID, "project", "p", "", "Filter sections by <project-id>")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
