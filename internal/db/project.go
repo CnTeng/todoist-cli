@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/CnTeng/todoist-api-go/sync"
+	"github.com/CnTeng/todoist-cli/internal/model"
 )
 
 const (
@@ -19,12 +20,14 @@ const (
 			data = excluded.data`
 	projectDeleteQuery = `DELETE FROM projects WHERE id = ?`
 
-	projectGetQuery  = `SELECT data FROM projects WHERE id = ?`
-	projectListQuery = `
+	projectGetQuery     = `SELECT data FROM projects WHERE id = ?`
+	projectListTemplate = `
 		SELECT
 			data
 		FROM
 			projects
+		WHERE
+			TRUE {{ . }}
 		ORDER BY
 			data ->> 'inbox_project' DESC,
 			data ->> 'is_favorite' DESC,
@@ -59,11 +62,23 @@ func (db *DB) GetProject(ctx context.Context, id string) (*sync.Project, error) 
 	})
 }
 
-func (db *DB) ListProjects(ctx context.Context) ([]*sync.Project, error) {
+func (db *DB) ListProjects(ctx context.Context, args *model.ProjectListArgs) ([]*sync.Project, error) {
+	conds := listConditions{
+		"is_archived": {Query: "data ->> 'is_archived' = false"},
+	}
+	if args != nil && args.Archived {
+		delete(conds, "is_archived")
+	}
+
+	query, qargs, err := db.buildListQuery(projectListTemplate, conds)
+	if err != nil {
+		return nil, err
+	}
+
 	ps := []*sync.Project{}
 	return ps, db.withTx(func(tx *sql.Tx) error {
 		var err error
-		ps, err = listItems[sync.Project](ctx, tx, projectListQuery)
+		ps, err = listItems[sync.Project](ctx, tx, query, qargs...)
 		return err
 	})
 }
