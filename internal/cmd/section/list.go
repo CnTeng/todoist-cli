@@ -37,6 +37,7 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().BoolVarP(&params.Archived, "all", "a", false, "List all sections include archived")
 	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Filter sections by <project-id>")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 

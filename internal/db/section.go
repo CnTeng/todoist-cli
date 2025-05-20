@@ -20,7 +20,7 @@ const (
 			data = excluded.data`
 	sectionDeleteQuery = `DELETE FROM sections WHERE id = ?`
 
-	sectionListQueryTemplate = `
+	sectionListTemplate = `
 		SELECT
 			json_patch(
 				section,
@@ -56,7 +56,7 @@ func (db *DB) storeSection(ctx context.Context, tx *sql.Tx, section *sync.Sectio
 
 func (db *DB) GetSection(ctx context.Context, id string) (*model.Section, error) {
 	sectionGetQuery, args, err := db.buildListQuery(
-		sectionListQueryTemplate,
+		sectionListTemplate,
 		listConditions{"id": {Query: "id = ?", Arg: id}},
 	)
 	if err != nil {
@@ -72,15 +72,22 @@ func (db *DB) GetSection(ctx context.Context, id string) (*model.Section, error)
 }
 
 func (db *DB) ListSections(ctx context.Context, args *model.SectionListArgs) ([]*model.Section, error) {
-	conds := listConditions{}
-	if args != nil && args.ProjectID != "" {
-		conds["project.id"] = &listCondition{
-			Query: "project ->> 'id' = ?",
-			Arg:   args.ProjectID,
+	conds := listConditions{
+		"is_archived": {Query: "section ->> 'is_archived' = false"},
+	}
+	if args != nil {
+		if args.ProjectID != "" {
+			conds["project.id"] = &listCondition{
+				Query: "project ->> 'id' = ?",
+				Arg:   args.ProjectID,
+			}
+		}
+		if args.Archived {
+			delete(conds, "is_archived")
 		}
 	}
 
-	query, qargs, err := db.buildListQuery(sectionListQueryTemplate, conds)
+	query, qargs, err := db.buildListQuery(sectionListTemplate, conds)
 	if err != nil {
 		return nil, err
 	}
