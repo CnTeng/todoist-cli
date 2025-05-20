@@ -20,7 +20,7 @@ const (
 			data = excluded.data`
 	taskDeleteQuery = `DELETE FROM tasks WHERE id = ?`
 
-	taskListQueryTemplate = `
+	taskListTemplate = `
 		SELECT
 			json_patch(
 				task,
@@ -64,8 +64,8 @@ func (db *DB) storeTask(ctx context.Context, tx *sql.Tx, task *sync.Task) error 
 
 func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 	taskGetQuery, args, err := db.buildListQuery(
-		taskListQueryTemplate,
-		listConditions{"id": {Query: "id = ?", Arg: id}},
+		taskListTemplate,
+		filters{"id": {Query: "id = ?", Arg: id}},
 	)
 	if err != nil {
 		return nil, err
@@ -79,8 +79,8 @@ func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 	})
 }
 
-func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds listConditions) ([]*model.Task, error) {
-	query, args, err := db.buildListQuery(taskListQueryTemplate, conds)
+func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, filters filters) ([]*model.Task, error) {
+	query, args, err := db.buildListQuery(taskListTemplate, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -91,12 +91,12 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds listConditions) (
 	}
 
 	for _, t := range ts {
-		conds["task.parent_id"] = &listCondition{
+		filters["task.parent_id"] = &filter{
 			Query: "task ->> 'parent_id' = ?",
 			Arg:   t.ID,
 		}
 
-		subTasks, err := db.listTasks(ctx, tx, conds)
+		subTasks, err := db.listTasks(ctx, tx, filters)
 		if err != nil {
 			return nil, err
 		}
@@ -107,19 +107,28 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, conds listConditions) (
 }
 
 func (db *DB) ListTasks(ctx context.Context, args *model.TaskListArgs) ([]*model.Task, error) {
-	ts := []*model.Task{}
-	conds := listConditions{
+	filters := filters{
 		"project.is_archived": {Query: "project ->> 'is_archived' = false"},
 		"task.checked":        {Query: "task ->> 'checked' = false"},
 		"task.parent_id":      {Query: "task ->> 'parent_id' IS NULL"},
 	}
-	if args != nil && args.Completed {
-		delete(conds, "task.checked")
+	if args != nil {
+		if args.Completed {
+			delete(filters, "task.checked")
+		}
+
+		if args.ProjectID != "" {
+			filters["project.id"] = &filter{
+				Query: "project ->> 'id' = ?",
+				Arg:   args.ProjectID,
+			}
+		}
 	}
 
+	ts := []*model.Task{}
 	return ts, db.withTx(func(tx *sql.Tx) error {
 		var err error
-		ts, err = db.listTasks(ctx, tx, conds)
+		ts, err = db.listTasks(ctx, tx, filters)
 		return err
 	})
 }

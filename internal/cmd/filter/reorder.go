@@ -2,6 +2,7 @@ package filter
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
@@ -28,6 +29,10 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 			if err := f.CallResult(cmd.Context(), daemon.FilterList, nil, &filters); err != nil {
 				return err
 			}
+
+			slices.SortFunc(filters, func(i, j *sync.Filter) int {
+				return i.ItemOrder - j.ItemOrder
+			})
 
 			rItems := make([]*view.ReorderItem, 0, len(filters))
 			for _, filter := range filters {

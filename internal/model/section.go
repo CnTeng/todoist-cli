@@ -8,5 +8,6 @@ type Section struct {
 }
 
 type SectionListArgs struct {
-	ProjectID string
+	ProjectID string `json:"project_id"`
+	Archived  bool   `json:"archived"`
 }

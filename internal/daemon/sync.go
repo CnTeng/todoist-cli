@@ -6,15 +6,10 @@ import (
 
 	"github.com/CnTeng/todoist-api-go/rest"
 	"github.com/CnTeng/todoist-api-go/todoist"
+	"github.com/CnTeng/todoist-cli/internal/model"
 )
 
-type SyncArgs struct {
-	Force bool
-	All   bool
-	Since time.Time
-}
-
-func (d *Daemon) sync(ctx context.Context, args *SyncArgs) error {
+func (d *Daemon) sync(ctx context.Context, args *model.SyncArgs) error {
 	if _, err := d.client.SyncWithAutoToken(ctx, args.Force); err != nil {
 		return err
 	}

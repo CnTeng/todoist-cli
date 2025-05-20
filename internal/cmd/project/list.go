@@ -6,11 +6,13 @@ import (
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/CnTeng/todoist-cli/internal/view"
 	"github.com/spf13/cobra"
 )
 
 func NewListCmd(f *util.Factory) *cobra.Command {
+	params := &model.ProjectListArgs{}
 	cmd := &cobra.Command{
 		Use:               "list",
 		Aliases:           []string{"ls"},
@@ -26,7 +28,7 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 			defer f.Close()
 
 			projects := []*sync.Project{}
-			if err := f.CallResult(cmd.Context(), daemon.ProjectList, nil, &projects); err != nil {
+			if err := f.CallResult(cmd.Context(), daemon.ProjectList, params, &projects); err != nil {
 				return err
 			}
 
@@ -36,6 +38,7 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
+	cmd.Flags().BoolVarP(&params.Archived, "all", "a", false, "List all projects include archived")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
 	return cmd

@@ -27,6 +27,7 @@ func NewCmd(f *util.Factory, group string) *cobra.Command {
 	cmd.AddCommand(NewListCmd(f))
 	cmd.AddCommand(NewModifyCmd(f))
 	cmd.AddCommand(NewRemoveCmd(f))
+	cmd.AddCommand(NewReorderCmd(f))
 
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 

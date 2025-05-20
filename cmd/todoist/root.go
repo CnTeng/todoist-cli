@@ -51,6 +51,7 @@ func newCmd() (*cobra.Command, error) {
 		task.NewMoveCmd(f, taskGroup.ID),
 		task.NewRemoveCmd(f, taskGroup.ID),
 		task.NewReopenCmd(f, taskGroup.ID),
+		task.NewReorderCmd(f, taskGroup.ID),
 
 		// Other resources commands
 		project.NewCmd(f, otherGroup.ID),
