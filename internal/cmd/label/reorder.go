@@ -2,6 +2,7 @@ package label
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
@@ -30,8 +31,13 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 				return err
 			}
 
+			slices.SortFunc(labels, func(i, j *model.Label) int {
+				return i.ItemOrder - j.ItemOrder
+			})
+
 			rItems := make([]*view.ReorderItem, 0, len(labels))
 			for _, l := range labels {
+				// Skip shared labels
 				if l.IsShared {
 					continue
 				}
