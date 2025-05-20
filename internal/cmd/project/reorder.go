@@ -36,8 +36,8 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 
 			rItems := make([]*view.ReorderItem, 0, len(projects))
 			for _, project := range projects {
-				// Skip inbox project and archived projects
-				if project.InboxProject || project.IsArchived {
+				// Skip inbox project
+				if project.InboxProject {
 					continue
 				}
 
