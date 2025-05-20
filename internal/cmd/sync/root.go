@@ -6,11 +6,12 @@ import (
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/spf13/cobra"
 )
 
 func NewCmd(f *util.Factory) *cobra.Command {
-	params := &daemon.SyncArgs{
+	params := &model.SyncArgs{
 		Since: time.Now().AddDate(0, -1, 0),
 	}
 	cmd := &cobra.Command{

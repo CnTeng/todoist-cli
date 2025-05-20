@@ -5,11 +5,12 @@ import (
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/spf13/cobra"
 )
 
 func NewModifyCmd(f *util.Factory) *cobra.Command {
-	params := &daemon.LabelUpdateArgs{}
+	params := &model.LabelUpdateArgs{}
 	cmd := &cobra.Command{
 		Use:     "modify [flags] <label-name>",
 		Aliases: []string{"m"},

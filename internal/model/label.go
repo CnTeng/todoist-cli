@@ -7,3 +7,12 @@ type Label struct {
 	IsShared bool `json:"is_shared"`
 	Count    int  `json:"count"`
 }
+
+type LabelUpdateArgs struct {
+	Name string `json:"name"`
+	Args sync.LabelUpdateArgs
+}
+
+type LabelDeleteArgs struct {
+	Name string `json:"name"`
+}

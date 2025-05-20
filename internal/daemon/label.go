@@ -6,14 +6,10 @@ import (
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-api-go/todoist"
+	"github.com/CnTeng/todoist-cli/internal/model"
 )
 
-type LabelUpdateArgs struct {
-	Name string `json:"name"`
-	Args sync.LabelUpdateArgs
-}
-
-func (d *Daemon) updateLabel(ctx context.Context, args *LabelUpdateArgs) error {
+func (d *Daemon) updateLabel(ctx context.Context, args *model.LabelUpdateArgs) error {
 	label, err := d.db.GetLabel(ctx, args.Name)
 	if err != nil {
 		return fmt.Errorf("label %s not found: %w", args.Name, err)
@@ -37,11 +33,7 @@ func (d *Daemon) updateLabel(ctx context.Context, args *LabelUpdateArgs) error {
 	}
 }
 
-type LabelDeleteArgs struct {
-	Name string `json:"name"`
-}
-
-func (d *Daemon) deleteLabels(ctx context.Context, args []*LabelDeleteArgs) error {
+func (d *Daemon) deleteLabels(ctx context.Context, args []*model.LabelDeleteArgs) error {
 	cmds := make(sync.Commands, len(args))
 
 	for i, arg := range args {

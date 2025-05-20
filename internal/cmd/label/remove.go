@@ -6,6 +6,7 @@ import (
 
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/spf13/cobra"
 )
 
@@ -24,9 +25,9 @@ func NewRemoveCmd(f *util.Factory) *cobra.Command {
 			}
 			defer f.Close()
 
-			params := []*daemon.LabelDeleteArgs{}
+			params := []*model.LabelDeleteArgs{}
 			for _, arg := range args {
-				params = append(params, &daemon.LabelDeleteArgs{Name: arg})
+				params = append(params, &model.LabelDeleteArgs{Name: arg})
 			}
 			if _, err := f.Call(cmd.Context(), daemon.LabelRemove, params); err != nil {
 				return err
