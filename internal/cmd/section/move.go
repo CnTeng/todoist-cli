@@ -18,7 +18,7 @@ func NewMoveCmd(f *util.Factory) *cobra.Command {
 		Long:              "Move a section in Todoist.",
 		Example:           "  todoist section move 6X7FxXvX84jHphx2 --project 9Bw8VQXxpwv56ZY2",
 		Args:              cobra.ExactArgs(1),
-		ValidArgsFunction: f.NewSectionCompletionFunc(1),
+		ValidArgsFunction: f.NewSectionCompletionFunc(1, nil),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
@@ -40,7 +40,7 @@ func NewMoveCmd(f *util.Factory) *cobra.Command {
 	cmd.Flags().AddFlag(projectFlag)
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
-	_ = cmd.RegisterFlagCompletionFunc(projectFlag.Name, f.NewProjectCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc(projectFlag.Name, f.NewProjectCompletionFunc(-1, nil))
 
 	_ = cmd.MarkFlagRequired(projectFlag.Name)
 

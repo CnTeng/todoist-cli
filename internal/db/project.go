@@ -62,14 +62,28 @@ func (db *DB) GetProject(ctx context.Context, id string) (*sync.Project, error) 
 	})
 }
 
-func (db *DB) ListProjects(ctx context.Context, args *model.ProjectListArgs) ([]*sync.Project, error) {
+func parseProjectFilters(args *model.ProjectListArgs) filters {
 	filters := filters{
 		"is_archived": {Query: "data ->> 'is_archived' = false"},
 	}
-	if args != nil && args.Archived {
+
+	if args == nil {
+		return filters
+	}
+
+	if args.All {
 		delete(filters, "is_archived")
 	}
 
+	if args.OnlyArchived {
+		filters["is_archived"] = &filter{Query: "data ->> 'is_archived' = true"}
+	}
+
+	return filters
+}
+
+func (db *DB) ListProjects(ctx context.Context, args *model.ProjectListArgs) ([]*sync.Project, error) {
+	filters := parseProjectFilters(args)
 	query, qargs, err := db.buildListQuery(projectListTemplate, filters)
 	if err != nil {
 		return nil, err

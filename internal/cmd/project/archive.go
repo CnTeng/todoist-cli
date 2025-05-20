@@ -7,6 +7,7 @@ import (
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +18,7 @@ func NewArchiveCmd(f *util.Factory) *cobra.Command {
 		Long:              "Archive projects in Todoist.",
 		Example:           "  todoist project archive 6X7fphhgwcXVGccJ",
 		Args:              cobra.MinimumNArgs(1),
-		ValidArgsFunction: f.NewProjectCompletionFunc(-1),
+		ValidArgsFunction: f.NewProjectCompletionFunc(-1, nil),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
@@ -49,7 +50,7 @@ func NewUnarchiveCmd(f *util.Factory) *cobra.Command {
 		Long:              "Unarchive projects in Todoist.",
 		Example:           "  todoist project unarchive 6X7fphhgwcXVGccJ",
 		Args:              cobra.MinimumNArgs(1),
-		ValidArgsFunction: f.NewProjectCompletionFunc(-1),
+		ValidArgsFunction: f.NewProjectCompletionFunc(-1, &model.ProjectListArgs{OnlyArchived: true}),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

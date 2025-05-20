@@ -1,5 +1,6 @@
 package model
 
 type ProjectListArgs struct {
-	Archived bool `json:"archived"`
+	All          bool `json:"all"`
+	OnlyArchived bool `json:"only_archived"`
 }

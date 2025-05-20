@@ -19,7 +19,7 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		Example: `  todoist project modify 6Jf8VQXxpwv56VQ7 --name Shopping
   todoist project modify 6Jf8VQXxpwv56VQ7 --favorite=false`,
 		Args:              cobra.ExactArgs(1),
-		ValidArgsFunction: f.NewProjectCompletionFunc(1),
+		ValidArgsFunction: f.NewProjectCompletionFunc(1, nil),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

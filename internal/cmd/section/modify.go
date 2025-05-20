@@ -18,7 +18,7 @@ func NewModifyCmd(f *util.Factory) *cobra.Command {
 		Long:              "Modify a section in Todoist.",
 		Example:           "  todoist section modify 6X7FxXvX84jHphx2 --name Supermarket",
 		Args:              cobra.ExactArgs(1),
-		ValidArgsFunction: f.NewSectionCompletionFunc(1),
+		ValidArgsFunction: f.NewSectionCompletionFunc(1, nil),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

@@ -64,7 +64,7 @@ func NewReorderCmd(f *util.Factory) *cobra.Command {
 	cmd.Flags().StringVarP(&lParams.ProjectID, "project", "p", "", "Filter sections by <project-id>")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
-	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1, nil))
 
 	_ = cmd.MarkFlagRequired("project")
 

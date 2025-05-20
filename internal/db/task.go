@@ -79,7 +79,7 @@ func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 	})
 }
 
-func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, filters filters) ([]*model.Task, error) {
+func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, filters filters, recursion bool) ([]*model.Task, error) {
 	query, args, err := db.buildListQuery(taskListTemplate, filters)
 	if err != nil {
 		return nil, err
@@ -90,13 +90,17 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, filters filters) ([]*mo
 		return nil, err
 	}
 
+	if !recursion {
+		return ts, nil
+	}
+
 	for _, t := range ts {
 		filters["task.parent_id"] = &filter{
 			Query: "task ->> 'parent_id' = ?",
 			Arg:   t.ID,
 		}
 
-		subTasks, err := db.listTasks(ctx, tx, filters)
+		subTasks, err := db.listTasks(ctx, tx, filters, recursion)
 		if err != nil {
 			return nil, err
 		}
@@ -106,29 +110,52 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, filters filters) ([]*mo
 	return ts, nil
 }
 
-func (db *DB) ListTasks(ctx context.Context, args *model.TaskListArgs) ([]*model.Task, error) {
+func parseTaskFilters(args *model.TaskListArgs) filters {
 	filters := filters{
 		"project.is_archived": {Query: "project ->> 'is_archived' = false"},
 		"task.checked":        {Query: "task ->> 'checked' = false"},
-		"task.parent_id":      {Query: "task ->> 'parent_id' IS NULL"},
 	}
-	if args != nil {
-		if args.Completed {
-			delete(filters, "task.checked")
-		}
 
-		if args.ProjectID != "" {
-			filters["project.id"] = &filter{
-				Query: "project ->> 'id' = ?",
-				Arg:   args.ProjectID,
-			}
+	if args == nil {
+		return filters
+	}
+
+	if args.Tree {
+		filters["task.parent_id"] = &filter{Query: "task ->> 'parent_id' IS NULL"}
+	}
+
+	if args.ProjectID != "" {
+		filters["project.id"] = &filter{
+			Query: "project ->> 'id' = ?",
+			Arg:   args.ProjectID,
 		}
 	}
+
+	if args.ParentID != "" {
+		filters["task.parent_id"] = &filter{
+			Query: "task ->> 'parent_id' = ?",
+			Arg:   args.ParentID,
+		}
+	}
+
+	if args.All {
+		delete(filters, "task.checked")
+	}
+
+	if args.OnlyCompleted {
+		filters["task.checked"] = &filter{Query: "task ->> 'checked' = true"}
+	}
+
+	return filters
+}
+
+func (db *DB) ListTasks(ctx context.Context, args *model.TaskListArgs) ([]*model.Task, error) {
+	filters := parseTaskFilters(args)
 
 	ts := []*model.Task{}
 	return ts, db.withTx(func(tx *sql.Tx) error {
 		var err error
-		ts, err = db.listTasks(ctx, tx, filters)
+		ts, err = db.listTasks(ctx, tx, filters, args.Tree)
 		return err
 	})
 }

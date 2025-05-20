@@ -71,22 +71,35 @@ func (db *DB) GetSection(ctx context.Context, id string) (*model.Section, error)
 	})
 }
 
-func (db *DB) ListSections(ctx context.Context, args *model.SectionListArgs) ([]*model.Section, error) {
+func parseSectionFilters(args *model.SectionListArgs) filters {
 	filters := filters{
 		"is_archived": {Query: "section ->> 'is_archived' = false"},
 	}
-	if args != nil {
-		if args.ProjectID != "" {
-			filters["project.id"] = &filter{
-				Query: "project ->> 'id' = ?",
-				Arg:   args.ProjectID,
-			}
-		}
-		if args.Archived {
-			delete(filters, "is_archived")
+
+	if args == nil {
+		return filters
+	}
+
+	if args.ProjectID != "" {
+		filters["project.id"] = &filter{
+			Query: "project ->> 'id' = ?",
+			Arg:   args.ProjectID,
 		}
 	}
 
+	if args.All {
+		delete(filters, "is_archived")
+	}
+
+	if args.OnlyArchived {
+		filters["is_archived"] = &filter{Query: "section ->> 'is_archived' = true"}
+	}
+
+	return filters
+}
+
+func (db *DB) ListSections(ctx context.Context, args *model.SectionListArgs) ([]*model.Section, error) {
+	filters := parseSectionFilters(args)
 	query, qargs, err := db.buildListQuery(sectionListTemplate, filters)
 	if err != nil {
 		return nil, err
