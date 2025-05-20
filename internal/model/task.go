@@ -18,6 +18,9 @@ type Task struct {
 }
 
 type TaskListArgs struct {
-	Completed bool   `json:"completed"`
-	ProjectID string `json:"project_id"`
+	Tree          bool   `json:"tree"`
+	ProjectID     string `json:"project_id"`
+	ParentID      string `json:"parent_id"`
+	All           bool   `json:"completed"`
+	OnlyCompleted bool   `json:"only_completed"`
 }

@@ -12,7 +12,7 @@ import (
 )
 
 func NewReorderCmd(f *util.Factory, group string) *cobra.Command {
-	params := &model.TaskListArgs{}
+	params := &model.TaskListArgs{Tree: true}
 	cmd := &cobra.Command{
 		Use:               "reorder",
 		Short:             "Reorder tasks",
@@ -68,11 +68,13 @@ func NewReorderCmd(f *util.Factory, group string) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Filter tasks by <project-id>")
+	cmd.Flags().StringVarP(&params.ParentID, "parent", "P", "", "Filter tasks by parent <task-id>")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
-	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1, nil))
+	_ = cmd.RegisterFlagCompletionFunc("parent", f.NewTaskCompletionFunc(-1, nil))
 
-	_ = cmd.MarkFlagRequired("project")
+	cmd.MarkFlagsOneRequired("project", "parent")
 
 	return cmd
 }

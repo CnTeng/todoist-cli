@@ -38,7 +38,7 @@ func NewAddCmd(f *util.Factory) *cobra.Command {
 	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Assign the section to a specific project by <project-id>")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
-	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1, nil))
 
 	_ = cmd.MarkFlagRequired("project")
 

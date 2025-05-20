@@ -19,7 +19,7 @@ func NewMoveCmd(f *util.Factory, group string) *cobra.Command {
 		Example:           "  todoist move 6X7rM8997g3RQmvh --parent 6X7rf9x6pv2FGghW",
 		GroupID:           group,
 		Args:              cobra.ExactArgs(1),
-		ValidArgsFunction: f.NewTaskCompletionFunc(1),
+		ValidArgsFunction: f.NewTaskCompletionFunc(1, nil),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err
@@ -45,9 +45,9 @@ func NewMoveCmd(f *util.Factory, group string) *cobra.Command {
 	cmd.Flags().AddFlag(projectFlag)
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
-	_ = cmd.RegisterFlagCompletionFunc(sectionFlag.Name, f.NewSectionCompletionFunc(-1))
-	_ = cmd.RegisterFlagCompletionFunc(parentFlag.Name, f.NewTaskCompletionFunc(-1))
-	_ = cmd.RegisterFlagCompletionFunc(projectFlag.Name, f.NewProjectCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc(sectionFlag.Name, f.NewSectionCompletionFunc(-1, nil))
+	_ = cmd.RegisterFlagCompletionFunc(parentFlag.Name, f.NewTaskCompletionFunc(-1, nil))
+	_ = cmd.RegisterFlagCompletionFunc(projectFlag.Name, f.NewProjectCompletionFunc(-1, nil))
 
 	cmd.MarkFlagsOneRequired(sectionFlag.Name, parentFlag.Name, projectFlag.Name)
 	cmd.MarkFlagsMutuallyExclusive(parentFlag.Name, projectFlag.Name)

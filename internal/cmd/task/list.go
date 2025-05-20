@@ -11,7 +11,7 @@ import (
 )
 
 func NewListCmd(f *util.Factory, group string) *cobra.Command {
-	params := &model.TaskListArgs{}
+	params := &model.TaskListArgs{Tree: true}
 	viewConfig := &view.TaskViewConfig{}
 	cmd := &cobra.Command{
 		Use:               "list [flags]",
@@ -39,7 +39,7 @@ func NewListCmd(f *util.Factory, group string) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&params.Completed, "all", "a", false, "List all tasks include completed")
+	cmd.Flags().BoolVarP(&params.All, "all", "a", false, "List all tasks include completed")
 	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Filter tasks by <project-id>")
 
 	cmd.Flags().BoolVarP(&viewConfig.Description, "description", "d", false, "List tasks with description")
@@ -47,7 +47,7 @@ func NewListCmd(f *util.Factory, group string) *cobra.Command {
 
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
-	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1, nil))
 
 	return cmd
 }

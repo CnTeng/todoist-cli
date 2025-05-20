@@ -7,6 +7,7 @@ import (
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
+	"github.com/CnTeng/todoist-cli/internal/model"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,7 @@ func NewReopenCmd(f *util.Factory, group string) *cobra.Command {
 		Example:           "  todoist reopen 6X7rfFVPjhvv84XG",
 		GroupID:           group,
 		Args:              cobra.MinimumNArgs(1),
-		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
+		ValidArgsFunction: f.NewTaskCompletionFunc(-1, &model.TaskListArgs{OnlyCompleted: true}),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

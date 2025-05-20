@@ -18,7 +18,7 @@ func NewCloseCmd(f *util.Factory, group string) *cobra.Command {
 		Example:           "  todoist close 6X7rfFVPjhvv84XG",
 		GroupID:           group,
 		Args:              cobra.MinimumNArgs(1),
-		ValidArgsFunction: f.NewTaskCompletionFunc(-1),
+		ValidArgsFunction: f.NewTaskCompletionFunc(-1, nil),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := f.Dial(); err != nil {
 				return err

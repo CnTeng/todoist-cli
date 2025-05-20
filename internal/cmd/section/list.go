@@ -37,11 +37,11 @@ func NewListCmd(f *util.Factory) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().BoolVarP(&params.Archived, "all", "a", false, "List all sections include archived")
+	cmd.Flags().BoolVarP(&params.All, "all", "a", false, "List all sections include archived")
 	cmd.Flags().StringVarP(&params.ProjectID, "project", "p", "", "Filter sections by <project-id>")
 	cmd.Flags().BoolP("help", "h", false, "Show help for this command")
 
-	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc("project", f.NewProjectCompletionFunc(-1, nil))
 
 	return cmd
 }

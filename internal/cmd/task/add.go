@@ -62,10 +62,10 @@ func NewAddCmd(f *util.Factory, group string) *cobra.Command {
 	_ = cmd.RegisterFlagCompletionFunc(dueFlag.Name, cobra.NoFileCompletions)
 	_ = cmd.RegisterFlagCompletionFunc(durationFlag.Name, cobra.NoFileCompletions)
 	_ = cmd.RegisterFlagCompletionFunc("labels", f.NewLabelCompletionFunc(-1))
-	_ = cmd.RegisterFlagCompletionFunc(parentFlag.Name, f.NewTaskCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc(parentFlag.Name, f.NewTaskCompletionFunc(-1, nil))
 	_ = cmd.RegisterFlagCompletionFunc(priorityFlag.Name, f.NewPriorityCompletionFunc(-1))
-	_ = cmd.RegisterFlagCompletionFunc(projectFlag.Name, f.NewProjectCompletionFunc(-1))
-	_ = cmd.RegisterFlagCompletionFunc(sectionFlag.Name, f.NewSectionCompletionFunc(-1))
+	_ = cmd.RegisterFlagCompletionFunc(projectFlag.Name, f.NewProjectCompletionFunc(-1, nil))
+	_ = cmd.RegisterFlagCompletionFunc(sectionFlag.Name, f.NewSectionCompletionFunc(-1, nil))
 
 	cmd.MarkFlagsMutuallyExclusive(parentFlag.Name, projectFlag.Name)
 	cmd.MarkFlagsMutuallyExclusive(parentFlag.Name, sectionFlag.Name)
