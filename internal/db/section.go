@@ -57,7 +57,7 @@ func (db *DB) storeSection(ctx context.Context, tx *sql.Tx, section *sync.Sectio
 func (db *DB) GetSection(ctx context.Context, id string) (*model.Section, error) {
 	sectionGetQuery, args, err := db.buildListQuery(
 		sectionListTemplate,
-		listConditions{"id": {Query: "id = ?", Arg: id}},
+		filters{"id": {Query: "id = ?", Arg: id}},
 	)
 	if err != nil {
 		return nil, err
@@ -72,22 +72,22 @@ func (db *DB) GetSection(ctx context.Context, id string) (*model.Section, error)
 }
 
 func (db *DB) ListSections(ctx context.Context, args *model.SectionListArgs) ([]*model.Section, error) {
-	conds := listConditions{
+	filters := filters{
 		"is_archived": {Query: "section ->> 'is_archived' = false"},
 	}
 	if args != nil {
 		if args.ProjectID != "" {
-			conds["project.id"] = &listCondition{
+			filters["project.id"] = &filter{
 				Query: "project ->> 'id' = ?",
 				Arg:   args.ProjectID,
 			}
 		}
 		if args.Archived {
-			delete(conds, "is_archived")
+			delete(filters, "is_archived")
 		}
 	}
 
-	query, qargs, err := db.buildListQuery(sectionListTemplate, conds)
+	query, qargs, err := db.buildListQuery(sectionListTemplate, filters)
 	if err != nil {
 		return nil, err
 	}

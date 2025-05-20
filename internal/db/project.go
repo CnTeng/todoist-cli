@@ -63,14 +63,14 @@ func (db *DB) GetProject(ctx context.Context, id string) (*sync.Project, error) 
 }
 
 func (db *DB) ListProjects(ctx context.Context, args *model.ProjectListArgs) ([]*sync.Project, error) {
-	conds := listConditions{
+	filters := filters{
 		"is_archived": {Query: "data ->> 'is_archived' = false"},
 	}
 	if args != nil && args.Archived {
-		delete(conds, "is_archived")
+		delete(filters, "is_archived")
 	}
 
-	query, qargs, err := db.buildListQuery(projectListTemplate, conds)
+	query, qargs, err := db.buildListQuery(projectListTemplate, filters)
 	if err != nil {
 		return nil, err
 	}

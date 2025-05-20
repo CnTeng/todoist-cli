@@ -71,24 +71,24 @@ func (db *DB) withTx(fn func(tx *sql.Tx) error) error {
 	return nil
 }
 
-type listCondition struct {
+type filter struct {
 	Query string
 	Arg   any
 }
 
-type listConditions map[string]*listCondition
+type filters map[string]*filter
 
-func (db *DB) buildListQuery(query string, conds listConditions) (string, []any, error) {
+func (db *DB) buildListQuery(query string, filters filters) (string, []any, error) {
 	t, err := template.New("listQuery").Parse(query)
 	if err != nil {
 		return "", nil, err
 	}
 
-	cb := &strings.Builder{}
+	fb := &strings.Builder{}
 	args := []any{}
-	for _, c := range conds {
-		cb.WriteString(" AND ")
-		cb.WriteString(c.Query)
+	for _, c := range filters {
+		fb.WriteString(" AND ")
+		fb.WriteString(c.Query)
 
 		if c.Arg != nil {
 			args = append(args, c.Arg)
@@ -96,7 +96,7 @@ func (db *DB) buildListQuery(query string, conds listConditions) (string, []any,
 	}
 
 	b := &strings.Builder{}
-	if err := t.Execute(b, cb.String()); err != nil {
+	if err := t.Execute(b, fb.String()); err != nil {
 		return "", nil, err
 	}
 
