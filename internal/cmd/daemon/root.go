@@ -1,6 +1,9 @@
 package daemon
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/CnTeng/todoist-cli/internal/cmd/util"
 	"github.com/CnTeng/todoist-cli/internal/daemon"
 	"github.com/CnTeng/todoist-cli/internal/db"
@@ -16,6 +19,10 @@ func NewCmd(f *util.Factory) *cobra.Command {
 		Args:              cobra.NoArgs,
 		ValidArgsFunction: cobra.NoFileCompletions,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := os.MkdirAll(filepath.Dir(f.DataPath), 0o755); err != nil {
+				return err
+			}
+
 			db, err := db.NewDB(f.DataPath)
 			if err != nil {
 				return err
