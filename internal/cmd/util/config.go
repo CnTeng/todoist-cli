@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"os"
+	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 )
@@ -24,6 +25,10 @@ func (f *Factory) loadConfigFromFile() error {
 		encoder := toml.NewEncoder(buf)
 		encoder.Indent = ""
 		if err := encoder.Encode(f); err != nil {
+			return err
+		}
+
+		if err := os.MkdirAll(filepath.Dir(f.ConfigPath), 0o755); err != nil {
 			return err
 		}
 

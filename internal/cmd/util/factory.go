@@ -28,23 +28,14 @@ type Factory struct {
 	*jrpc2.Client
 }
 
-func NewFactory() (*Factory, error) {
-	configPath, err := xdg.ConfigFile(filepath.Join(appName, configFile))
-	if err != nil {
-		return nil, err
-	}
-	dataPath, err := xdg.DataFile(filepath.Join(appName, dataFile))
-	if err != nil {
-		return nil, err
-	}
-
+func NewFactory() *Factory {
 	return &Factory{
 		DeamonConfig: daemon.DefaultConfig,
 		IconConfig:   view.DefaultIconConfig,
 
-		ConfigPath: configPath,
-		DataPath:   dataPath,
-	}, nil
+		ConfigPath: filepath.Join(xdg.ConfigHome, appName, configFile),
+		DataPath:   filepath.Join(xdg.DataHome, appName, dataFile),
+	}
 }
 
 func (f *Factory) Dial() error {

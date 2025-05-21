@@ -15,15 +15,15 @@ import (
 )
 
 func newCmd() (*cobra.Command, error) {
-	f, err := util.NewFactory()
-	if err != nil {
-		return nil, err
-	}
+	f := util.NewFactory()
 
 	cmd := &cobra.Command{
 		Use:   "todoist <command> [subcommand] [flags]",
 		Short: "A CLI for Todoist",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Parent().Name() == "completion" {
+				return nil
+			}
 			return f.LoadConfig()
 		},
 	}
