@@ -34,7 +34,7 @@
         todoist-cli = final.callPackage ./nix/package.nix { };
       };
 
-      flake.homeManagerModules.default = import ./nix/hm-module.nix self;
+      flake.homeModules.default = import ./nix/hm-module.nix self;
 
       perSystem =
         {
@@ -64,6 +64,8 @@
             CGO_ENABLED = "0";
             shellHook = config.pre-commit.installationScript;
           };
+
+          checks.todoist-cli = import ./nix/check.nix self pkgs.nixosTest;
 
           pre-commit.settings.hooks = {
             commitizen.enable = true;
