@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/model"
@@ -68,7 +69,7 @@ func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 		filters{"id": {Query: "id = ?", Arg: id}},
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build task get query: %w", err)
 	}
 
 	t := &model.Task{}
@@ -82,12 +83,12 @@ func (db *DB) GetTask(ctx context.Context, id string) (*model.Task, error) {
 func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, filters filters, recursion bool) ([]*model.Task, error) {
 	query, args, err := db.buildListQuery(taskListTemplate, filters)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build task list query: %w", err)
 	}
 
 	ts, err := listItems[model.Task](ctx, tx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list tasks: %w", err)
 	}
 
 	if !recursion {
@@ -102,7 +103,7 @@ func (db *DB) listTasks(ctx context.Context, tx *sql.Tx, filters filters, recurs
 
 		subTasks, err := db.listTasks(ctx, tx, filters, recursion)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to list subtasks for task %s: %w", t.ID, err)
 		}
 		t.SubTasks = subTasks
 	}

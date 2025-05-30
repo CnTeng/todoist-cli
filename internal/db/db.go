@@ -29,7 +29,7 @@ func NewDB(path string) (*DB, error) {
 	dbPath := fmt.Sprintf("file:%s?_time_format=sqlite", path)
 	database, err := sql.Open("sqlite", dbPath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	if _, err = database.Exec("PRAGMA foreign_keys = ON"); err != nil {

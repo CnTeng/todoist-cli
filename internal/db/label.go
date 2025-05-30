@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/model"
@@ -55,7 +56,7 @@ func (db *DB) GetLabel(ctx context.Context, name string) (*model.Label, error) {
 	return l, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		l, err = getItem[model.Label](ctx, tx, labelGetQuery, name)
-		return err
+		return fmt.Errorf("failed to get label %s: %w", name, err)
 	})
 }
 
@@ -64,6 +65,6 @@ func (db *DB) ListLabels(ctx context.Context) ([]*model.Label, error) {
 	return ls, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		ls, err = listItems[model.Label](ctx, tx, labelListQuery)
-		return err
+		return fmt.Errorf("failed to list labels: %w", err)
 	})
 }

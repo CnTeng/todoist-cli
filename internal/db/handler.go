@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/rest"
 	"github.com/CnTeng/todoist-api-go/sync"
@@ -39,42 +40,42 @@ func (db *DB) handleSyncResponse(ctx context.Context, resp *sync.SyncResponse) e
 
 		for _, task := range resp.Tasks {
 			if err := db.storeTask(ctx, tx, task); err != nil {
-				return err
+				return fmt.Errorf("failed to store task %s: %w", task.ID, err)
 			}
 		}
 
 		for _, project := range resp.Projects {
 			if err := db.storeProject(ctx, tx, project); err != nil {
-				return err
+				return fmt.Errorf("failed to store project %s: %w", project.ID, err)
 			}
 		}
 
 		for _, section := range resp.Sections {
 			if err := db.storeSection(ctx, tx, section); err != nil {
-				return err
+				return fmt.Errorf("failed to store section %s: %w", section.ID, err)
 			}
 		}
 
 		for _, label := range resp.Labels {
 			if err := db.storeLabel(ctx, tx, label); err != nil {
-				return err
+				return fmt.Errorf("failed to store label %s: %w", label.ID, err)
 			}
 		}
 
 		for _, filter := range resp.Filters {
 			if err := db.storeFilter(ctx, tx, filter); err != nil {
-				return err
+				return fmt.Errorf("failed to store filter %s: %w", filter.ID, err)
 			}
 		}
 
 		if resp.User != nil {
 			if err := db.storeUser(ctx, tx, resp.User); err != nil {
-				return err
+				return fmt.Errorf("failed to store user %s: %w", resp.User.ID, err)
 			}
 		}
 
 		if err := db.storeSyncToken(ctx, tx, resp.SyncToken); err != nil {
-			return err
+			return fmt.Errorf("failed to store sync token: %w", err)
 		}
 
 		return nil
@@ -84,7 +85,7 @@ func (db *DB) handleSyncResponse(ctx context.Context, resp *sync.SyncResponse) e
 
 	for _, syncErr := range resp.SyncStatus {
 		if syncErr != nil {
-			return syncErr
+			return fmt.Errorf("sync error: %w", syncErr)
 		}
 	}
 	return nil
@@ -94,7 +95,7 @@ func (db *DB) handleTaskGetCompletedResponse(ctx context.Context, resp *rest.Tas
 	return db.withTx(func(tx *sql.Tx) error {
 		for _, task := range resp.Tasks {
 			if err := db.storeTask(ctx, tx, task); err != nil {
-				return err
+				return fmt.Errorf("failed to store completed task %s: %w", task.ID, err)
 			}
 		}
 
@@ -106,7 +107,7 @@ func (db *DB) handleProjectGetArchivedResponse(ctx context.Context, resp *rest.P
 	return db.withTx(func(tx *sql.Tx) error {
 		for _, project := range resp.Projects {
 			if err := db.storeProject(ctx, tx, project); err != nil {
-				return err
+				return fmt.Errorf("failed to store archived project %s: %w", project.ID, err)
 			}
 		}
 

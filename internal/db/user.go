@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 )
@@ -45,6 +46,6 @@ func (db *DB) GetUser(ctx context.Context) (*sync.User, error) {
 	return u, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		u, err = getItem[sync.User](ctx, tx, userGetQuery)
-		return err
+		return fmt.Errorf("failed to get user: %w", err)
 	})
 }

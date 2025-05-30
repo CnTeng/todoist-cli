@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/model"
@@ -60,14 +61,14 @@ func (db *DB) GetSection(ctx context.Context, id string) (*model.Section, error)
 		filters{"id": {Query: "id = ?", Arg: id}},
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build section get query: %w", err)
 	}
 
 	s := &model.Section{}
 	return s, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		s, err = getItem[model.Section](ctx, tx, sectionGetQuery, args...)
-		return err
+		return fmt.Errorf("failed to get section %s: %w", id, err)
 	})
 }
 
@@ -102,13 +103,13 @@ func (db *DB) ListSections(ctx context.Context, args *model.SectionListArgs) ([]
 	filters := parseSectionFilters(args)
 	query, qargs, err := db.buildListQuery(sectionListTemplate, filters)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to build section list query: %w", err)
 	}
 
 	ss := []*model.Section{}
 	return ss, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		ss, err = listItems[model.Section](ctx, tx, query, qargs...)
-		return err
+		return fmt.Errorf("failed to list sections: %w", err)
 	})
 }
