@@ -11,7 +11,6 @@ func (d *Daemon) HandleMessage(ctx context.Context, msg ws.Message) error {
 	case ws.Connected:
 		fallthrough
 	case ws.SyncNeeded:
-		d.log.Println("sync needed")
 		if _, err := d.client.SyncWithAutoToken(ctx, false); err != nil {
 			return err
 		}

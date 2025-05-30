@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/CnTeng/todoist-api-go/todoist"
 	"github.com/CnTeng/todoist-api-go/ws"
@@ -26,18 +27,20 @@ var DefaultConfig = &Config{
 }
 
 type Daemon struct {
-	address string
-	client  *todoist.Client
-	db      *db.DB
-	log     *log.Logger
+	address   string
+	client    *todoist.Client
+	db        *db.DB
+	rpcLogger *log.Logger
+	wsLogger  *log.Logger
 }
 
 func NewDaemon(db *db.DB, config *Config) *Daemon {
 	return &Daemon{
-		address: config.Address,
-		client:  todoist.NewClient(http.DefaultClient, config.ApiToken, db),
-		db:      db,
-		log:     log.New(log.Writer(), "daemon: ", log.Flags()),
+		address:   config.Address,
+		client:    todoist.NewClient(http.DefaultClient, config.ApiToken, db),
+		db:        db,
+		rpcLogger: log.New(os.Stderr, "rpc: ", 0),
+		wsLogger:  log.New(os.Stderr, "ws: ", 0),
 	}
 }
 
@@ -61,7 +64,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 		return err
 	}
 
-	ws := ws.NewClient(url, d)
+	ws := ws.NewClient(url, d, d.wsLogger)
 	ws.Listen(ctx)
 
 	lst, err := net.Listen(jrpc2.Network(d.address))
@@ -126,7 +129,7 @@ func (d *Daemon) Serve(ctx context.Context) error {
 
 	return server.Loop(ctx, server.NetAccepter(lst, channel.Line), svc, &server.LoopOptions{
 		ServerOptions: &jrpc2.ServerOptions{
-			Logger: jrpc2.StdLogger(d.log),
+			RPCLog: &rpcLogger{logger: d.rpcLogger},
 		},
 	})
 }
