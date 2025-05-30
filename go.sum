@@ -2,8 +2,8 @@ github.com/BurntSushi/toml v1.5.0 h1:W5quZX/G/csjUnuI8SUYlsHs9M38FC7znL0lIO+DvMg
 github.com/BurntSushi/toml v1.5.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2lLoLwho=
 github.com/CnTeng/table v0.1.6 h1:iYG5v0FIsNiV/2EdO3c/uuEzSiVvofvrW9mI6tUXOhY=
 github.com/CnTeng/table v0.1.6/go.mod h1:bBYiPq2VRea9M/WpkzsfZcNl60m8zW65xk5mxxkgqNE=
-github.com/CnTeng/todoist-api-go v0.2.1 h1:+TQn23cGWIBbZw41NOrD2yMO/sUUmsYW026q0IcfClI=
-github.com/CnTeng/todoist-api-go v0.2.1/go.mod h1:u36OAHzPMxaHFutYUS2goVgxYnVEuDAu4R0z/WgIYTQ=
+github.com/CnTeng/todoist-api-go v0.2.2 h1:bjHildAIZ6a3sQ9NgLrP/WeTLeMo7L/q8xHRm1uM1qA=
+github.com/CnTeng/todoist-api-go v0.2.2/go.mod h1:u36OAHzPMxaHFutYUS2goVgxYnVEuDAu4R0z/WgIYTQ=
 github.com/adrg/xdg v0.5.3 h1:xRnxJXne7+oWDatRhR1JLnvuccuIeCoBu2rtuLqQB78=
 github.com/adrg/xdg v0.5.3/go.mod h1:nlTsY+NNiCBGCK2tpm09vRqfVzrc2fLmXGpBLF0zlTQ=
 github.com/coder/websocket v1.8.13 h1:f3QZdXy7uGVz+4uCJy2nTZyM0yTBj8yANEHhqlXZ9FE=
