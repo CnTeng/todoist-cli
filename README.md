@@ -9,6 +9,9 @@ This repository provides a Go library that implements Todoist API v1.
 ### Pretty Table
 
 #### Table like
+![table](https://github.com/user-attachments/assets/2b7541a6-9acf-486f-b794-3fa03b40a129)
+
+
 
 ## ⭐ Credit
 
