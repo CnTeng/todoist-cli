@@ -25,6 +25,9 @@ func (rl *rpcLogger) LogRequest(ctx context.Context, req *jrpc2.Request) {
 
 	var params json.RawMessage
 	_ = req.UnmarshalParams(&params)
+	if len(params) == 0 {
+		params = json.RawMessage(`null`)
+	}
 
 	rl.logger.Printf("%s for %s (ID %s): %s", reqType, req.Method(), id, params)
 }
