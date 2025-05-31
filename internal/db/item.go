@@ -4,17 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 )
 
 func getItem[T any](ctx context.Context, tx *sql.Tx, query string, args ...any) (*T, error) {
 	var data []byte
 	if err := tx.QueryRowContext(ctx, query, args...).Scan(&data); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get item: %w", err)
 	}
 
 	var item T
 	if err := json.Unmarshal(data, &item); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal item: %w", err)
 	}
 
 	return &item, nil
@@ -31,12 +32,12 @@ func listItems[T any](ctx context.Context, tx *sql.Tx, query string, args ...any
 	for rows.Next() {
 		var data []byte
 		if err := rows.Scan(&data); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to list items: %w", err)
 		}
 
 		var item T
 		if err := json.Unmarshal(data, &item); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to unmarshal item: %w", err)
 		}
 
 		items = append(items, &item)
