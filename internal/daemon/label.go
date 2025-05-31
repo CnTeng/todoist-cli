@@ -28,6 +28,7 @@ func (d *Daemon) updateLabel(ctx context.Context, args *model.LabelUpdateArgs) e
 		})
 		return err
 	} else {
+		args.Args.ID = label.ID
 		_, err := svc.UpdateLabel(ctx, &args.Args)
 		return err
 	}

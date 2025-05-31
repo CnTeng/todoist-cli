@@ -81,7 +81,7 @@ type filters map[string]*filter
 func (db *DB) buildListQuery(query string, filters filters) (string, []any, error) {
 	t, err := template.New("listQuery").Parse(query)
 	if err != nil {
-		return "", nil, err
+		return "", nil, fmt.Errorf("failed to parse query template: %w", err)
 	}
 
 	fb := &strings.Builder{}
@@ -97,7 +97,7 @@ func (db *DB) buildListQuery(query string, filters filters) (string, []any, erro
 
 	b := &strings.Builder{}
 	if err := t.Execute(b, fb.String()); err != nil {
-		return "", nil, err
+		return "", nil, fmt.Errorf("failed to execute query template: %w", err)
 	}
 
 	return b.String(), args, nil

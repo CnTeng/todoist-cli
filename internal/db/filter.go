@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 )
@@ -54,7 +53,7 @@ func (db *DB) GetFilter(ctx context.Context, id string) (*sync.Filter, error) {
 	return f, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		f, err = getItem[sync.Filter](ctx, tx, filterGetQuery, id)
-		return fmt.Errorf("failed to get filter %s: %w", id, err)
+		return err
 	})
 }
 
@@ -63,6 +62,6 @@ func (db *DB) ListFilters(ctx context.Context) ([]*sync.Filter, error) {
 	return fs, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		fs, err = listItems[sync.Filter](ctx, tx, filterListQuery)
-		return fmt.Errorf("failed to list filters: %w", err)
+		return err
 	})
 }

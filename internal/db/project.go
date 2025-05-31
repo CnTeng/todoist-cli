@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 
 	"github.com/CnTeng/todoist-api-go/sync"
 	"github.com/CnTeng/todoist-cli/internal/model"
@@ -59,7 +58,7 @@ func (db *DB) GetProject(ctx context.Context, id string) (*sync.Project, error) 
 	return p, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		p, err = getItem[sync.Project](ctx, tx, projectGetQuery, id)
-		return fmt.Errorf("failed to get project %s: %w", id, err)
+		return err
 	})
 }
 
@@ -87,13 +86,13 @@ func (db *DB) ListProjects(ctx context.Context, args *model.ProjectListArgs) ([]
 	filters := parseProjectFilters(args)
 	query, qargs, err := db.buildListQuery(projectListTemplate, filters)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build project list query: %w", err)
+		return nil, err
 	}
 
 	ps := []*sync.Project{}
 	return ps, db.withTx(func(tx *sql.Tx) error {
 		var err error
 		ps, err = listItems[sync.Project](ctx, tx, query, qargs...)
-		return fmt.Errorf("failed to list projects: %w", err)
+		return err
 	})
 }
