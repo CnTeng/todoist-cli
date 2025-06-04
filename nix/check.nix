@@ -3,7 +3,7 @@ let
   stateVersion = "25.05";
   home-manager = builtins.fetchTarball {
     url = "https://github.com/nix-community/home-manager/archive/release-${stateVersion}.tar.gz";
-    sha256 = "1iqfq5lz3102cp3ryqqqs2hr2bdmwn0mdajprh1ls5h5nsfkigs1";
+    sha256 = "1v1r9igz2n7j65rhqspplsq5zg0g1ba4gbkq4042md4nyaf67j24";
   };
 in
 nixosTest {
