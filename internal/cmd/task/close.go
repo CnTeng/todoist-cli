@@ -33,7 +33,7 @@ func NewCloseCmd(f *util.Factory, group string) *cobra.Command {
 				return err
 			}
 
-			fmt.Printf("Tasks deleted: %s\n", strings.Join(args, ", "))
+			fmt.Printf("Tasks closed: %s\n", strings.Join(args, ", "))
 			return nil
 		},
 	}
