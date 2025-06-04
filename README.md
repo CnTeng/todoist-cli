@@ -23,7 +23,7 @@ A powerful CLI client for Todoist.
 
 #### Autocompletion
 
-- Built on [cobra](https://github.com/spf13/cobra)
+- Built on [cobra](https://github.com/spf13/cobra).
 - Autocompletion for `task`, `project`, `section`, `color`, and more.
 - Supports `bash`, `zsh`, `fish`, and `powershell`.
 
