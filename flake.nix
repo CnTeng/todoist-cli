@@ -1,82 +1,75 @@
 {
-  description = "A Todoist CLI client";
+  description = "A CLI client for Todoist.";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    flake-parts.url = "github:hercules-ci/flake-parts";
 
     git-hooks-nix = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    treefmt = {
-      url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs =
-    inputs@{ self, flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+    inputs@{ self, nixpkgs, ... }:
+    let
       systems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
+      forAllPkgs = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system} system);
+    in
+    {
+      homeModules.default = import ./nix/hm-module.nix self;
 
-      imports = [
-        inputs.git-hooks-nix.flakeModule
-        inputs.treefmt.flakeModule
-      ];
+      packages = forAllPkgs (
+        pkgs: _: {
+          todoist-cli = pkgs.callPackage ./nix/package.nix { };
+        }
+      );
 
-      flake.overlays.default = final: prev: {
-        todoist-cli = final.callPackage ./nix/package.nix { };
-      };
+      checks = forAllPkgs (
+        pkgs: system: {
+          todoist-cli = import ./nix/check.nix self pkgs.nixosTest;
 
-      flake.homeModules.default = import ./nix/hm-module.nix self;
-
-      perSystem =
-        {
-          config,
-          pkgs,
-          system,
-          ...
-        }:
-        {
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            overlays = [ self.overlays.default ];
+          pre-commit-check = inputs.git-hooks-nix.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              commitizen.enable = true;
+              treefmt = {
+                enable = true;
+                package = self.formatter.${system};
+              };
+            };
           };
+        }
+      );
 
-          packages = {
-            default = config.packages.todoist-cli;
-            todoist-cli = pkgs.todoist-cli;
-          };
-
-          devShells.default = pkgs.mkShell {
+      devShells = forAllPkgs (
+        pkgs: system: {
+          default = pkgs.mkShell {
             packages = with pkgs; [
               go
               gotools
-
-              config.treefmt.build.wrapper
             ];
             CGO_ENABLED = "0";
-            shellHook = config.pre-commit.installationScript;
-          };
 
-          checks.todoist-cli = import ./nix/check.nix self pkgs.nixosTest;
-
-          pre-commit.settings.hooks = {
-            commitizen.enable = true;
-            treefmt.enable = true;
+            inherit (self.checks.${system}.pre-commit-check) shellHook;
           };
+        }
+      );
 
-          treefmt.programs = {
-            gofumpt.enable = true;
-            nixfmt.enable = true;
-            prettier.enable = true;
+      formatter = forAllPkgs (
+        pkgs: _:
+        pkgs.nixfmt-tree.override {
+          runtimeInputs = with pkgs; [ gofumpt ];
+          settings.formatter.gofumpt = {
+            command = "gofumpt";
+            excludes = [ "vendor/*" ];
+            includes = [ "*.go" ];
+            options = [ "-w" ];
           };
-        };
+        }
+      );
     };
 }
