@@ -9,7 +9,7 @@ buildGoModule {
 
   src = ../.;
 
-  vendorHash = "sha256-IqmGLYguPXjQcUsU9r37Qc+Eq/BVxZgpXafKlTNGf+0=";
+  vendorHash = "sha256-FMt3SoSkUlQoziuMRzSfJPgfc/jclkfbd5smdP6NIvU=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -28,9 +28,11 @@ buildGoModule {
   '';
 
   meta = {
+    description = "CLI client for Todoist";
     homepage = "https://github.com/CnTeng/todoist-cli";
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ CnTeng ];
     mainProgram = "todoist";
+    maintainers = with lib.maintainers; [ CnTeng ];
+    platforms = lib.platforms.all;
   };
 }
