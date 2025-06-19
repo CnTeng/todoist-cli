@@ -4,8 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    flake-parts.url = "github:hercules-ci/flake-parts";
-
     git-hooks-nix = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -13,46 +11,65 @@
   };
 
   outputs =
-    inputs@{ self, flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+    inputs@{ self, nixpkgs, ... }:
+    let
       systems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
+      forAllPkgs = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system} system);
+    in
+    {
+      homeModules.default = import ./nix/hm-module.nix self;
 
-      imports = [ inputs.git-hooks-nix.flakeModule ];
+      packages = forAllPkgs (
+        pkgs: _: {
+          todoist-cli = pkgs.callPackage ./nix/package.nix { };
+        }
+      );
 
-      flake.homeModules.default = import ./nix/hm-module.nix self;
+      checks = forAllPkgs (
+        pkgs: system: {
+          todoist-cli = import ./nix/check.nix self pkgs.nixosTest;
 
-      perSystem =
-        { config, pkgs, ... }:
-        {
-          devShells.default = pkgs.mkShell {
-            packages = [ pkgs.nvfetcher ];
-            shellHook = config.pre-commit.installationScript;
-          };
-
-          packages.todoist-cli = pkgs.callPackage ./nix/package.nix { };
-
-          checks.todoist-cli = import ./nix/check.nix self pkgs.nixosTest;
-
-          formatter = pkgs.nixfmt-tree.override {
-            settings.formatter.gofumpt = {
-              command = "gofumpt";
-              excludes = [ "vendor/*" ];
-              includes = [ "*.go" ];
-              options = [ "-w" ];
+          pre-commit-check = inputs.git-hooks-nix.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              commitizen.enable = true;
+              treefmt = {
+                enable = true;
+                package = self.formatter.${system};
+              };
             };
-            runtimeInputs = [ pkgs.gofumpt ];
           };
+        }
+      );
 
-          pre-commit.settings.hooks = {
-            treefmt = {
-              enable = true;
-              package = config.formatter;
-            };
-            commitizen.enable = true;
+      devShells = forAllPkgs (
+        pkgs: system: {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              go
+              gotools
+            ];
+            CGO_ENABLED = "0";
+
+            inherit (self.checks.${system}.pre-commit-check) shellHook;
           };
-        };
+        }
+      );
+
+      formatter = forAllPkgs (
+        pkgs: _:
+        pkgs.nixfmt-tree.override {
+          runtimeInputs = with pkgs; [ gofumpt ];
+          settings.formatter.gofumpt = {
+            command = "gofumpt";
+            excludes = [ "vendor/*" ];
+            includes = [ "*.go" ];
+            options = [ "-w" ];
+          };
+        }
+      );
     };
 }
