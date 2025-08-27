@@ -5,11 +5,11 @@
 }:
 buildGoModule {
   pname = "todoist-cli";
-  version = "unstable-2025-05-23";
+  version = "unstable-2025-08-27";
 
   src = ../.;
 
-  vendorHash = "sha256-FMt3SoSkUlQoziuMRzSfJPgfc/jclkfbd5smdP6NIvU=";
+  vendorHash = "sha256-zXFyx30R3AxhRbvZJFyfuSqweC9kxz/THXZqyekUs84=";
 
   nativeBuildInputs = [ installShellFiles ];
 
