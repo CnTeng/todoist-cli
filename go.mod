@@ -7,7 +7,7 @@ require (
 	github.com/CnTeng/table v0.1.7
 	github.com/CnTeng/todoist-api-go v0.2.3
 	github.com/adrg/xdg v0.5.3
-	github.com/creachadair/jrpc2 v1.3.1
+	github.com/creachadair/jrpc2 v1.3.2
 	github.com/fatih/color v1.18.0
 	github.com/jedib0t/go-pretty/v6 v6.6.8
 	github.com/spf13/cobra v1.9.1
@@ -17,7 +17,7 @@ require (
 
 require (
 	github.com/coder/websocket v1.8.13 // indirect
-	github.com/creachadair/mds v0.24.2 // indirect
+	github.com/creachadair/mds v0.25.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
