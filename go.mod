@@ -10,8 +10,8 @@ require (
 	github.com/creachadair/jrpc2 v1.3.2
 	github.com/fatih/color v1.18.0
 	github.com/jedib0t/go-pretty/v6 v6.6.8
-	github.com/spf13/cobra v1.9.1
-	github.com/spf13/pflag v1.0.7
+	github.com/spf13/cobra v1.10.0
+	github.com/spf13/pflag v1.0.8
 	modernc.org/sqlite v1.38.2
 )
 
