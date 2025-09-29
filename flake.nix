@@ -22,8 +22,6 @@
 
       imports = [ inputs.git-hooks-nix.flakeModule ];
 
-      flake.homeModules.default = import ./nix/hm-module.nix self;
-
       perSystem =
         { config, pkgs, ... }:
         {
@@ -35,10 +33,6 @@
             CGO_ENABLED = "0";
             shellHook = config.pre-commit.installationScript;
           };
-
-          packages.todoist-cli = pkgs.callPackage ./nix/package.nix { };
-
-          checks.todoist-cli = import ./nix/check.nix self pkgs.nixosTest;
 
           formatter = pkgs.nixfmt-tree.override {
             settings.formatter.gofumpt = {
