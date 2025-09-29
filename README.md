@@ -81,22 +81,7 @@ Flags:
 Use "todoist [command] --help" for more information about a command.
 ```
 
-### Nix
-
-Install with home-manager:
-
-```nix
-{
-  programs.todoist-cli = {
-    enable = true;
-    settings = {
-      daemon.api_token_file = "/run/secrets/your-todoist-api-token";
-    };
-  };
-}
-```
-
-### Other
+### Install
 
 Install via Go:
 
