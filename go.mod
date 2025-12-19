@@ -3,7 +3,7 @@ module github.com/CnTeng/todoist-cli
 go 1.24.6
 
 require (
-	github.com/BurntSushi/toml v1.5.0
+	github.com/BurntSushi/toml v1.6.0
 	github.com/CnTeng/table v0.1.7
 	github.com/CnTeng/todoist-api-go v0.2.4
 	github.com/adrg/xdg v0.5.3
