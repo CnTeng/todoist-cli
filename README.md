@@ -1,5 +1,8 @@
 # todoist-cli
 
+> [!WARNING]
+> This project has been archived since I no longer use Todoist.
+
 [![Go][go-shield]][go-url]
 
 A powerful CLI client for Todoist.
